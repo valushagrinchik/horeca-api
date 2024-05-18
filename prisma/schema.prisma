@@ -1,0 +1,94 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ProfileType {
+  Provider
+  Horeca
+}
+
+enum UserRole {
+  Admin
+  Horeca
+  Provider
+}
+
+model User {
+  id    Int     @id @default(autoincrement())
+
+  email String  @unique
+  password String
+  // Название компании
+  name  String
+  // ИНН
+  tin String
+
+  role UserRole
+
+  phone String?
+  profile Profile?
+
+  @@map("users")
+}
+
+model Profile {
+  id    Int     @id @default(autoincrement())
+  user User   @relation(fields: [userId], references: [id])
+  userId Int @unique @map("user_id")
+
+  profileType ProfileType @map("profile_type")
+
+  // Provider 
+  minOrderAmount Int? @map("min_order_amount")
+  deliveryMethods String[] @map("delivery_methods")
+  categories String[] 
+
+  // Horeca
+  info String?
+  addresses Address[]
+
+  @@map("profiles")
+}
+
+model Address {
+    id    Int     @id @default(autoincrement())
+    address String
+
+    profile Profile   @relation(fields: [profileId], references: [id])
+    profileId Int @unique @map("profile_id")
+
+    // Monday
+    moFrom String? @map("mo_from")
+    moTo String? @map("mo_to")
+    // Tuesday
+    tuFrom String? @map("tu_from")
+    tuTo String? @map("tu_to")
+    // Wednesday
+    weFrom String? @map("we_from")
+    weTo String? @map("we_to")
+    // Thursday
+    thFrom String? @map("th_from")
+    thTo String? @map("th_to")
+    // Friday
+    frFrom String? @map("fr_from")
+    frTo String? @map("fr_to")
+    // Saturday
+    saFrom String? @map("sa_from")
+    saTo String? @map("sa_to")
+    // Sunday
+    suFrom String? @map("su_from")
+    suTo String? @map("su_to")
+
+    @@map("addresses")
+}
