@@ -25,10 +25,11 @@ export class RolesGuard implements CanActivate {
 
         const user = await this.getUserFromToken(token)
 
-        const roles = this.reflector.get<UserRole>(ROLES_KEY, context.getHandler())
+        const roles =
+            this.reflector.getAllAndOverride<UserRole[]>(ROLES_KEY, [context.getHandler(), context.getClass()]) || []
 
         if (!roles.includes(user.role)) {
-            throw new ForbiddenException({ code: 403 })
+            throw new ForbiddenException()
         }
 
         return true

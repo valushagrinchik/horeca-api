@@ -5,6 +5,8 @@ import { ApiExtraModels, ApiTags } from '@nestjs/swagger'
 import { HorecaProfileDto } from './dto/horeca-profile.dto'
 import { ProviderProfileDto } from './dto/provider-profile.dto'
 import { LoginUserDto } from './dto/login-user.dto'
+import { AuthResultDto } from './dto/auth.result.dto'
+import { DockPost } from 'src/utils/swagger/decorators/swagger.decorators'
 
 @Controller('users')
 @ApiTags('User')
@@ -12,6 +14,7 @@ export class UsersController {
     constructor(private readonly usersService: UsersService) {}
 
     @Post()
+    @DockPost(RegistrateUserDto, AuthResultDto)
     @ApiExtraModels(HorecaProfileDto, ProviderProfileDto)
     async registrate(@Body() dto: RegistrateUserDto) {
         return this.usersService.registrate(dto)

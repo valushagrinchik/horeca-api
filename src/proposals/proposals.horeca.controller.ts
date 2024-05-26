@@ -12,7 +12,7 @@ export class ProposalsHorecaController {
     constructor(private readonly service: ProposalsHorecaService) {}
 
     @Post()
-    async registrate(@Body() dto: CreateProposalHorecaDto) {
+    async create(@Body() dto: CreateProposalHorecaDto) {
         return this.service.create(dto)
     }
 }

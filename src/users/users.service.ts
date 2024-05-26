@@ -11,9 +11,11 @@ import { ErrorCodeEnum } from 'src/utils/error.code.enum'
 
 @Injectable()
 export class UsersService {
+
     constructor(private prisma: PrismaService, private authService: AuthService) {}
+
     async registrate(dto: RegistrateUserDto) {
-        return this.prisma.user.create({
+        const user = await this.prisma.user.create({
             data: {
                 email: dto.email,
                 password: await bcrypt.hash(dto.password, 10),
@@ -29,7 +31,17 @@ export class UsersService {
                             ? {
                                   addresses: {
                                       createMany: {
-                                          data: dto.profile.addresses as Prisma.AddressCreateManyProfileInput[],
+                                          data: dto.profile.addresses.map(address => {
+                                            return {
+                                                address: address.address,
+                                                ...address.weekdays.reduce((prev, weekday) => {
+                                                    prev[weekday+'From'] = address[weekday+'From']
+                                                    prev[weekday+'To'] = address[weekday+'To']
+                                                    return prev
+                                                }, {})
+                                            }
+                                            
+                                          }) as Prisma.AddressCreateManyProfileInput[],
                                       },
                                   },
                               }
@@ -38,6 +50,7 @@ export class UsersService {
                 },
             },
         })
+        return this.authService.login(user)
     }
 
     

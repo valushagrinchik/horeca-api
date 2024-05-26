@@ -15,6 +15,7 @@ import {
     IsString,
     IsUrl,
     MaxLength,
+    MinLength,
 } from 'class-validator'
 
 import { ErrorValidationCodeEnum } from './error.validation.code.enum'

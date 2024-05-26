@@ -1,63 +1,86 @@
+import { Type } from 'class-transformer'
+import { ArrayMinSize, ValidateIf, ValidateNested } from 'class-validator'
+import { Weekday } from 'src/utils/constants'
 import { TypeValidate, Validate } from 'src/utils/validation/validate.decotators'
 
 export class Address {
     @Validate(TypeValidate.STRING)
     address: string
 
+    @Validate(TypeValidate.ARRAY, { type: [Weekday], enum: Weekday, enumName: 'Weekday' })
+    weekdays: Weekday[]
+
     // Monday
-    @Validate(TypeValidate.STRING, { required: true })
+    @Validate(TypeValidate.STRING)
+    @ValidateIf(o => Array.from(o.weekdays).includes(Weekday.mo))
     moFrom?: string
 
-    @Validate(TypeValidate.STRING, { required: true })
+    @Validate(TypeValidate.STRING)
+    @ValidateIf(o => Array.from(o.weekdays).includes(Weekday.mo))
     moTo?: string
 
     // Tuesday
-    @Validate(TypeValidate.STRING, { required: true })
+    @Validate(TypeValidate.STRING)
+    @ValidateIf(o => Array.from(o.weekdays).includes(Weekday.tu))
     tuFrom?: string
 
-    @Validate(TypeValidate.STRING, { required: true })
+    @Validate(TypeValidate.STRING)
+    @ValidateIf(o => Array.from(o.weekdays).includes(Weekday.tu))
     tuTo?: string
 
     // Wednesday
-    @Validate(TypeValidate.STRING, { required: true })
+    @Validate(TypeValidate.STRING)
+    @ValidateIf(o => Array.from(o.weekdays).includes(Weekday.we))
     weFrom?: string
 
-    @Validate(TypeValidate.STRING, { required: true })
+    @Validate(TypeValidate.STRING)
+    @ValidateIf(o => Array.from(o.weekdays).includes(Weekday.we))
     weTo?: string
 
     // Thursday
-    @Validate(TypeValidate.STRING, { required: true })
+    @Validate(TypeValidate.STRING)
+    @ValidateIf(o => Array.from(o.weekdays).includes(Weekday.th))
     thFrom?: string
 
-    @Validate(TypeValidate.STRING, { required: true })
+    @Validate(TypeValidate.STRING)
+    @ValidateIf(o => Array.from(o.weekdays).includes(Weekday.th))
     thTo?: string
 
     // Friday
-    @Validate(TypeValidate.STRING, { required: true })
+    @Validate(TypeValidate.STRING)
+    @ValidateIf(o => Array.from(o.weekdays).includes(Weekday.fr))
     frFrom?: string
 
-    @Validate(TypeValidate.STRING, { required: true })
+    @Validate(TypeValidate.STRING)
+    @ValidateIf(o => Array.from(o.weekdays).includes(Weekday.fr))
     frTo?: string
 
     // Saturday
-    @Validate(TypeValidate.STRING, { required: true })
+    @Validate(TypeValidate.STRING)
+    @ValidateIf(o => Array.from(o.weekdays).includes(Weekday.sa))
     saFrom?: string
 
-    @Validate(TypeValidate.STRING, { required: true })
+    @Validate(TypeValidate.STRING)
+    @ValidateIf(o => Array.from(o.weekdays).includes(Weekday.sa))
     saTo?: string
 
     // Sunday
-    @Validate(TypeValidate.STRING, { required: true })
+    @Validate(TypeValidate.STRING)
+    @ValidateIf(o => Array.from(o.weekdays).includes(Weekday.su))
     suFrom?: string
 
-    @Validate(TypeValidate.STRING, { required: true })
+    @Validate(TypeValidate.STRING)
+    @ValidateIf(o => Array.from(o.weekdays).includes(Weekday.su))
     suTo?: string
 }
 
 export class HorecaProfileDto {
-    @Validate(TypeValidate.STRING)
+    @Validate(TypeValidate.STRING, {required: false})
     info: string
 
-    @Validate(TypeValidate.OBJECT, { type: [Address] })
+    @Validate(TypeValidate.ARRAY, {minItems: 1, type: [Address]})
+    @ValidateNested({ each: true })
+    @Type(() => Address)
+    @ArrayMinSize(1)
     addresses: Address[]
 }

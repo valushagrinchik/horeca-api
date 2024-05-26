@@ -12,7 +12,7 @@ export class ProposalsProviderController {
     constructor(private readonly service: ProposalsProviderService) {}
 
     @Post()
-    async registrate(@Body() dto: CreateProposalProviderDto) {
+    async create(@Body() dto: CreateProposalProviderDto) {
         return this.service.create(dto)
     }
 }

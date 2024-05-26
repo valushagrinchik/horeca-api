@@ -1,3 +1,4 @@
+
 export const CategoryLabels: Record<Categories, string> = {
     alcoholicDrinks: 'Алкогольные напитки',
     grocerySpicesSeasonings: 'Бакалея, специи, приправы',
@@ -57,4 +58,14 @@ export enum DeliveryMethods {
     deliveryBySupplier = 'deliveryBySupplier',
     sameDayDelivery = 'sameDayDelivery',
     weekends = 'weekends'
+}
+
+export enum Weekday {
+	mo = 'mo',
+	tu = 'tu',
+	we = 'we',
+	th = 'th',
+	fr = 'fr',
+	sa = 'sa',
+	su = 'su'
 }
