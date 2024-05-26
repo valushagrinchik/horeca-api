@@ -13,6 +13,7 @@ export class ProposalsHorecaController {
 
     @Post()
     async create(@Body() dto: CreateProposalHorecaDto) {
-        return this.service.create(dto)
+        // return this.service.create(dto)
+        return { status: 'ok' }
     }
 }
