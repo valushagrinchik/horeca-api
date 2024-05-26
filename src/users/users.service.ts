@@ -15,6 +15,9 @@ export class UsersService {
     constructor(private prisma: PrismaService, private authService: AuthService) {}
 
     async registrate(dto: RegistrateUserDto) {
+        if(!dto.GDPRApproved) {
+           throw new BadRequestException(new ErrorDto(ErrorCodeEnum.GDPR_IS_NOT_APPROVED))
+        }
         const user = await this.prisma.user.create({
             data: {
                 email: dto.email,

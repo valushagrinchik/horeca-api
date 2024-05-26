@@ -13,6 +13,9 @@ export class RegistrateUserDto {
     @Validate(TypeValidate.STRING)
     tin: string
 
+    @Validate(TypeValidate.BOOLEAN)
+    GDPRApproved: boolean
+
     @Validate(TypeValidate.STRING)
     email: string
 
