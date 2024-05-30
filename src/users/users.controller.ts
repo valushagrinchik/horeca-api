@@ -12,7 +12,7 @@ import { AuthInfoDto } from './dto/auth.info.dto'
 import { AuthParamDecorator } from 'src/utils/auth/decorators/auth.param.decorator'
 
 @Controller('users')
-@ApiTags('User')
+@ApiTags('Users')
 @AuthUser(UserRole.Provider, UserRole.Horeca)
 export class UsersController {
     constructor(private readonly usersService: UsersService) {}
