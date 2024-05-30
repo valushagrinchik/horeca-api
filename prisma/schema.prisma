@@ -65,8 +65,8 @@ model Address {
     id    Int     @id @default(autoincrement())
     address String
 
-    profile Profile   @relation(fields: [profileId], references: [id])
-    profileId Int @unique @map("profile_id")
+    profile Profile @relation(fields: [profileId], references: [id])
+    profileId Int @map("profile_id")
 
     // Monday
     moFrom String? @map("mo_from")

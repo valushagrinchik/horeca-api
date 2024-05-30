@@ -1,9 +1,11 @@
-import { Type } from 'class-transformer'
-import { ArrayMinSize, ValidateIf, ValidateNested } from 'class-validator'
-import { Weekday } from 'src/utils/constants'
-import { TypeValidate, Validate } from 'src/utils/validation/validate.decotators'
+import { ValidateIf } from "class-validator"
+import { Weekday } from "src/utils/constants"
+import { TypeValidate, Validate } from "src/utils/validation/validate.decotators"
 
 export class Address {
+    @Validate(TypeValidate.STRING, {required: false})
+    id: number
+
     @Validate(TypeValidate.STRING)
     address: string
 
@@ -72,15 +74,4 @@ export class Address {
     @Validate(TypeValidate.STRING)
     @ValidateIf(o => Array.from(o.weekdays).includes(Weekday.su))
     suTo?: string
-}
-
-export class HorecaProfileDto {
-    @Validate(TypeValidate.STRING, {required: false})
-    info: string
-
-    @Validate(TypeValidate.ARRAY, {minItems: 1, type: [Address]})
-    @ValidateNested({ each: true })
-    @Type(() => Address)
-    @ArrayMinSize(1)
-    addresses: Address[]
 }

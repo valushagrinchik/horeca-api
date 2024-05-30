@@ -9,7 +9,7 @@ import { User } from '@prisma/client'
 // import { ErrorCodeEnum } from '../../helpers/enum/error.code.enum'
 
 @Injectable()
-export class AuthService {
+export class AuthorizationService {
     constructor(
         private jwtService: JwtService,
         private configService: ConfigService,

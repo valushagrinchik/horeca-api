@@ -2,7 +2,7 @@ import { Body, Controller, Post } from "@nestjs/common";
 import { ApiTags } from "@nestjs/swagger";
 import { CreateProposalHorecaDto } from "./dto/create-proposal.horeca.dto";
 import { ProposalsHorecaService } from "./proposals.horeca.service";
-import { AuthUser } from "src/utils/auth/decorators/auth.decorators";
+import { AuthUser } from "src/utils/auth/decorators/auth.decorator";
 import { UserRole } from "@prisma/client";
 
 @AuthUser(UserRole.Horeca)

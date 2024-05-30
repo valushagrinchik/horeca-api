@@ -1,6 +1,6 @@
 import { Body, Controller, Post } from "@nestjs/common";
 import { ApiTags } from "@nestjs/swagger";
-import { AuthUser } from "src/utils/auth/decorators/auth.decorators";
+import { AuthUser } from "src/utils/auth/decorators/auth.decorator";
 import { UserRole } from "@prisma/client";
 import { CreateProposalProviderDto } from "./dto/create-proposal.provider.dto";
 import { ProposalsProviderService } from "./proposals.provider.service";

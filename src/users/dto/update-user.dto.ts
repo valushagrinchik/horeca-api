@@ -1,37 +1,20 @@
 import { getSchemaPath } from '@nestjs/swagger'
 import { ProfileType } from '@prisma/client'
-import { TypeValidate, Validate, ValidateEnum } from 'src/utils/validation/validate.decotators'
+import { TypeValidate, Validate } from 'src/utils/validation/validate.decotators'
 import { ValidateIf, ValidateNested } from 'class-validator'
 import { Type } from 'class-transformer'
-import { CreateProviderProfileDto } from './provider/create-provider-profile.dto'
 import { CreateHorecaProfileDto } from './horeca/create-horeca-profile.dto'
+import { CreateProviderProfileDto } from './provider/create-provider-profile.dto'
 
-export class RegistrateUserDto {
+export class UpdateUserDto {
     @Validate(TypeValidate.STRING)
     name: string
-
-    @Validate(TypeValidate.STRING)
-    tin: string
-
-    @Validate(TypeValidate.BOOLEAN)
-    GDPRApproved: boolean
 
     @Validate(TypeValidate.STRING)
     email: string
 
     @Validate(TypeValidate.STRING)
     phone: string
-
-    @Validate(TypeValidate.STRING)
-    password: string
-
-    @Validate(TypeValidate.STRING)
-    @ValidateIf(o => o.password !== o.repeatPassword)
-    repeatPassword: string
-
-    @Validate(TypeValidate.STRING)
-    @ValidateEnum(ProfileType, { type: ProfileType, enum: ProfileType, enumName: 'ProfileType' })
-    profileType: ProfileType
 
     @Validate(TypeValidate.OBJECT, {
         oneOf: [{ $ref: getSchemaPath(CreateHorecaProfileDto) }, { $ref: getSchemaPath(CreateProviderProfileDto) }],
