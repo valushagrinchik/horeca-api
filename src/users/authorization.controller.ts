@@ -21,6 +21,7 @@ export class AuthorizationController {
     }
 
     @Post('login')
+    @DockPost(LoginUserDto, AuthResultDto)
     async login(@Body() loginDto: LoginUserDto) {
         return this.usersService.login(loginDto)
     }
