@@ -19,7 +19,11 @@ async function bootstrap() {
     const { httpAdapter } = app.get(HttpAdapterHost);
     app.useGlobalFilters(new PrismaClientExceptionFilter(httpAdapter));
     app.useGlobalInterceptors( new ClassSerializerInterceptor(app.get(Reflector)))
-
+    app.enableCors({
+        origin: '*', // или ваш конкретный домен
+        methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+        allowedHeaders: 'Content-Type, Accept, Authorization',
+    })
 
     const config = new DocumentBuilder()
         .setTitle('HoReCa API')
