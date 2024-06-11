@@ -11,35 +11,101 @@ import { ProductResponse } from './dto/product.response.dto'
 export class ProductsProviderService {
     constructor(private prisma: PrismaService) {}
 
-    async create(auth: AuthInfoDto, dto: CreateProductProviderDto) {
-        const profile = await this.prisma.profile.findUnique({where: { userId:  auth.id }})
-        const product = await this.prisma.product.create({ data: {...dto,  profile: {
-            connect: { id: profile.id}
-        }} })
+    async create(auth: AuthInfoDto, {imageIds, ...dto}: CreateProductProviderDto) {
+        const profile = await this.prisma.profile.findUnique({ where: { userId: auth.id } })
+        const product = await this.prisma.product.create({
+            data: {
+                ...dto,
+                profile: {
+                    connect: { id: profile.id },
+                },
+                ...(imageIds
+                    ? {
+                          productImage: {
+                              createMany: {
+                                  data: imageIds.map(imageId => ({ imageId })),
+                              },
+                          },
+                      }
+                    : {}),
+            },
+            include: {
+                productImage: {
+                    include: {
+                        image: true,
+                    },
+                },
+            },
+        })
         return new ProductResponse(product)
     }
 
     async findAll(auth: AuthInfoDto) {
-        const profile = await this.prisma.profile.findUnique({where: { userId:  auth.id }})
+        const profile = await this.prisma.profile.findUnique({ where: { userId: auth.id } })
 
-        const products = await this.prisma.product.findMany({ where: {
-            profileId: profile.id
-        }})
+        const products = await this.prisma.product.findMany({
+            where: {
+                profileId: profile.id,
+            },
+            include: {
+                productImage: {
+                    include: {
+                        image: true,
+                    },
+                },
+            },
+        })
 
         return products.map(p => new ProductResponse(p))
     }
 
     async get(auth: AuthInfoDto, id: number) {
-        const product = await this.prisma.product.findUnique({ where: { id } })
+        const product = await this.prisma.product.findUnique({
+            where: { id },
+            include: {
+                productImage: {
+                    include: {
+                        image: true,
+                    },
+                },
+            },
+        })
         return new ProductResponse(product)
     }
 
-    async update(auth: AuthInfoDto, id: number, dto: UpdateProductProviderDto) {
-        const product = await this.prisma.product.findUnique({ where: { id } })
+    async update(auth: AuthInfoDto, id: number, {imageIds, ...dto}: UpdateProductProviderDto) {
+        const product = await this.prisma.product.findUnique({
+            where: { id },
+            include: {
+                productImage: true,
+            },
+        })
         if (!product) {
             throw new BadRequestException(new ErrorDto(ErrorCodeEnum.ITEM_NOT_FOUND))
         }
-        const updated = await this.prisma.product.update({ where: { id }, data: dto })
+        const updated = await this.prisma.product.update({
+            where: { id },
+            data: {
+                ...dto,
+                productImage: {
+                    deleteMany: product.productImage.map(pi => ({ imageId: pi.imageId })),
+                    ...(imageIds
+                        ? {
+                              createMany: {
+                                  data: imageIds.map(imageId => ({ imageId })),
+                              },
+                          }
+                        : {}),
+                },
+            },
+            include: {
+                productImage: {
+                    include: {
+                        image: true,
+                    },
+                },
+            },
+        })
         return new ProductResponse(updated)
     }
 

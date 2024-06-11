@@ -5,6 +5,7 @@ import { ProposalsModule } from './proposals/proposals.module'
 import { ProductsModule } from './products/products.module'
 import { MailModule } from './mail/mail.module'
 import { ScheduleModule } from '@nestjs/schedule'
+import { UploadsModule } from './uploads/uploads.module'
 
 @Module({
     imports: [
@@ -15,6 +16,7 @@ import { ScheduleModule } from '@nestjs/schedule'
         ScheduleModule.forRoot(),
 
         // Services
+        UploadsModule,
         UsersModule,
         ProposalsModule,
         ProductsModule,

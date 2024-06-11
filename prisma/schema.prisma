@@ -37,19 +37,21 @@ enum CronStatus {
   Error
   Failed
 }
+
 enum CronType {
-    Mail
+  Mail
 }
+
 model User {
   id Int @id @default(autoincrement())
 
-  email    String @unique
-  password String
+  email          String @unique
+  password       String
   activationLink String @default(uuid()) @map("activation_link")
   // Название компании
-  name     String
+  name           String
   // ИНН
-  tin      String
+  tin            String
 
   role UserRole
 
@@ -57,8 +59,8 @@ model User {
   profile Profile?
   mails   Mail[]
 
-  createdAt  DateTime   @default(now()) @map("created_at")
-  updatedAt  DateTime   @default(now()) @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
   @@map("users")
 }
@@ -71,17 +73,17 @@ model Profile {
   profileType ProfileType @map("profile_type")
 
   // Provider 
-  minOrderAmount  Int?     @map("min_order_amount")
-  deliveryMethods String[] @map("delivery_methods")
-  categories String[] 
-  products Product[]
+  minOrderAmount  Int?      @map("min_order_amount")
+  deliveryMethods String[]  @map("delivery_methods")
+  categories      String[]
+  products        Product[]
 
   // Horeca
   info      String?
   addresses Address[]
 
-  createdAt  DateTime   @default(now()) @map("created_at")
-  updatedAt  DateTime   @default(now()) @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
   @@map("profiles")
 }
@@ -115,28 +117,56 @@ model Address {
   suFrom String? @map("su_from")
   suTo   String? @map("su_to")
 
-    @@map("addresses")
+  @@map("addresses")
 }
 
 model Product {
-    id    Int     @id @default(autoincrement())
+  id Int @id @default(autoincrement())
 
-    profile Profile @relation(fields: [profileId], references: [id])
-    profileId Int @unique @map("profile_id")
+  profile   Profile @relation(fields: [profileId], references: [id])
+  profileId Int @map("profile_id")
 
-    category String
-    name String
-    description String 
-    producer String
-    cost Float
-    count Int
-    packagingType ProductPackagingType @map("packaging_type")
+  category      String
+  name          String
+  description   String
+  producer      String
+  cost          Float
+  count         Int
+  packagingType ProductPackagingType @map("packaging_type")
 
-    createdAt  DateTime   @default(now()) @map("created_at")
-    updatedAt  DateTime   @default(now()) @updatedAt @map("updated_at")
+  productImage ProductImages[]
 
-    @@map("products")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@map("products")
 }
+
+model ProductImages {
+  id Int @id @default(autoincrement())
+
+  product   Product @relation(fields: [productId], references: [id])
+  productId Int     @map("product_id")
+
+  image   Uploads? @relation(fields: [imageId], references: [id])
+  imageId Int?     @unique
+
+  @@map("products_images")
+}
+
+model Uploads {
+  id       Int    @id @default(autoincrement())
+  // originalname
+  name     String
+  mimetype String
+  path     String
+  size     Int
+
+  productImage ProductImages?
+
+  @@map("uploads")
+}
+
 
 model Mail {
   id     Int  @id @default(autoincrement())
@@ -148,48 +178,48 @@ model Mail {
   template String
   context  Json
 
-  logs  MailLog[]
+  logs MailLog[]
 
-  createdAt  DateTime   @default(now()) @map("created_at")
-  updatedAt  DateTime   @default(now()) @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
   @@map("mails")
 }
 
 model MailLog {
-  id     Int  @id @default(autoincrement())
+  id Int @id @default(autoincrement())
 
   mail   Mail @relation(fields: [mailId], references: [id])
   mailId Int  @map("mail_id")
 
   message String
 
-  createdAt  DateTime   @default(now()) @map("created_at")
-  updatedAt  DateTime   @default(now()) @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
   @@map("mail_logs")
 }
 
 model CronTask {
-  id  Int  @id @default(autoincrement())
+  id Int @id @default(autoincrement())
 
   sourceType CronType @map("source_type")
-  sourceId Int @map("source_id")
+  sourceId   Int      @map("source_id")
 
   cronStatus CronStatus @map("cron_status")
 
   cronTries Int @default(0) @map("cron_tries")
 
   start  DateTime?
-  finish  DateTime?
+  finish DateTime?
 
   proof String?
-  pid Int @default(0)
+  pid   Int     @default(0)
 
   source String?
 
-  createdAt  DateTime   @default(now()) @map("created_at")
-  updatedAt  DateTime   @default(now()) @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
   @@map("cron_tasks")
 }

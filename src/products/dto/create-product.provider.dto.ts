@@ -22,4 +22,7 @@ export class CreateProductProviderDto {
 
     @Validate(TypeValidate.STRING)
     packagingType: ProductPackagingType
+
+    @Validate(TypeValidate.ARRAY, {type: [Number]})
+    imageIds: number[]
 }

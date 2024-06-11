@@ -1,0 +1,59 @@
+import {
+  Controller,
+  Get,
+  Param,
+  Post,
+  Delete,
+  StreamableFile,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
+import { UploadsService } from './uploads.service';
+import { FileInterceptor } from '@nestjs/platform-express/multer';
+import { createReadStream } from 'fs';
+import { join } from 'path';
+import { Upload } from './entities/Upload.entity';
+import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
+import { AuthUser } from 'src/utils/auth/decorators/auth.decorator';
+import { UserRole } from '@prisma/client';
+import { DockGet, DockPost } from 'src/utils/swagger/decorators/swagger.decorators';
+
+@AuthUser(UserRole.Provider)
+@Controller('uploads')
+@ApiTags('Uploads')
+export class UploadsController {
+  constructor(private readonly uploadsService: UploadsService) {}
+
+  @Post()
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @UseInterceptors(FileInterceptor('file'))
+  async upload(@UploadedFile() file: Express.Multer.File) {
+    const upload = await this.uploadsService.upload(file);
+    return new Upload(upload);
+  }
+
+  @Get(':id')
+  @DockGet(StreamableFile)
+  async read(@Param('id') id: number): Promise<StreamableFile> {
+    const upload = await this.uploadsService.findOne(id);
+    const file = createReadStream(join(process.cwd(), upload.path));
+    return new StreamableFile(file);
+  }
+
+  @Delete(':id')
+  async delete(@Param('id') id: number): Promise<{ id: number }> {
+    await this.uploadsService.delete(id);
+    return { id };
+  }
+}

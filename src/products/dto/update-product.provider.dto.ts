@@ -23,4 +23,7 @@ export class UpdateProductProviderDto extends CreateProductProviderDto {
 
     @Validate(TypeValidate.STRING, {required: false})
     packagingType: ProductPackagingType
+
+    @Validate(TypeValidate.ARRAY, {type: [Number]})
+    imageIds: number[]
 }

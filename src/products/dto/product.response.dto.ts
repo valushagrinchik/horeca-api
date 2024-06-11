@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Product, ProductPackagingType } from '@prisma/client';
+import { Product, ProductPackagingType, Uploads } from '@prisma/client';
 import { Expose } from 'class-transformer';
 
 export class ProductResponse implements Product {
@@ -26,6 +26,11 @@ export class ProductResponse implements Product {
     @ApiProperty()
     updatedAt: Date;
 
+    @ApiProperty()
+    productImage: {
+        image: Uploads
+    }[]
+   
     @ApiProperty()
     @Expose()
     get isEditable(): boolean {
