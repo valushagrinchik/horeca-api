@@ -7,6 +7,8 @@ import { ProductsProviderService } from "./products.provider.service";
 import { UpdateProductProviderDto } from "./dto/update-product.provider.dto";
 import { AuthInfoDto } from "src/users/dto/auth.info.dto";
 import { AuthParamDecorator } from "src/utils/auth/decorators/auth.param.decorator";
+import { DockGet } from "src/utils/swagger/decorators/swagger.decorators";
+import { ProductResponse } from "./dto/product.response.dto";
 
 @AuthUser(UserRole.Provider)
 @Controller('products')
@@ -19,18 +21,24 @@ export class ProductsProviderController {
         return this.service.create(auth, dto)
     }
 
+    @Get()
+    @DockGet([ProductResponse])
+    async findAll(@AuthParamDecorator() auth: AuthInfoDto) {
+        return this.service.findAll(auth)
+    }
+
     @Get(':id')
-    async get(@AuthParamDecorator() auth: AuthInfoDto, @Param() id: number,) {
+    async get(@AuthParamDecorator() auth: AuthInfoDto, @Param('id') id: number,) {
         return this.service.get(auth, id)
     }
 
     @Put(':id')
-    async update(@AuthParamDecorator() auth: AuthInfoDto, @Param() id: number, @Body() dto: UpdateProductProviderDto) {
+    async update(@AuthParamDecorator() auth: AuthInfoDto, @Param('id') id: number, @Body() dto: UpdateProductProviderDto) {
         return this.service.update(auth, id, dto)
     }
 
     @Delete(':id')
-    async delete(@AuthParamDecorator() auth: AuthInfoDto, @Param() id: number) {
+    async delete(@AuthParamDecorator() auth: AuthInfoDto,  @Param('id') id: number) {
         return this.service.delete(auth, id)
     }
 }
