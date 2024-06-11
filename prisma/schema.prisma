@@ -30,77 +30,93 @@ enum ProductPackagingType {
   Pallet
 }
 
+enum CronStatus {
+  Ready
+  Work
+  Done
+  Error
+  Failed
+}
+enum CronType {
+    Mail
+}
 model User {
-  id    Int     @id @default(autoincrement())
+  id Int @id @default(autoincrement())
 
-  email String  @unique
+  email    String @unique
   password String
+  activationLink String @default(uuid()) @map("activation_link")
   // Название компании
-  name  String
+  name     String
   // ИНН
-  tin String
+  tin      String
 
   role UserRole
 
-  phone String?
+  phone   String?
   profile Profile?
+  mails   Mail[]
+
+  createdAt  DateTime   @default(now()) @map("created_at")
+  updatedAt  DateTime   @default(now()) @updatedAt @map("updated_at")
 
   @@map("users")
 }
 
 model Profile {
-  id    Int     @id @default(autoincrement())
-  user User   @relation(fields: [userId], references: [id])
-  userId Int @unique @map("user_id")
+  id     Int  @id @default(autoincrement())
+  user   User @relation(fields: [userId], references: [id])
+  userId Int  @unique @map("user_id")
 
   profileType ProfileType @map("profile_type")
 
   // Provider 
-  minOrderAmount Int? @map("min_order_amount")
+  minOrderAmount  Int?     @map("min_order_amount")
   deliveryMethods String[] @map("delivery_methods")
   categories String[] 
   products Product[]
 
   // Horeca
-  info String?
+  info      String?
   addresses Address[]
+
+  createdAt  DateTime   @default(now()) @map("created_at")
+  updatedAt  DateTime   @default(now()) @updatedAt @map("updated_at")
 
   @@map("profiles")
 }
 
 model Address {
-    id    Int     @id @default(autoincrement())
-    address String
+  id      Int    @id @default(autoincrement())
+  address String
 
-    profile Profile @relation(fields: [profileId], references: [id])
-    profileId Int @map("profile_id")
+  profile   Profile @relation(fields: [profileId], references: [id])
+  profileId Int     @map("profile_id")
 
-    // Monday
-    moFrom String? @map("mo_from")
-    moTo String? @map("mo_to")
-    // Tuesday
-    tuFrom String? @map("tu_from")
-    tuTo String? @map("tu_to")
-    // Wednesday
-    weFrom String? @map("we_from")
-    weTo String? @map("we_to")
-    // Thursday
-    thFrom String? @map("th_from")
-    thTo String? @map("th_to")
-    // Friday
-    frFrom String? @map("fr_from")
-    frTo String? @map("fr_to")
-    // Saturday
-    saFrom String? @map("sa_from")
-    saTo String? @map("sa_to")
-    // Sunday
-    suFrom String? @map("su_from")
-    suTo String? @map("su_to")
+  // Monday
+  moFrom String? @map("mo_from")
+  moTo   String? @map("mo_to")
+  // Tuesday
+  tuFrom String? @map("tu_from")
+  tuTo   String? @map("tu_to")
+  // Wednesday
+  weFrom String? @map("we_from")
+  weTo   String? @map("we_to")
+  // Thursday
+  thFrom String? @map("th_from")
+  thTo   String? @map("th_to")
+  // Friday
+  frFrom String? @map("fr_from")
+  frTo   String? @map("fr_to")
+  // Saturday
+  saFrom String? @map("sa_from")
+  saTo   String? @map("sa_to")
+  // Sunday
+  suFrom String? @map("su_from")
+  suTo   String? @map("su_to")
 
     @@map("addresses")
 }
-
-
 
 model Product {
     id    Int     @id @default(autoincrement())
@@ -118,4 +134,60 @@ model Product {
 
 
     @@map("products")
+}
+
+model Mail {
+  id     Int  @id @default(autoincrement())
+  user   User @relation(fields: [userId], references: [id])
+  userId Int  @map("user_id")
+
+  to       String
+  subject  String
+  template String
+  context  Json
+
+  logs  MailLog[]
+
+  createdAt  DateTime   @default(now()) @map("created_at")
+  updatedAt  DateTime   @default(now()) @updatedAt @map("updated_at")
+
+  @@map("mails")
+}
+
+model MailLog {
+  id     Int  @id @default(autoincrement())
+
+  mail   Mail @relation(fields: [mailId], references: [id])
+  mailId Int  @map("mail_id")
+
+  message String
+
+  createdAt  DateTime   @default(now()) @map("created_at")
+  updatedAt  DateTime   @default(now()) @updatedAt @map("updated_at")
+
+  @@map("mail_logs")
+}
+
+model CronTask {
+  id  Int  @id @default(autoincrement())
+
+  sourceType CronType @map("source_type")
+  sourceId Int @map("source_id")
+
+  cronStatus CronStatus @map("cron_status")
+
+  cronTries Int @default(0) @map("cron_tries")
+
+  start  DateTime?
+  finish  DateTime?
+
+  proof String?
+  pid Int @default(0)
+
+  source String?
+
+  createdAt  DateTime   @default(now()) @map("created_at")
+  updatedAt  DateTime   @default(now()) @updatedAt @map("updated_at")
+
+  @@map("cron_tasks")
 }

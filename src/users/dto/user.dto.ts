@@ -29,6 +29,11 @@ export class UserDto implements User {
     @ApiProperty()
     profileType: ProfileType
 
+    createdAt: Date
+    updatedAt: Date
+
+    activationLink: string
+
     @ApiProperty({ oneOf: [{ $ref: getSchemaPath(HorecaProfileDto) }, { $ref: getSchemaPath(ProviderProfileDto) }] })
     @Type(({ object }) => (object.profileType == ProfileType.Horeca ? HorecaProfileDto : ProviderProfileDto))
     @Transform(({ value }) => {
