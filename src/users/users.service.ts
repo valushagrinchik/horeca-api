@@ -11,11 +11,13 @@ import { ErrorCodeEnum } from 'src/utils/error.code.enum'
 import { UpdateUserDto } from './dto/update-user.dto'
 import { UserDto } from './dto/user.dto'
 import { omit } from 'lodash'
+import { MailService } from 'src/mail/mail.service'
 @Injectable()
 export class UsersService {
     constructor(
         private prisma: PrismaService,
-        private authService: AuthorizationService
+        private authService: AuthorizationService,
+        private mailService: MailService
     ) {}
 
     async registrate(dto: RegistrateUserDto) {
@@ -56,6 +58,15 @@ export class UsersService {
                 },
             },
         })
+
+        // send activation link
+        await this.mailService.sendActivationMail({
+            userId: user.id,
+            username: user.name,
+            email: user.email,
+            link: user.activationLink,
+        })
+
         return this.authService.login(user)
     }
 

@@ -8,6 +8,9 @@ export class HorecaProfileDto implements Profile {
     id: number
     userId: number
     profileType: ProfileType
+
+    createdAt: Date
+    updatedAt: Date
     
     @Validate(TypeValidate.STRING, {required: false})
     info: string

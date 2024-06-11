@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common'
+import { Logger, Module } from '@nestjs/common'
 import { UsersService } from './users.service'
 import { UsersController } from './users.controller'
 import { PrismaService } from 'src/prisma.service'
@@ -7,6 +7,8 @@ import { JwtModule } from '@nestjs/jwt'
 import { ConfigService } from '@nestjs/config'
 import { JwtStrategy } from './jwtStrategy'
 import { AuthorizationController } from './authorization.controller'
+import { MailService } from 'src/mail/mail.service'
+import { MailModule } from 'src/mail/mail.module'
 
 @Module({
     imports: [
@@ -17,9 +19,10 @@ import { AuthorizationController } from './authorization.controller'
             }),
             inject: [ConfigService],
         }),
+        MailModule,
     ],
     controllers: [UsersController, AuthorizationController],
-    providers: [UsersService, PrismaService, AuthorizationService, JwtStrategy],
+    providers: [UsersService, PrismaService, MailService, AuthorizationService, JwtStrategy, Logger],
     exports:[AuthorizationService, UsersService]
 })
 export class UsersModule {}
