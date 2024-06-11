@@ -1,0 +1,25 @@
+import { ProductPackagingType } from "@prisma/client"
+import { TypeValidate, Validate } from "src/utils/validation/validate.decotators"
+
+export class CreateProductProviderDto {
+    @Validate(TypeValidate.STRING)
+    category: string
+
+    @Validate(TypeValidate.STRING)
+    name: string
+
+    @Validate(TypeValidate.STRING)
+    description: string
+
+    @Validate(TypeValidate.STRING)
+    producer: string
+
+    @Validate(TypeValidate.NUMBER)
+    cost: number
+
+    @Validate(TypeValidate.NUMBER)
+    count: number
+
+    @Validate(TypeValidate.STRING)
+    packagingType: ProductPackagingType
+}

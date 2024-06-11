@@ -24,6 +24,12 @@ enum UserRole {
   Provider
 }
 
+enum ProductPackagingType {
+  Bottle
+  Box
+  Pallet
+}
+
 model User {
   id    Int     @id @default(autoincrement())
 
@@ -53,6 +59,7 @@ model Profile {
   minOrderAmount Int? @map("min_order_amount")
   deliveryMethods String[] @map("delivery_methods")
   categories String[] 
+  products Product[]
 
   // Horeca
   info String?
@@ -91,4 +98,24 @@ model Address {
     suTo String? @map("su_to")
 
     @@map("addresses")
+}
+
+
+
+model Product {
+    id    Int     @id @default(autoincrement())
+
+    profile Profile @relation(fields: [profileId], references: [id])
+    profileId Int @unique @map("profile_id")
+
+    category String
+    name String
+    description String 
+    producer String
+    cost Float
+    count Int
+    packagingType ProductPackagingType @map("packaging_type")
+
+
+    @@map("products")
 }
