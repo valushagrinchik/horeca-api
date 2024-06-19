@@ -17,17 +17,17 @@ import { AuthParamDecorator } from 'src/utils/auth/decorators/auth.param.decorat
 export class UsersController {
     constructor(private readonly usersService: UsersService) {}
 
-    @Put(':id')
+    @Put('me')
     @DockPost(UpdateUserDto, UserDto)
-    async update( @AuthParamDecorator() auth: AuthInfoDto, @Param('id') id: number, @Body() dto: UpdateUserDto) {
-        return this.usersService.update(auth, id, dto)
+    async update( @AuthParamDecorator() auth: AuthInfoDto, @Body() dto: UpdateUserDto) {
+        return this.usersService.update(auth, auth.id, dto)
     }
 
-    @Get(':id')
+    @Get('me')
     @DockGet(UserDto)
     @ApiExtraModels(HorecaProfileDto, ProviderProfileDto)
-    async get( @AuthParamDecorator() auth: AuthInfoDto, @Param('id') id: number ) {
-        return this.usersService.get(auth, id)
+    async get( @AuthParamDecorator() auth: AuthInfoDto ) {
+        return this.usersService.get(auth, auth.id)
     }
 }
 
