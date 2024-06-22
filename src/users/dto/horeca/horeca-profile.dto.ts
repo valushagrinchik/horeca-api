@@ -7,6 +7,8 @@ import { Address } from './address.dto'
 export class HorecaProfileDto implements Profile {
     id: number
     userId: number
+
+    @Validate(TypeValidate.STRING, {required: true, enum: ProfileType})
     profileType: ProfileType
 
     createdAt: Date

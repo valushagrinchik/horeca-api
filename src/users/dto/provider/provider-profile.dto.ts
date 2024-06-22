@@ -7,6 +7,8 @@ import { TypeValidate, Validate } from 'src/utils/validation/validate.decotators
 export class ProviderProfileDto implements Profile {
     id: number
     userId: number
+    
+    @Validate(TypeValidate.STRING, {required: true, enum: ProfileType})
     profileType: ProfileType
 
     createdAt: Date

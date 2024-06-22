@@ -26,9 +26,6 @@ export class UserDto implements User {
     @ApiProperty()
     password: string
 
-    @ApiProperty()
-    profileType: ProfileType
-
     createdAt: Date
     updatedAt: Date
 
