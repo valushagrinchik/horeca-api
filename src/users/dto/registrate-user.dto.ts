@@ -5,6 +5,7 @@ import { ValidateIf, ValidateNested } from 'class-validator'
 import { Type } from 'class-transformer'
 import { CreateProviderProfileDto } from './provider/create-provider-profile.dto'
 import { CreateHorecaProfileDto } from './horeca/create-horeca-profile.dto'
+import { Match } from 'src/utils/auth/decorators/match.decorator'
 
 export class RegistrateUserDto {
     @Validate(TypeValidate.STRING)
@@ -27,17 +28,13 @@ export class RegistrateUserDto {
 
     @Validate(TypeValidate.STRING)
     @ValidateIf(o => o.password !== o.repeatPassword)
+    @Match(RegistrateUserDto, (s) => s.password)
     repeatPassword: string
-
-    @Validate(TypeValidate.STRING)
-    @ValidateEnum(ProfileType, { type: ProfileType, enum: ProfileType, enumName: 'ProfileType' })
-    profileType: ProfileType
 
     @Validate(TypeValidate.OBJECT, {
         oneOf: [{ $ref: getSchemaPath(CreateHorecaProfileDto) }, { $ref: getSchemaPath(CreateProviderProfileDto) }],
     })
     @ValidateNested()
-    @ValidateIf(o => o.profileType)
     @Type(({ object }) => object.profileType == ProfileType.Horeca ? CreateHorecaProfileDto : CreateProviderProfileDto)
     profile: CreateHorecaProfileDto | CreateProviderProfileDto
 }

@@ -1,10 +1,12 @@
 import { BadRequestException, Injectable, OnModuleInit } from '@nestjs/common'
-import { Address, Prisma, PrismaClient, Profile, ProfileType, User } from '@prisma/client'
+import { Address, Prisma, PrismaClient, Profile, ProfileType, User, UserRole } from '@prisma/client'
 import { ErrorCodeEnum } from './utils/error.code.enum'
 import { ErrorDto } from './utils/error.dto'
 import { UpdateUserDto } from './users/dto/update-user.dto'
 import { CreateProviderProfileDto } from './users/dto/provider/create-provider-profile.dto'
 import { CreateHorecaProfileDto } from './users/dto/horeca/create-horeca-profile.dto'
+import { RegistrateUserDto } from './users/dto/registrate-user.dto'
+import * as bcrypt from'bcrypt'
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit {
@@ -12,6 +14,42 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
         await this.$connect()
     }
 
+    createUser = async(dto: RegistrateUserDto) => {
+        return this.user.create({
+            data: {
+                email: dto.email,
+                password: await bcrypt.hash(dto.password, 10),
+                name: dto.name,
+                tin: dto.tin,
+                phone: dto.phone,
+                role: dto.profile.profileType == ProfileType.Horeca ? UserRole.Horeca : UserRole.Provider,
+                profile: {
+                    create: {
+                        profileType: dto.profile.profileType as ProfileType,
+                        ...(dto.profile as Omit<RegistrateUserDto['profile'], 'addresses'>),
+                        ...('addresses' in dto.profile
+                            ? {
+                                  addresses: {
+                                      createMany: {
+                                          data: dto.profile.addresses.map(address => {
+                                              return {
+                                                  address: address.address,
+                                                  ...address.weekdays.reduce((prev, weekday) => {
+                                                      prev[weekday + 'From'] = address[weekday + 'From']
+                                                      prev[weekday + 'To'] = address[weekday + 'To']
+                                                      return prev
+                                                  }, {}),
+                                              }
+                                          }) as Prisma.AddressCreateManyProfileInput[],
+                                      },
+                                  },
+                              }
+                            : {}),
+                    },
+                },
+            },
+        })
+    }
 
     updateProfile = async (id: number, dto: UpdateUserDto) => {
         const user = await this.user.findUnique({ where: { id }, include: { profile: { include: { addresses: true } } } })
@@ -26,9 +64,9 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
         }
     }
 
-    updateHorecaProfile = async (user: User & {profile: Profile & { addresses: Address[] }}, {profile: profileInput, ...mainInfo}: UpdateUserDto) => {
+    updateHorecaProfile = async (user: User & {profile: Profile & { addresses: Address[] }}, {profile: profileInput, password, repeatPassword, ...mainInfo}: UpdateUserDto) => {
         const profile = profileInput as CreateHorecaProfileDto
-        const {addresses, ...profileInfo} = profile
+        const {addresses = [], ...profileInfo} = profile || {}
         const existingAddresses = user.profile.addresses.map(a=>a.id)
 
         return this.user.update({
@@ -36,6 +74,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
             include: { profile: { include: { addresses: true } } },
             data: {
                 ...mainInfo,
+                ...(password ? { password: await bcrypt.hash(password, 10)} : {}), 
                 profile: {
                     update: {
                         data: {
@@ -70,13 +109,14 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
         })
     }
 
-    updateProviderProfile = async (user: User & {profile: Profile}, {profile: profileInput, ...mainInfo}: UpdateUserDto) => {
+    updateProviderProfile = async (user: User & {profile: Profile}, {profile: profileInput, password, repeatPassword, ...mainInfo}: UpdateUserDto) => {
         const profile = profileInput as CreateProviderProfileDto
         return this.user.update({
             where: { id: user.id },
             include: { profile: { include: { addresses: true } } },
             data: {
                 ...mainInfo,
+                ...(password ? { password: await bcrypt.hash(password, 10)} : {}), 
                 profile: {
                     update: {
                         data: profile

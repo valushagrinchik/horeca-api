@@ -1,7 +1,6 @@
 import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common'
 import { RegistrateUserDto } from './dto/registrate-user.dto'
 import { PrismaService } from 'src/prisma.service'
-import { Prisma, ProfileType, UserRole } from '@prisma/client'
 import * as bcrypt from 'bcrypt'
 import { AuthInfoDto } from 'src/users/dto/auth.info.dto'
 import { AuthorizationService } from './authorization.service'
@@ -10,7 +9,6 @@ import { ErrorDto } from 'src/utils/error.dto'
 import { ErrorCodeEnum } from 'src/utils/error.code.enum'
 import { UpdateUserDto } from './dto/update-user.dto'
 import { UserDto } from './dto/user.dto'
-import { omit } from 'lodash'
 import { MailService } from 'src/mail/mail.service'
 @Injectable()
 export class UsersService {
@@ -24,40 +22,7 @@ export class UsersService {
         if (!dto.GDPRApproved) {
             throw new BadRequestException(new ErrorDto(ErrorCodeEnum.GDPR_IS_NOT_APPROVED))
         }
-        const user = await this.prisma.user.create({
-            data: {
-                email: dto.email,
-                password: await bcrypt.hash(dto.password, 10),
-                name: dto.name,
-                tin: dto.tin,
-                phone: dto.phone,
-                role: dto.profileType == ProfileType.Horeca ? UserRole.Horeca : UserRole.Provider,
-                profile: {
-                    create: {
-                        profileType: dto.profileType as ProfileType,
-                        ...(dto.profile as Omit<RegistrateUserDto['profile'], 'addresses'>),
-                        ...('addresses' in dto.profile
-                            ? {
-                                  addresses: {
-                                      createMany: {
-                                          data: dto.profile.addresses.map(address => {
-                                              return {
-                                                  address: address.address,
-                                                  ...address.weekdays.reduce((prev, weekday) => {
-                                                      prev[weekday + 'From'] = address[weekday + 'From']
-                                                      prev[weekday + 'To'] = address[weekday + 'To']
-                                                      return prev
-                                                  }, {}),
-                                              }
-                                          }) as Prisma.AddressCreateManyProfileInput[],
-                                      },
-                                  },
-                              }
-                            : {}),
-                    },
-                },
-            },
-        })
+        const user = await this.prisma.createUser(dto)
 
         // send activation link
         await this.mailService.sendActivationMail({
