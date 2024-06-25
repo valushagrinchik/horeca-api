@@ -10,6 +10,7 @@ import { ErrorCodeEnum } from 'src/utils/error.code.enum'
 import { UpdateUserDto } from './dto/update-user.dto'
 import { UserDto } from './dto/user.dto'
 import { MailService } from 'src/mail/mail.service'
+import { User } from '@prisma/client'
 @Injectable()
 export class UsersService {
     constructor(
@@ -23,7 +24,7 @@ export class UsersService {
             throw new BadRequestException(new ErrorDto(ErrorCodeEnum.GDPR_IS_NOT_APPROVED))
         }
         const user = await this.prisma.createUser(dto)
-
+        
         // send activation link
         await this.mailService.sendActivationMail({
             userId: user.id,
@@ -35,11 +36,29 @@ export class UsersService {
         return this.authService.login(user)
     }
 
+    async activateAccount(uuid: string) {
+        const user = await this.prisma.user.findFirst({ where: { activationLink: uuid } })
+        if (!user) {
+            throw new ErrorDto(ErrorCodeEnum.ACTIVATION_LINK_ERROR)
+        }
+        await this.activateUser(user)
+    }
+
+    async activateUser(user: User) {
+        await this.prisma.user.update({
+            where: { id: user.id },
+            data: { isActivated: true },
+        })
+    }
+
     async update(auth: AuthInfoDto, id: number, dto: UpdateUserDto) {
-        if(auth.id !== id){
+        if (auth.id !== id) {
             throw new ForbiddenException()
         }
-        const user = await this.prisma.user.findUnique({ where: { id }, include: { profile: { include: { addresses: true } } } })
+        const user = await this.prisma.user.findUnique({
+            where: { id },
+            include: { profile: { include: { addresses: true } } },
+        })
         if (!user) {
             throw new BadRequestException(new ErrorDto(ErrorCodeEnum.USER_DOES_NOT_EXISTS))
         }
@@ -50,7 +69,7 @@ export class UsersService {
     }
 
     async get(auth: AuthInfoDto, id: number): Promise<UserDto> {
-        if(auth.id !== id){
+        if (auth.id !== id) {
             throw new ForbiddenException()
         }
         const user = await this.prisma.user.findUnique({

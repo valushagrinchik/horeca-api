@@ -45,9 +45,10 @@ enum CronType {
 model User {
   id Int @id @default(autoincrement())
 
-  email          String @unique
+  email          String  @unique
   password       String
-  activationLink String @default(uuid()) @map("activation_link")
+  activationLink String  @default(uuid()) @map("activation_link")
+  isActivated    Boolean @default(false)
   // Название компании
   name           String
   // ИНН
@@ -124,7 +125,7 @@ model Product {
   id Int @id @default(autoincrement())
 
   profile   Profile @relation(fields: [profileId], references: [id])
-  profileId Int @map("profile_id")
+  profileId Int     @map("profile_id")
 
   category      String
   name          String
@@ -134,7 +135,7 @@ model Product {
   count         Int
   packagingType ProductPackagingType @map("packaging_type")
 
-  productImage ProductImages[]
+  productImage ProductImage[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
@@ -142,7 +143,7 @@ model Product {
   @@map("products")
 }
 
-model ProductImages {
+model ProductImage {
   id Int @id @default(autoincrement())
 
   product   Product @relation(fields: [productId], references: [id])
@@ -162,11 +163,27 @@ model Uploads {
   path     String
   size     Int
 
-  productImage ProductImages?
+  productImage ProductImage?
 
   @@map("uploads")
 }
 
+model CronTask {
+  id Int @id @default(autoincrement())
+
+  mail Mail?
+
+  status    CronStatus @default(Ready)
+  tries     Int        @default(0)
+  start     DateTime?
+  finish    DateTime?
+  proof     String?
+  pid       Int        @default(0)
+  createdAt DateTime   @default(now()) @map("created_at")
+  updatedAt DateTime   @default(now()) @updatedAt @map("updated_at")
+
+  @@map("cron_tasks")
+}
 
 model Mail {
   id     Int  @id @default(autoincrement())
@@ -179,6 +196,9 @@ model Mail {
   context  Json
 
   logs MailLog[]
+
+  cron   CronTask @relation(fields: [cronId], references: [id])
+  cronId Int      @unique @map("cron_id")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
@@ -198,28 +218,4 @@ model MailLog {
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
   @@map("mail_logs")
-}
-
-model CronTask {
-  id Int @id @default(autoincrement())
-
-  sourceType CronType @map("source_type")
-  sourceId   Int      @map("source_id")
-
-  cronStatus CronStatus @map("cron_status")
-
-  cronTries Int @default(0) @map("cron_tries")
-
-  start  DateTime?
-  finish DateTime?
-
-  proof String?
-  pid   Int     @default(0)
-
-  source String?
-
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
-
-  @@map("cron_tasks")
 }

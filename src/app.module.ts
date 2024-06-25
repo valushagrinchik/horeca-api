@@ -16,11 +16,11 @@ import { UploadsModule } from './uploads/uploads.module'
         ScheduleModule.forRoot(),
 
         // Services
+        MailModule,
         UploadsModule,
         UsersModule,
         ProposalsModule,
         ProductsModule,
-        MailModule,
     ],
     controllers: [],
     providers: [],

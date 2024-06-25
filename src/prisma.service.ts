@@ -7,6 +7,7 @@ import { CreateProviderProfileDto } from './users/dto/provider/create-provider-p
 import { CreateHorecaProfileDto } from './users/dto/horeca/create-horeca-profile.dto'
 import { RegistrateUserDto } from './users/dto/registrate-user.dto'
 import * as bcrypt from'bcrypt'
+import { v4 as uuidv4 } from 'uuid'
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit {
@@ -22,6 +23,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
                 name: dto.name,
                 tin: dto.tin,
                 phone: dto.phone,
+                activationLink: uuidv4(),
                 role: dto.profile.profileType == ProfileType.Horeca ? UserRole.Horeca : UserRole.Provider,
                 profile: {
                     create: {

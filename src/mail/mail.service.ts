@@ -8,7 +8,7 @@ import * as hbs from 'hbs'
 
 import { MailDto, MailParamsDto } from './dto/mail.dto'
 import { PrismaService } from 'src/prisma.service'
-import { Mail } from '@prisma/client'
+import { CronTask, Mail } from '@prisma/client'
 
 @Injectable()
 export class MailService {
@@ -26,8 +26,8 @@ export class MailService {
      * @param dto
      * @returns
      */
-    async create(userId: number, dto: MailDto): Promise<Mail> {
-        return await this.prisma.mail.create({data: { ...dto, userId }})
+    async create(userId: number, dto: MailDto) {
+        return this.prisma.cronTask.create({data: {  mail: { create: dto} }})
     }
 
     /**
@@ -35,8 +35,8 @@ export class MailService {
      * @param id
      */
     async sendMailById(id: number) {
-        const mail = await this.prisma.mail.findUnique({ where: { id } })
-        await this.sendMail(mail)
+        const cron = await this.prisma.cronTask.findUnique({ where: { id } })
+        await this.sendMail(cron)
     }
 
     /**
@@ -44,15 +44,20 @@ export class MailService {
      * @param mail
      * @returns
      */
-    async sendMail(mail: Mail): Promise<number | undefined> {
+    async sendMail(cron: CronTask): Promise<number | undefined> {
+
+        const mail = await this.prisma.mail.findUnique({where: {cronId: cron.id}})
+
         const { id: mailId, to, template, subject, context } = mail
 
         const templateFile: string = join(__dirname, 'templates', `${template}.hbs`)
+
         if (!fs.existsSync(templateFile)) {
             throw new Error('Template not found')
         }
 
         this.logger.log(`Send mail from ${this.configService.get(`SMTP_USER`)}`)
+
         await this.mailerService.sendMail({
             from: this.configService.get(`SMTP_USER`),
             to,
@@ -85,8 +90,8 @@ export class MailService {
             template: 'confirmation',
             context: {
                 username,
-                link: `${this.configService.get('BACKEND_URL')}/api/user/activate/${link}`,
-                service: 'Crossnetics',
+                link: `${this.configService.get('BACKEND_URL')}/api/auth/activate/${link}`,
+                service: 'HoReCa',
             },
         })
     }
@@ -103,7 +108,7 @@ export class MailService {
             template: 'password_recovery',
             context: {
                 link: `${this.configService.get('BACKEND_URL')}/api/user/recoveryPassword/${link}`,
-                service: 'Crossnetics',
+                service: 'HoReCa',
             },
         })
     }

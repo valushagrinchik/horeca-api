@@ -31,6 +31,9 @@ export class UserDto implements User {
 
     activationLink: string
 
+    @Exclude()
+    isActivated: boolean
+
     @ApiProperty({ oneOf: [{ $ref: getSchemaPath(HorecaProfileDto) }, { $ref: getSchemaPath(ProviderProfileDto) }] })
     @Type(({ object }) => (object.profile.profileType == ProfileType.Horeca ? HorecaProfileDto : ProviderProfileDto))
     @Transform(({ value }) => {

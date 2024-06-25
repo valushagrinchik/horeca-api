@@ -1,11 +1,17 @@
+import * as process from 'node:process'
 import { HttpAdapterHost, NestFactory, Reflector } from '@nestjs/core'
 import { AppModule } from './app.module'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
-import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common'
+import { ClassSerializerInterceptor, Logger, ValidationPipe } from '@nestjs/common'
 import { PrismaClientExceptionFilter } from './prisma-client-exception.filter'
+
+process.on('unhandledRejection', (reason, promise) => {
+    console.log('Unhandled Rejection at:', promise, 'reason:', reason)
+})
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule)
+    app.useLogger(app.get(Logger))
     app.setGlobalPrefix('api')
     app.useGlobalPipes(
         new ValidationPipe({
@@ -16,9 +22,9 @@ async function bootstrap() {
             whitelist: true,
         })
     )
-    const { httpAdapter } = app.get(HttpAdapterHost);
-    app.useGlobalFilters(new PrismaClientExceptionFilter(httpAdapter));
-    app.useGlobalInterceptors( new ClassSerializerInterceptor(app.get(Reflector)))
+    const { httpAdapter } = app.get(HttpAdapterHost)
+    app.useGlobalFilters(new PrismaClientExceptionFilter(httpAdapter))
+    app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)))
     app.enableCors({
         origin: '*', // или ваш конкретный домен
         methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',

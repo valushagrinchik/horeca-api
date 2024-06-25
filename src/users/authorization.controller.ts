@@ -1,17 +1,23 @@
-import { Controller, Post, Body } from '@nestjs/common'
+import { Controller, Post, Body, Get, Param, Res } from '@nestjs/common'
 import { UsersService } from './users.service'
 import { RegistrateUserDto } from './dto/registrate-user.dto'
 import { ApiExtraModels, ApiTags } from '@nestjs/swagger'
 import { LoginUserDto } from './dto/login-user.dto'
 import { AuthResultDto } from './dto/auth.result.dto'
-import { DockPost } from 'src/utils/swagger/decorators/swagger.decorators'
+import { DockGet, DockPost } from 'src/utils/swagger/decorators/swagger.decorators'
 import { CreateHorecaProfileDto } from './dto/horeca/create-horeca-profile.dto'
 import { CreateProviderProfileDto } from './dto/provider/create-provider-profile.dto'
+import { SuccessDto } from 'src/utils/success.dto'
+import { Response } from 'express'
+import { ConfigService } from '@nestjs/config'
 
 @Controller('auth')
 @ApiTags('Authorization')
 export class AuthorizationController {
-    constructor(private readonly usersService: UsersService) {}
+    constructor(
+        private readonly configService: ConfigService,
+        private readonly usersService: UsersService
+    ) {}
 
     @Post('registration')
     @DockPost(RegistrateUserDto, AuthResultDto)
@@ -24,6 +30,13 @@ export class AuthorizationController {
     @DockPost(LoginUserDto, AuthResultDto)
     async login(@Body() loginDto: LoginUserDto) {
         return this.usersService.login(loginDto)
+    }
+
+    @Get('activate/:uuid')
+    @DockGet(SuccessDto)
+    async activateAccount(@Res() res: Response, @Param('uuid') uuid: string) {
+        await this.usersService.activateAccount(uuid)
+        res.redirect(this.configService.get('FRONTEND_URL'))
     }
 
     // @Get('password-recovery')
@@ -47,5 +60,3 @@ export class AuthorizationController {
     //     return await this.usersService.changePassword(auth, dto)
     // }
 }
-
-

@@ -22,10 +22,10 @@ export class CronPrismaService {
     async getNotRunningTasks() {
         const tasks = await this.prisma.cronTask.findMany({
             where: {
-                cronStatus: {in: [CronStatus.Ready, CronStatus.Error]}
+                status: {in: [CronStatus.Ready, CronStatus.Error]}
             },
             orderBy: {
-                cronTries: 'desc'
+                tries: 'desc'
             },
             
         })
@@ -49,7 +49,7 @@ export class CronPrismaService {
      * @param id
      * @param updateData
      */
-    async updateTask({ id }: CronTask, updateData: any): Promise<CronTask> {
+    async updateTask({ id }: CronTask, updateData: Partial<CronTask>): Promise<CronTask> {
         return await this.prisma.cronTask.update({
             where: {
                 id
@@ -64,9 +64,9 @@ export class CronPrismaService {
      */
     async startTask(item: CronTask) {
         return await this.updateTask(item,  {
-            cronStatus: CronStatus.Work,
-            cronStart: new Date(),
-            cronTries: item.cronTries + 1
+            status: CronStatus.Work,
+            start: new Date(),
+            tries: item.tries + 1
         })
     }
 
@@ -78,9 +78,9 @@ export class CronPrismaService {
         return await this.updateTask(
             item,
             {
-                cronStatus: CronStatus.Done,
-                cronFinish: new Date(),
-                cronProof: proof.toString(),
+                status: CronStatus.Done,
+                finish: new Date(),
+                proof: proof.toString(),
             }
         )
     }
@@ -93,8 +93,8 @@ export class CronPrismaService {
         return await this.updateTask(
             item,
             {
-                cronStatus: CronStatus.Ready,
-                cronStart: null,
+                status: CronStatus.Ready,
+                start: null,
             }
         )
     }
@@ -106,7 +106,7 @@ export class CronPrismaService {
     async errorTask(item: CronTask) {
         // set task failed if counter more then MAX_TRIES
         const task = await this.getTaskById(item.id)
-        if (task.cronTries >= this.MAX_TRIES) {
+        if (task.tries >= this.MAX_TRIES) {
             await this.failedTask(item)
             return
         }
@@ -114,8 +114,8 @@ export class CronPrismaService {
         return await this.updateTask(
             item,
             {
-                cronStatus: CronStatus.Error,
-                cronStart: null,
+                status: CronStatus.Error,
+                start: null,
             }
         )
     }
@@ -128,7 +128,7 @@ export class CronPrismaService {
         return await this.updateTask(
             item,
             {
-                cronStatus: CronStatus.Failed,
+                status: CronStatus.Failed,
             }
         )
     }
