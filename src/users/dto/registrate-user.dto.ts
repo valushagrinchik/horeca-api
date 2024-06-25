@@ -35,6 +35,6 @@ export class RegistrateUserDto {
         oneOf: [{ $ref: getSchemaPath(CreateHorecaProfileDto) }, { $ref: getSchemaPath(CreateProviderProfileDto) }],
     })
     @ValidateNested()
-    @Type(({ object }) => object.profileType == ProfileType.Horeca ? CreateHorecaProfileDto : CreateProviderProfileDto)
+    @Type(({ object }) => object.profile.profileType == ProfileType.Horeca ? CreateHorecaProfileDto : CreateProviderProfileDto)
     profile: CreateHorecaProfileDto | CreateProviderProfileDto
 }

@@ -32,9 +32,9 @@ export class UserDto implements User {
     activationLink: string
 
     @ApiProperty({ oneOf: [{ $ref: getSchemaPath(HorecaProfileDto) }, { $ref: getSchemaPath(ProviderProfileDto) }] })
-    @Type(({ object }) => (object.profileType == ProfileType.Horeca ? HorecaProfileDto : ProviderProfileDto))
+    @Type(({ object }) => (object.profile.profileType == ProfileType.Horeca ? HorecaProfileDto : ProviderProfileDto))
     @Transform(({ value }) => {
-        return value.profileType == ProfileType.Horeca ? new HorecaProfileDto(value) : new ProviderProfileDto(value)
+        return value.profile.profileType == ProfileType.Horeca ? new HorecaProfileDto(value) : new ProviderProfileDto(value)
     })
     profile: HorecaProfileDto | ProviderProfileDto
 
