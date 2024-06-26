@@ -24,7 +24,7 @@ export class UsersService {
             throw new BadRequestException(new ErrorDto(ErrorCodeEnum.GDPR_IS_NOT_APPROVED))
         }
         const user = await this.prisma.createUser(dto)
-        
+
         // send activation link
         await this.mailService.sendActivationMail({
             userId: user.id,
@@ -79,6 +79,7 @@ export class UsersService {
         if (!user) {
             throw new BadRequestException(new ErrorDto(ErrorCodeEnum.AUTH_FAIL))
         }
+
         return new UserDto(user)
     }
 
