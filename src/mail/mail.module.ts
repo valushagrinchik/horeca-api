@@ -37,7 +37,7 @@ import { CronPrismaService } from '../utils/cron/cron.prisma.service'
             }),
         }),
     ],
-    providers: [MailService, PrismaService, CronPrismaService, MailCronService, Logger],
+    providers: [MailService, PrismaService, CronPrismaService, MailCronService, Logger, ConfigService],
     exports: [MailService],
 })
 export class MailModule {}

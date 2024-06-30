@@ -7,7 +7,6 @@ import { JwtModule } from '@nestjs/jwt'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { Logger } from '@nestjs/common'
 import { MailModule } from '../mail/mail.module'
-import { CronPrismaService } from '../utils/cron/cron.prisma.service'
 
 const prismaMock = {
     user: {
@@ -23,7 +22,6 @@ describe('UsersService', () => {
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 AuthorizationService,
-                ConfigService,
                 MailService,
                 UsersService,
                 {
@@ -31,6 +29,14 @@ describe('UsersService', () => {
                     useValue: prismaMock,
                 },
                 Logger,
+                {
+                    provide: ConfigService,
+                    useValue: {
+                      get: jest.fn((key: string) => {
+                        return null;
+                      })
+                    }
+                }
             ],
        
             imports: [ConfigModule, MailModule, JwtModule],
@@ -56,7 +62,8 @@ describe('UsersService', () => {
             expect(result).toEqual(existingUser)
             expect(prismaMock.user.findUnique).toHaveBeenCalledTimes(1)
             expect(prismaMock.user.findUnique).toHaveBeenCalledWith({
-                where: { username: existingUser.username },
+                where: { id: existingUser.id  },
+                include: { profile: { include: { addresses: true } } },
             })
         })
     })
