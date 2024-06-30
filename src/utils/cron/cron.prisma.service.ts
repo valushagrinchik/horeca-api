@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { CronStatus, CronTask } from '@prisma/client'
-import { PrismaService } from 'src/prisma.service'
+import { PrismaService } from '../../prisma.service'
 
 @Injectable()
 export class CronPrismaService {
@@ -14,7 +14,7 @@ export class CronPrismaService {
     }
 
     MAX_TRIES: number = 0
- 
+
     /**
      * Get not running tasks
      * @returns
@@ -22,14 +22,12 @@ export class CronPrismaService {
     async getNotRunningTasks() {
         const tasks = await this.prisma.cronTask.findMany({
             where: {
-                status: {in: [CronStatus.Ready, CronStatus.Error]}
+                status: { in: [CronStatus.Ready, CronStatus.Error] },
             },
             orderBy: {
-                tries: 'desc'
+                tries: 'desc',
             },
-            
         })
-    
 
         return tasks
     }
@@ -40,9 +38,8 @@ export class CronPrismaService {
      * @returns
      */
     async getTaskById(id: number) {
-        return await this.prisma.cronTask.findUnique({where :{id}})
+        return await this.prisma.cronTask.findUnique({ where: { id } })
     }
-
 
     /**
      * Update task
@@ -52,9 +49,9 @@ export class CronPrismaService {
     async updateTask({ id }: CronTask, updateData: Partial<CronTask>): Promise<CronTask> {
         return await this.prisma.cronTask.update({
             where: {
-                id
+                id,
             },
-            data: updateData
+            data: updateData,
         })
     }
 
@@ -63,10 +60,10 @@ export class CronPrismaService {
      * @param item
      */
     async startTask(item: CronTask) {
-        return await this.updateTask(item,  {
+        return await this.updateTask(item, {
             status: CronStatus.Work,
             start: new Date(),
-            tries: item.tries + 1
+            tries: item.tries + 1,
         })
     }
 
@@ -75,14 +72,11 @@ export class CronPrismaService {
      * @param item
      */
     async finishTask(item: CronTask, proof?: number | string) {
-        return await this.updateTask(
-            item,
-            {
-                status: CronStatus.Done,
-                finish: new Date(),
-                proof: proof.toString(),
-            }
-        )
+        return await this.updateTask(item, {
+            status: CronStatus.Done,
+            finish: new Date(),
+            proof: proof.toString(),
+        })
     }
 
     /**
@@ -90,13 +84,10 @@ export class CronPrismaService {
      * @param item
      */
     async readyTask(item: CronTask) {
-        return await this.updateTask(
-            item,
-            {
-                status: CronStatus.Ready,
-                start: null,
-            }
-        )
+        return await this.updateTask(item, {
+            status: CronStatus.Ready,
+            start: null,
+        })
     }
 
     /**
@@ -111,13 +102,10 @@ export class CronPrismaService {
             return
         }
 
-        return await this.updateTask(
-            item,
-            {
-                status: CronStatus.Error,
-                start: null,
-            }
-        )
+        return await this.updateTask(item, {
+            status: CronStatus.Error,
+            start: null,
+        })
     }
 
     /**
@@ -125,12 +113,9 @@ export class CronPrismaService {
      * @param item
      */
     async failedTask(item: CronTask) {
-        return await this.updateTask(
-            item,
-            {
-                status: CronStatus.Failed,
-            }
-        )
+        return await this.updateTask(item, {
+            status: CronStatus.Failed,
+        })
     }
 
     /**

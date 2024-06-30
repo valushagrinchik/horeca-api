@@ -7,12 +7,11 @@ import { MailerService } from '@nestjs-modules/mailer'
 import * as hbs from 'hbs'
 
 import { MailDto, MailParamsDto } from './dto/mail.dto'
-import { PrismaService } from 'src/prisma.service'
+import { PrismaService } from '../prisma.service'
 import { CronTask, Mail } from '@prisma/client'
 
 @Injectable()
 export class MailService {
-
     constructor(
         private configService: ConfigService,
         private readonly mailerService: MailerService,
@@ -27,7 +26,7 @@ export class MailService {
      * @returns
      */
     async create(userId: number, dto: MailDto) {
-        return this.prisma.cronTask.create({data: {  mail: { create: dto} }})
+        return this.prisma.cronTask.create({ data: { mail: { create: dto } } })
     }
 
     /**
@@ -45,8 +44,7 @@ export class MailService {
      * @returns
      */
     async sendMail(cron: CronTask): Promise<number | undefined> {
-
-        const mail = await this.prisma.mail.findUnique({where: {cronId: cron.id}})
+        const mail = await this.prisma.mail.findUnique({ where: { cronId: cron.id } })
 
         const { id: mailId, to, template, subject, context } = mail
 
@@ -63,7 +61,7 @@ export class MailService {
             to,
             subject,
             template,
-            context: context as Record<string, any>
+            context: context as Record<string, any>,
         })
 
         //get mail text and save message to log
@@ -71,10 +69,12 @@ export class MailService {
         const htmlTemplate = hbs.handlebars.compile(templateText)
         const message: string = htmlTemplate(context)
 
-        const mailLog = await this.prisma.mailLog.create({data: {
-            mailId,
-            message,
-        }})
+        const mailLog = await this.prisma.mailLog.create({
+            data: {
+                mailId,
+                message,
+            },
+        })
         return mailLog?.id
     }
 

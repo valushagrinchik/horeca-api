@@ -9,5 +9,3 @@ import { ApiBearerAuth } from '@nestjs/swagger'
 export function AuthUser(...roles: UserRole[]) {
     return applyDecorators(ApiBearerAuth(), UseGuards(JwtAuthGuard), UseGuards(RolesGuard), Roles(...roles))
 }
-
-

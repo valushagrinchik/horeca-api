@@ -5,7 +5,7 @@ import { CronPrismaService } from '../utils/cron/cron.prisma.service'
 
 @Injectable()
 export class MailCronService {
-    constructor (
+    constructor(
         private cron: CronPrismaService,
         private readonly mailService: MailService
     ) {}

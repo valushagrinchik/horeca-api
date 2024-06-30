@@ -1,15 +1,15 @@
 import { Type } from 'class-transformer'
 import { ArrayMinSize, ValidateIf, ValidateNested } from 'class-validator'
-import { TypeValidate, Validate } from 'src/utils/validation/validate.decotators'
+import { TypeValidate, Validate } from '../../../utils/validation/validate.decotators'
 import { Address } from './address.dto'
 import { Profile } from '../profile.dto'
 
 export class CreateHorecaProfileDto extends Profile {
-    @Validate(TypeValidate.STRING, {required: false})
+    @Validate(TypeValidate.STRING, { required: false })
     @ValidateIf(o => o.profileType)
     info: string
 
-    @Validate(TypeValidate.ARRAY, {minItems: 1, type: [Address]})
+    @Validate(TypeValidate.ARRAY, { minItems: 1, type: [Address] })
     @ValidateIf(o => o.profileType)
     @ValidateNested({ each: true })
     @Type(() => Address)
@@ -21,4 +21,3 @@ export class CreateHorecaProfileDto extends Profile {
         Object.assign(this, partial)
     }
 }
-

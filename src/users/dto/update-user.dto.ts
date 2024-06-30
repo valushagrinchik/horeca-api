@@ -1,35 +1,37 @@
 import { getSchemaPath } from '@nestjs/swagger'
 import { ProfileType } from '@prisma/client'
-import { TypeValidate, Validate } from 'src/utils/validation/validate.decotators'
+import { TypeValidate, Validate } from '../../utils/validation/validate.decotators'
 import { ValidateIf, ValidateNested } from 'class-validator'
 import { Type } from 'class-transformer'
 import { CreateHorecaProfileDto } from './horeca/create-horeca-profile.dto'
 import { CreateProviderProfileDto } from './provider/create-provider-profile.dto'
-import { Match } from 'src/utils/auth/decorators/match.decorator'
+import { Match } from '../../utils/auth/decorators/match.decorator'
 
 export class UpdateUserDto {
-    @Validate(TypeValidate.STRING, {required: false})
+    @Validate(TypeValidate.STRING, { required: false })
     name: string
 
-    @Validate(TypeValidate.STRING, {required: false})
+    @Validate(TypeValidate.STRING, { required: false })
     email: string
 
-    @Validate(TypeValidate.STRING, {required: false})
+    @Validate(TypeValidate.STRING, { required: false })
     phone: string
 
-    @Validate(TypeValidate.STRING, {required: false})
+    @Validate(TypeValidate.STRING, { required: false })
     password: string
 
     @Validate(TypeValidate.STRING)
-    @Match(UpdateUserDto, (s) => s.password)
-    @ValidateIf(o => o.password && (o.password !== o.repeatPassword))
+    @Match(UpdateUserDto, s => s.password)
+    @ValidateIf(o => o.password && o.password !== o.repeatPassword)
     repeatPassword: string
 
     @Validate(TypeValidate.OBJECT, {
         oneOf: [{ $ref: getSchemaPath(CreateHorecaProfileDto) }, { $ref: getSchemaPath(CreateProviderProfileDto) }],
-        required: false
+        required: false,
     })
     @ValidateNested()
-    @Type(({ object }) =>  object.profile.profileType == ProfileType.Horeca ? CreateHorecaProfileDto : CreateProviderProfileDto)
+    @Type(({ object }) =>
+        object.profile.profileType == ProfileType.Horeca ? CreateHorecaProfileDto : CreateProviderProfileDto
+    )
     profile: CreateHorecaProfileDto | CreateProviderProfileDto
 }

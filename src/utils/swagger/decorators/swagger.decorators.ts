@@ -1,7 +1,6 @@
 import { applyDecorators } from '@nestjs/common'
 import { ApiBody, ApiResponse } from '@nestjs/swagger'
-import { ErrorDto } from 'src/utils/error.dto'
-
+import { ErrorDto } from '../../error.dto'
 
 export function DockGet(success = null) {
     return applyDecorators(ApiResponse({ status: 200, type: success }), ApiResponse({ status: 400, type: ErrorDto }))

@@ -1,5 +1,5 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { Application, ApplicationImage, PaymentType } from "@prisma/client";
+import { ApiProperty } from '@nestjs/swagger'
+import { Application, ApplicationImage, PaymentType } from '@prisma/client'
 
 export class ApplicationDto implements Application {
     @ApiProperty()
@@ -7,10 +7,10 @@ export class ApplicationDto implements Application {
 
     @ApiProperty()
     profileId: number
-  
+
     @ApiProperty()
     proposalId: number
-  
+
     @ApiProperty()
     images: ApplicationImage[]
 
@@ -24,7 +24,7 @@ export class ApplicationDto implements Application {
     manufacturer: string
 
     @ApiProperty()
-    paymentType:  PaymentType   
+    paymentType: PaymentType
 
     @ApiProperty()
     cost: number

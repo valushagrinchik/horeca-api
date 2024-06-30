@@ -27,7 +27,7 @@ export class ProposalDto implements Proposal {
     phone: string
 
     @ApiProperty()
-    items:  ProposalItem[]
+    items: ProposalItem[]
 
     @ApiProperty()
     images: ProposalImage[]

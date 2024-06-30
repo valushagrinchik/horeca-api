@@ -1,7 +1,7 @@
 import { PaymentType } from '@prisma/client'
 import { ValidateNested } from 'class-validator'
-import { Categories } from 'src/utils/constants'
-import { TypeValidate, Validate } from 'src/utils/validation/validate.decotators'
+import { Categories } from '../../utils/constants'
+import { TypeValidate, Validate } from '../../utils/validation/validate.decotators'
 
 class CreateProposalItemDto {
     @Validate(TypeValidate.STRING)
@@ -13,29 +13,29 @@ class CreateProposalItemDto {
     @Validate(TypeValidate.STRING)
     unit: string
 
-    @Validate(TypeValidate.STRING, {enum: Categories, enumName: 'Categories'})
+    @Validate(TypeValidate.STRING, { enum: Categories, enumName: 'Categories' })
     category: Categories
 }
 
 export class CreateProposalDto {
-    @Validate(TypeValidate.ARRAY, {minItems: 1, type: [CreateProposalItemDto]})
+    @Validate(TypeValidate.ARRAY, { minItems: 1, type: [CreateProposalItemDto] })
     @ValidateNested()
     items: CreateProposalItemDto[]
 
-    @Validate(TypeValidate.ARRAY, {type: [Number]})
+    @Validate(TypeValidate.ARRAY, { type: [Number] })
     imageIds: number[]
 
     @Validate(TypeValidate.STRING)
     address: string
 
     @Validate(TypeValidate.DATE)
-    deliveryTime:  Date  
+    deliveryTime: Date
 
     @Validate(TypeValidate.DATE)
-    acceptUntill:  Date   
+    acceptUntill: Date
 
-    @Validate(TypeValidate.STRING, {enum: PaymentType})
-    paymentType:  PaymentType 
+    @Validate(TypeValidate.STRING, { enum: PaymentType })
+    paymentType: PaymentType
 
     @Validate(TypeValidate.STRING)
     name: string
@@ -43,6 +43,6 @@ export class CreateProposalDto {
     @Validate(TypeValidate.STRING)
     phone: string
 
-    @Validate(TypeValidate.STRING, {required: false})
+    @Validate(TypeValidate.STRING, { required: false })
     comment: string
 }

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
-import { PrismaService } from 'src/prisma.service'
-import { AuthInfoDto } from 'src/users/dto/auth.info.dto'
+import { PrismaService } from '../prisma.service'
+import { AuthInfoDto } from '../users/dto/auth.info.dto'
 import { ProposalDto } from './dto/proposal.dto'
 
 @Injectable()
@@ -20,9 +20,8 @@ export class ProposalsProviderService {
                 },
                 //TODO: check only day not time
                 acceptUntill: {
-                    gte: now
-                }
-                
+                    gte: now,
+                },
             },
         })
         return proposals.map(proposal => new ProposalDto(proposal))

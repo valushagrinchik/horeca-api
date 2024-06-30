@@ -1,44 +1,44 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { Product, ProductPackagingType, Uploads } from '@prisma/client';
-import { Expose } from 'class-transformer';
-import { Categories } from 'src/utils/constants';
+import { ApiProperty } from '@nestjs/swagger'
+import { Product, ProductPackagingType, Uploads } from '@prisma/client'
+import { Expose } from 'class-transformer'
+import { Categories } from '../../utils/constants'
 
 export class ProductResponse implements Product {
     @ApiProperty()
-    id: number;
+    id: number
     @ApiProperty()
-    profileId: number;
+    profileId: number
     @ApiProperty()
-    category: Categories;
+    category: Categories
     @ApiProperty()
-    name: string;
+    name: string
     @ApiProperty()
-    description: string;
+    description: string
     @ApiProperty()
-    producer: string;
+    producer: string
     @ApiProperty()
-    cost: number;
+    cost: number
     @ApiProperty()
-    count: number;
+    count: number
     @ApiProperty()
-    packagingType: ProductPackagingType;
+    packagingType: ProductPackagingType
     @ApiProperty()
-    createdAt: Date;
+    createdAt: Date
     @ApiProperty()
-    updatedAt: Date;
+    updatedAt: Date
 
     @ApiProperty()
     productImage: {
         image: Uploads
     }[]
-   
+
     @ApiProperty()
     @Expose()
     get isEditable(): boolean {
-      return new Date().getTime() - new Date(this.createdAt).getTime() < 3 * 24 * 60 * 60 * 1000
+        return new Date().getTime() - new Date(this.createdAt).getTime() < 3 * 24 * 60 * 60 * 1000
     }
-    
+
     constructor(partial: Product) {
-      Object.assign(this, partial);
+        Object.assign(this, partial)
     }
 }

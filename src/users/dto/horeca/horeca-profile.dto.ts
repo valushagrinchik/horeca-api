@@ -1,33 +1,33 @@
-import {  Profile, ProfileType } from '@prisma/client'
+import { Profile, ProfileType } from '@prisma/client'
 import { Exclude, Type } from 'class-transformer'
 import { ArrayMinSize, ValidateNested } from 'class-validator'
-import { TypeValidate, Validate } from 'src/utils/validation/validate.decotators'
+import { TypeValidate, Validate } from '../../../utils/validation/validate.decotators'
 import { Address } from './address.dto'
 
 export class HorecaProfileDto implements Profile {
     id: number
     userId: number
 
-    @Validate(TypeValidate.STRING, {required: true, enum: ProfileType})
+    @Validate(TypeValidate.STRING, { required: true, enum: ProfileType })
     profileType: ProfileType
 
     createdAt: Date
     updatedAt: Date
-    
-    @Validate(TypeValidate.STRING, {required: false})
+
+    @Validate(TypeValidate.STRING, { required: false })
     info: string
 
-    @Validate(TypeValidate.ARRAY, {minItems: 1, type: [Address]})
+    @Validate(TypeValidate.ARRAY, { minItems: 1, type: [Address] })
     @ValidateNested({ each: true })
     @Type(() => Address)
     @ArrayMinSize(1)
     addresses: Address[]
 
     @Exclude()
-    categories: string[];
+    categories: string[]
 
     @Exclude()
-    deliveryMethods: string[];
+    deliveryMethods: string[]
 
     @Exclude()
     minOrderAmount: number
@@ -36,4 +36,3 @@ export class HorecaProfileDto implements Profile {
         Object.assign(this, partial)
     }
 }
-

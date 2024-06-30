@@ -1,9 +1,9 @@
-import { ProductPackagingType } from "@prisma/client"
-import { Categories } from "src/utils/constants"
-import { TypeValidate, Validate } from "src/utils/validation/validate.decotators"
+import { ProductPackagingType } from '@prisma/client'
+import { Categories } from '../../utils/constants'
+import { TypeValidate, Validate } from '../../utils/validation/validate.decotators'
 
 export class CreateProductProviderDto {
-    @Validate(TypeValidate.STRING, {enum: Categories, enumName: 'Categories'})
+    @Validate(TypeValidate.STRING, { enum: Categories, enumName: 'Categories' })
     category: Categories
 
     @Validate(TypeValidate.STRING)
@@ -24,6 +24,6 @@ export class CreateProductProviderDto {
     @Validate(TypeValidate.STRING)
     packagingType: ProductPackagingType
 
-    @Validate(TypeValidate.ARRAY, {type: [Number]})
+    @Validate(TypeValidate.ARRAY, { type: [Number] })
     imageIds: number[]
 }

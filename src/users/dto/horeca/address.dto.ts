@@ -1,9 +1,9 @@
-import { ValidateIf } from "class-validator"
-import { Weekday } from "src/utils/constants"
-import { TypeValidate, Validate } from "src/utils/validation/validate.decotators"
+import { ValidateIf } from 'class-validator'
+import { Weekday } from '../../../utils/constants'
+import { TypeValidate, Validate } from '../../../utils/validation/validate.decotators'
 
 export class Address {
-    @Validate(TypeValidate.STRING, {required: false})
+    @Validate(TypeValidate.STRING, { required: false })
     id: number
 
     @Validate(TypeValidate.STRING)

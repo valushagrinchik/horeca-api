@@ -2,7 +2,6 @@ import { ApiProperty, PartialType } from '@nestjs/swagger'
 import { Mail } from '@prisma/client'
 import { IsEmail, IsNumber, IsObject, IsString } from 'class-validator'
 
-
 export class MailDto implements Partial<Mail> {
     @ApiProperty({ default: 1 })
     @IsNumber()

@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common'
 import { CreateProposalDto } from './dto/create-proposal.dto'
-import { PrismaService } from 'src/prisma.service'
+import { PrismaService } from '../prisma.service'
 import { ProposalDto } from './dto/proposal.dto'
 import { CreateProposalTemplateDto } from './dto/create-proposal-template.dto'
 import { ProposalTemplateDto } from './dto/proposal-template.dto'
-import { AuthInfoDto } from 'src/users/dto/auth.info.dto'
+import { AuthInfoDto } from '../users/dto/auth.info.dto'
 
 @Injectable()
 export class ProposalsHorecaService {

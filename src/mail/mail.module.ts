@@ -5,8 +5,8 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
 
 import { MailCronService } from './mail.cron.service'
 import { MailService } from './mail.service'
-import { PrismaService } from 'src/prisma.service'
-import { CronPrismaService } from 'src/utils/cron/cron.prisma.service'
+import { PrismaService } from '../prisma.service'
+import { CronPrismaService } from '../utils/cron/cron.prisma.service'
 
 @Module({
     imports: [

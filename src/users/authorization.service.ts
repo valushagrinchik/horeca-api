@@ -12,7 +12,7 @@ import { User } from '@prisma/client'
 export class AuthorizationService {
     constructor(
         private jwtService: JwtService,
-        private configService: ConfigService,
+        private configService: ConfigService
     ) {}
 
     async login(user: User) {
