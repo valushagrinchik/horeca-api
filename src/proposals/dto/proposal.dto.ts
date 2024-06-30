@@ -6,6 +6,9 @@ export class ProposalDto implements Proposal {
     id: number
 
     @ApiProperty()
+    profileId: number
+
+    @ApiProperty()
     address: string
 
     @ApiProperty()

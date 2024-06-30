@@ -4,12 +4,15 @@ import { PrismaService } from 'src/prisma.service'
 import { ProposalDto } from './dto/proposal.dto'
 import { CreateProposalTemplateDto } from './dto/create-proposal-template.dto'
 import { ProposalTemplateDto } from './dto/proposal-template.dto'
+import { AuthInfoDto } from 'src/users/dto/auth.info.dto'
 
 @Injectable()
 export class ProposalsHorecaService {
     constructor(private prisma: PrismaService) {}
 
-    async create({ imageIds, ...dto }: CreateProposalDto) {
+    async create(auth: AuthInfoDto, { imageIds, ...dto }: CreateProposalDto) {
+        const profile = await this.prisma.profile.findUnique({ where: { userId: auth.id } })
+
         const proposal = await this.prisma.proposal.create({
             data: {
                 ...dto,
@@ -22,6 +25,9 @@ export class ProposalsHorecaService {
                           },
                       }
                     : {}),
+                profile: {
+                    connect: { id: profile.id },
+                },
                 items: {
                     create: dto.items,
                 },

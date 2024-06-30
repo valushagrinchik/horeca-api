@@ -8,6 +8,8 @@ import { DockGet, DockPost } from "src/utils/swagger/decorators/swagger.decorato
 import { ProposalDto } from "./dto/proposal.dto";
 import { CreateProposalTemplateDto } from "./dto/create-proposal-template.dto";
 import { ProposalTemplateDto } from "./dto/proposal-template.dto";
+import { AuthParamDecorator } from "src/utils/auth/decorators/auth.param.decorator";
+import { AuthInfoDto } from "src/users/dto/auth.info.dto";
 
 @AuthUser(UserRole.Horeca)
 @Controller('proposals/horeca')
@@ -17,8 +19,8 @@ export class ProposalsHorecaController {
 
     @Post()
     @DockPost(CreateProposalDto, ProposalDto )
-    async create(@Body() dto: CreateProposalDto) {
-        return this.service.create(dto)
+    async create(@AuthParamDecorator() auth: AuthInfoDto, @Body() dto: CreateProposalDto) {
+        return this.service.create(auth, dto)
     }
 
     @Post('template')

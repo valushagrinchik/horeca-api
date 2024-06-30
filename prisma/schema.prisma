@@ -80,14 +80,16 @@ model Profile {
   profileType ProfileType @map("profile_type")
 
   // Provider 
-  minOrderAmount  Int?      @map("min_order_amount")
-  deliveryMethods String[]  @map("delivery_methods")
+  minOrderAmount  Int?          @map("min_order_amount")
+  deliveryMethods String[]      @map("delivery_methods")
   categories      String[]
   products        Product[]
+  applications    Application[]
 
   // Horeca
   info      String?
   addresses Address[]
+  proposals Proposal[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
@@ -172,11 +174,15 @@ model Uploads {
   path     String
   size     Int
 
-  productImage   ProductImage?
-  horecaAppImage ProposalImage[]
+  // Horeca
+  proposalImage ProposalImage?
 
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+  // Provider
+  productImage     ProductImage?
+  applicationImage ApplicationImage?
+
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @default(now()) @updatedAt @map("updated_at")
 
   @@map("uploads")
 }
@@ -235,7 +241,11 @@ model MailLog {
 
 // Horeca
 model Proposal {
-  id     Int                      @id @default(autoincrement())
+  id Int @id @default(autoincrement())
+
+  profile   Profile @relation(fields: [profileId], references: [id])
+  profileId Int     @map("profile_id")
+
   items  ProposalItem[]
   images ProposalImage[]
 
@@ -249,15 +259,17 @@ model Proposal {
   name  String
   phone String
 
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @default(now()) @updatedAt @map("updated_at")
+
+  applications Application[]
 
   @@map("proposals")
 }
 
 model ProposalItem {
-  id       Int               @id @default(autoincrement())
-  appId    Int               @map("app_id")
+  id       Int      @id @default(autoincrement())
+  appId    Int      @map("app_id")
   app      Proposal @relation(fields: [appId], references: [id])
   name     String
   amount   Float
@@ -273,11 +285,11 @@ model ProposalItem {
 model ProposalImage {
   id Int @id @default(autoincrement())
 
-  appId Int               @map("app_id")
-  app   Proposal @relation(fields: [appId], references: [id])
+  proposalId Int      @map("proposal_id")
+  proposal   Proposal @relation(fields: [proposalId], references: [id])
 
   image   Uploads? @relation(fields: [imageId], references: [id])
-  imageId Int
+  imageId Int      @unique
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
@@ -295,4 +307,41 @@ model ProposalTemplate {
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
   @@map("proposal_templates")
+}
+
+model Application {
+  id Int @id @default(autoincrement())
+
+  profile   Profile @relation(fields: [profileId], references: [id])
+  profileId Int     @map("profile_id")
+
+  proposal   Proposal @relation(fields: [proposalId], references: [id])
+  proposalId Int      @map("proposal_d")
+
+  images       ApplicationImage[]
+  comment      String?
+  available    Boolean            @default(true)
+  manufacturer String
+  paymentType  PaymentType        @map("payment_type")
+  cost         Float
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@map("applications")
+}
+
+model ApplicationImage {
+  id Int @id @default(autoincrement())
+
+  applicationId Int         @map("application_id")
+  application   Application @relation(fields: [applicationId], references: [id])
+
+  image   Uploads? @relation(fields: [imageId], references: [id])
+  imageId Int      @unique
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@map("application_images")
 }
