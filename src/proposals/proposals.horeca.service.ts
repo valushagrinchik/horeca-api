@@ -1,16 +1,19 @@
 import { Injectable } from '@nestjs/common'
-import { CreateProposalHorecaDto } from './dto/create-proposal.horeca.dto'
+import { CreateProposalDto } from './dto/create-proposal.dto'
 import { PrismaService } from 'src/prisma.service'
-import { ProposalHorecaDto } from './dto/proposal.horeca.dto'
-import { CreateProposalTemplateHorecaDto } from './dto/create-proposal-template.horeca.dto'
-import { ProposalTemplateHorecaDto } from './dto/proposal-template.horeca.dto'
+import { ProposalDto } from './dto/proposal.dto'
+import { CreateProposalTemplateDto } from './dto/create-proposal-template.dto'
+import { ProposalTemplateDto } from './dto/proposal-template.dto'
+import { AuthInfoDto } from 'src/users/dto/auth.info.dto'
 
 @Injectable()
 export class ProposalsHorecaService {
     constructor(private prisma: PrismaService) {}
 
-    async create({ imageIds, ...dto }: CreateProposalHorecaDto) {
-        const proposal = await this.prisma.horecaApplication.create({
+    async create(auth: AuthInfoDto, { imageIds, ...dto }: CreateProposalDto) {
+        const profile = await this.prisma.profile.findUnique({ where: { userId: auth.id } })
+
+        const proposal = await this.prisma.proposal.create({
             data: {
                 ...dto,
                 ...(imageIds
@@ -22,6 +25,9 @@ export class ProposalsHorecaService {
                           },
                       }
                     : {}),
+                profile: {
+                    connect: { id: profile.id },
+                },
                 items: {
                     create: dto.items,
                 },
@@ -32,23 +38,23 @@ export class ProposalsHorecaService {
             },
         })
 
-        return new ProposalHorecaDto(proposal)
+        return new ProposalDto(proposal)
     }
 
-    async createTemplate({ content, ...dto }: CreateProposalTemplateHorecaDto) {
-        const proposalTemplate = await this.prisma.horecaApplicationTemplate.create({
+    async createTemplate({ content, ...dto }: CreateProposalTemplateDto) {
+        const proposalTemplate = await this.prisma.proposalTemplate.create({
             data: {
                 ...dto,
                 content: JSON.stringify(content),
             },
         })
-        return new ProposalTemplateHorecaDto(proposalTemplate)
+        return new ProposalTemplateDto(proposalTemplate)
     }
 
     async getTemplate(id: number) {
-        const proposalTemplate = await this.prisma.horecaApplicationTemplate.findUnique({
+        const proposalTemplate = await this.prisma.proposalTemplate.findUnique({
             where: { id },
         })
-        return new ProposalTemplateHorecaDto(proposalTemplate)
+        return new ProposalTemplateDto(proposalTemplate)
     }
 }

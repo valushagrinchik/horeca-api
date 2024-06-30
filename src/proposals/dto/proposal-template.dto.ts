@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { HorecaApplication, HorecaApplicationImage, HorecaApplicationItem, HorecaApplicationTemplate, PaymentType, Prisma } from '@prisma/client'
+import { Prisma, ProposalTemplate } from '@prisma/client'
 
-export class ProposalTemplateHorecaDto implements HorecaApplicationTemplate {
+export class ProposalTemplateDto implements ProposalTemplate {
     @ApiProperty()
     id: number
 
@@ -17,7 +17,7 @@ export class ProposalTemplateHorecaDto implements HorecaApplicationTemplate {
     @ApiProperty()
     updatedAt: Date
 
-    constructor(partial: Partial<HorecaApplicationTemplate>) {
+    constructor(partial: Partial<ProposalTemplate>) {
         Object.assign(this, partial)
     }
 }
