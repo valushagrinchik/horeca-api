@@ -12,7 +12,7 @@ import { UploadsService } from './uploads.service';
 import { FileInterceptor } from '@nestjs/platform-express/multer';
 import { createReadStream } from 'fs';
 import { join } from 'path';
-import { Upload } from './entities/Upload.entity';
+import { Upload } from './entities/upload.entity';
 import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { AuthUser } from 'src/utils/auth/decorators/auth.decorator';
 import { UserRole } from '@prisma/client';

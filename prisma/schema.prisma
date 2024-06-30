@@ -173,7 +173,7 @@ model Uploads {
   size     Int
 
   productImage   ProductImage?
-  horecaAppImage HorecaApplicationImage[]
+  horecaAppImage ProposalImage[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
@@ -233,10 +233,11 @@ model MailLog {
   @@map("mail_logs")
 }
 
-model HorecaApplication {
+// Horeca
+model Proposal {
   id     Int                      @id @default(autoincrement())
-  items  HorecaApplicationItem[]
-  images HorecaApplicationImage[]
+  items  ProposalItem[]
+  images ProposalImage[]
 
   address      String
   deliveryTime DateTime    @map("delivery_time")
@@ -251,13 +252,13 @@ model HorecaApplication {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
-  @@map("horeca_applications")
+  @@map("proposals")
 }
 
-model HorecaApplicationItem {
+model ProposalItem {
   id       Int               @id @default(autoincrement())
   appId    Int               @map("app_id")
-  app      HorecaApplication @relation(fields: [appId], references: [id])
+  app      Proposal @relation(fields: [appId], references: [id])
   name     String
   amount   Float
   unit     String
@@ -266,14 +267,14 @@ model HorecaApplicationItem {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
-  @@map("horeca_application_items")
+  @@map("proposal_items")
 }
 
-model HorecaApplicationImage {
+model ProposalImage {
   id Int @id @default(autoincrement())
 
   appId Int               @map("app_id")
-  app   HorecaApplication @relation(fields: [appId], references: [id])
+  app   Proposal @relation(fields: [appId], references: [id])
 
   image   Uploads? @relation(fields: [imageId], references: [id])
   imageId Int
@@ -281,10 +282,10 @@ model HorecaApplicationImage {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
-  @@map("horeca_application_images")
+  @@map("proposal_images")
 }
 
-model HorecaApplicationTemplate {
+model ProposalTemplate {
   id Int @id @default(autoincrement())
 
   content Json
@@ -293,5 +294,5 @@ model HorecaApplicationTemplate {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
-  @@map("horeca_applications_templates")
+  @@map("proposal_templates")
 }

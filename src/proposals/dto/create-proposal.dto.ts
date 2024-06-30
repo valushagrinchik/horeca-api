@@ -3,7 +3,7 @@ import { ValidateNested } from 'class-validator'
 import { Categories } from 'src/utils/constants'
 import { TypeValidate, Validate } from 'src/utils/validation/validate.decotators'
 
-class CreateProposalItemHorecaDto {
+class CreateProposalItemDto {
     @Validate(TypeValidate.STRING)
     name: string
 
@@ -17,10 +17,10 @@ class CreateProposalItemHorecaDto {
     category: Categories
 }
 
-export class CreateProposalHorecaDto {
-    @Validate(TypeValidate.ARRAY, {minItems: 1, type: [CreateProposalItemHorecaDto]})
+export class CreateProposalDto {
+    @Validate(TypeValidate.ARRAY, {minItems: 1, type: [CreateProposalItemDto]})
     @ValidateNested()
-    items: CreateProposalItemHorecaDto[]
+    items: CreateProposalItemDto[]
 
     @Validate(TypeValidate.ARRAY, {type: [Number]})
     imageIds: number[]

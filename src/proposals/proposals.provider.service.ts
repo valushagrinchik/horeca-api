@@ -1,7 +1,24 @@
-import { Injectable } from "@nestjs/common";
-import { CreateProposalProviderDto } from "./dto/create-proposal.provider.dto";
+import { Injectable } from '@nestjs/common'
+import { PrismaService } from 'src/prisma.service'
+import { AuthInfoDto } from 'src/users/dto/auth.info.dto'
+import { ProposalDto } from './dto/proposal.dto'
 
 @Injectable()
 export class ProposalsProviderService {
-    create (dto: CreateProposalProviderDto) {}
+    constructor(private prisma: PrismaService) {}
+
+    async findAppropriateProposals(auth: AuthInfoDto) {
+        const provider = await this.prisma.user.findUnique({ where: { id: auth.id }, include: { profile: true } })
+        const categories = provider.profile.categories
+        const proposals = await this.prisma.proposal.findMany({
+            where: {
+                items: {
+                    some: {
+                        category: { in: categories },
+                    },
+                },
+            },
+        })
+        return proposals.map(proposal=> new ProposalDto(proposal))
+    }
 }
