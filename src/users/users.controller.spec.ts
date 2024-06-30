@@ -3,6 +3,11 @@ import { UsersController } from './users.controller'
 import { UsersService } from './users.service'
 import { Test } from '@nestjs/testing'
 import { PrismaService } from '../prisma.service'
+import { AuthorizationService } from './authorization.service'
+import { MailModule } from '../mail/mail.module'
+import { JwtModule } from '@nestjs/jwt'
+import { ConfigModule, ConfigService } from '@nestjs/config'
+import { CronPrismaService } from '../utils/cron/cron.prisma.service'
 
 describe('UsersController', () => {
     let usersController: UsersController
@@ -11,7 +16,8 @@ describe('UsersController', () => {
     beforeEach(async () => {
         const moduleRef = await Test.createTestingModule({
             controllers: [UsersController],
-            providers: [UsersService, PrismaService],
+            providers: [ConfigService, UsersService, PrismaService, CronPrismaService, AuthorizationService],
+            imports: [ConfigModule, MailModule, JwtModule],
         }).compile()
 
         usersService = moduleRef.get<UsersService>(UsersService)
