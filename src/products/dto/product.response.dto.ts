@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Product, ProductPackagingType, Uploads } from '@prisma/client';
 import { Expose } from 'class-transformer';
+import { Categories } from 'src/utils/constants';
 
 export class ProductResponse implements Product {
     @ApiProperty()
@@ -8,7 +9,7 @@ export class ProductResponse implements Product {
     @ApiProperty()
     profileId: number;
     @ApiProperty()
-    category: string;
+    category: Categories;
     @ApiProperty()
     name: string;
     @ApiProperty()

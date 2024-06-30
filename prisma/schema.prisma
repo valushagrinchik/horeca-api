@@ -42,6 +42,12 @@ enum CronType {
   Mail
 }
 
+enum PaymentType {
+  Prepayment
+  Deferment
+  PaymentUponDelivery
+}
+
 model User {
   id Int @id @default(autoincrement())
 
@@ -152,6 +158,9 @@ model ProductImage {
   image   Uploads? @relation(fields: [imageId], references: [id])
   imageId Int?     @unique
 
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
   @@map("products_images")
 }
 
@@ -163,7 +172,11 @@ model Uploads {
   path     String
   size     Int
 
-  productImage ProductImage?
+  productImage   ProductImage?
+  horecaAppImage HorecaApplicationImage[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
   @@map("uploads")
 }
@@ -218,4 +231,67 @@ model MailLog {
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
   @@map("mail_logs")
+}
+
+model HorecaApplication {
+  id     Int                      @id @default(autoincrement())
+  items  HorecaApplicationItem[]
+  images HorecaApplicationImage[]
+
+  address      String
+  deliveryTime DateTime    @map("delivery_time")
+  acceptUntill DateTime    @map("accept_untill")
+  paymentType  PaymentType @map("payment_type")
+
+  comment String?
+
+  name  String
+  phone String
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@map("horeca_applications")
+}
+
+model HorecaApplicationItem {
+  id       Int               @id @default(autoincrement())
+  appId    Int               @map("app_id")
+  app      HorecaApplication @relation(fields: [appId], references: [id])
+  name     String
+  amount   Float
+  unit     String
+  category String
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@map("horeca_application_items")
+}
+
+model HorecaApplicationImage {
+  id Int @id @default(autoincrement())
+
+  appId Int               @map("app_id")
+  app   HorecaApplication @relation(fields: [appId], references: [id])
+
+  image   Uploads? @relation(fields: [imageId], references: [id])
+  imageId Int
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@map("horeca_application_images")
+}
+
+model HorecaApplicationTemplate {
+  id Int @id @default(autoincrement())
+
+  content Json
+  name    String
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@map("horeca_applications_templates")
 }
