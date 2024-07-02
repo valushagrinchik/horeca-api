@@ -13,15 +13,17 @@
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-    "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json",
-    "migrate:dev": "npx prisma migrate dev --name",
-    "prisma:generate": "npx prisma generate",
-    "migrate:deploy": "npx prisma migrate deploy",
-    "migrate:reset": "npx prisma migrate reset"
+    "migration:create": "npx prisma migrate dev --name",
+    "migrate:dev": "npx prisma migrate dev",
+    "migrate:prod": "npx prisma migrate deploy && npx prisma generate",
+    "migrate:reset": "npx prisma migrate reset",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "test:prepare": "npm run docker:down && npm run docker:up && dotenv -e .env.test -- npm run migrate:prod",
+    "test": "npm run test:prepare && dotenv -e .env.test -- jest -i"
   },
   "dependencies": {
     "@nestjs-modules/mailer": "^2.0.2",
