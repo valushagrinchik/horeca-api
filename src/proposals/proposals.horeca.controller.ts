@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common'
-import { ApiTags } from '@nestjs/swagger'
+import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { CreateProposalDto } from './dto/create-proposal.dto'
 import { ProposalsHorecaService } from './proposals.horeca.service'
 import { AuthUser } from '../utils/auth/decorators/auth.decorator'
@@ -18,18 +18,21 @@ export class ProposalsHorecaController {
     constructor(private readonly service: ProposalsHorecaService) {}
 
     @Post()
+    @ApiOperation({ summary: 'Create products(categories) set proposal required for HoReCa' })
     @DockPost(CreateProposalDto, ProposalDto)
     async create(@AuthParamDecorator() auth: AuthInfoDto, @Body() dto: CreateProposalDto) {
         return this.service.create(auth, dto)
     }
 
     @Post('template')
+    @ApiOperation({ summary: 'Create template of products(categories) set proposal required for HoReCa to use later' })
     @DockPost(CreateProposalTemplateDto, ProposalTemplateDto)
     async createTemplate(@Body() dto: CreateProposalTemplateDto) {
         return this.service.createTemplate(dto)
     }
 
     @Get('template/:id')
+    @ApiOperation({ summary: 'Get template of products(categories) set proposal required for HoReCa' })
     @DockGet(ProposalTemplateDto)
     async getTemplate(@Param('id') id: number) {
         return this.service.getTemplate(id)

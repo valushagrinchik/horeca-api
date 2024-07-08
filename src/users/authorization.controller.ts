@@ -1,7 +1,7 @@
 import { Controller, Post, Body, Get, Param, Res } from '@nestjs/common'
 import { UsersService } from './users.service'
 import { RegistrateUserDto } from './dto/registrate-user.dto'
-import { ApiExtraModels, ApiTags } from '@nestjs/swagger'
+import { ApiExtraModels, ApiOperation, ApiTags } from '@nestjs/swagger'
 import { LoginUserDto } from './dto/login-user.dto'
 import { AuthResultDto } from './dto/auth.result.dto'
 import { DockGet, DockPost } from '../utils/swagger/decorators/swagger.decorators'
@@ -20,6 +20,7 @@ export class AuthorizationController {
     ) {}
 
     @Post('registration')
+    @ApiOperation({ summary: 'Registrate user' })
     @DockPost(RegistrateUserDto, AuthResultDto)
     @ApiExtraModels(CreateHorecaProfileDto, CreateProviderProfileDto)
     async registrate(@Body() dto: RegistrateUserDto) {
@@ -27,12 +28,14 @@ export class AuthorizationController {
     }
 
     @Post('login')
+    @ApiOperation({ summary: 'Authenticate user' })
     @DockPost(LoginUserDto, AuthResultDto)
     async login(@Body() loginDto: LoginUserDto) {
         return this.usersService.login(loginDto)
     }
 
     @Get('activate/:uuid')
+    @ApiOperation({ summary: 'Activate profile by link in the confirmation email' })
     @DockGet(SuccessDto)
     async activateAccount(@Res() res: Response, @Param('uuid') uuid: string) {
         await this.usersService.activateAccount(uuid)

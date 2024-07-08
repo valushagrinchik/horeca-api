@@ -1,5 +1,5 @@
 import { Controller, Get } from '@nestjs/common'
-import { ApiTags } from '@nestjs/swagger'
+import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { AuthUser } from '../utils/auth/decorators/auth.decorator'
 import { UserRole } from '@prisma/client'
 import { ProposalsProviderService } from './proposals.provider.service'
@@ -16,6 +16,7 @@ export class ProposalsProviderController {
 
     @Get()
     @DockGet([ProposalDto])
+    @ApiOperation({ summary: 'List of HoReCa proposals that matches with provider\'s offers' })
     async findAppropriateProposals(@AuthParamDecorator() auth: AuthInfoDto) {
         return this.service.findAppropriateProposals(auth)
     }
