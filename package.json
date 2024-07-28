@@ -8,22 +8,23 @@
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\"",
-    "start": "NODE_ENV=development nest start",
-    "start:dev": "NODE_ENV=development nest start --watch",
-    "start:prod": "NODE_ENV=production node dist/main",
+    "start": "nest start",
+    "start:dev": "nest start --watch",
+    "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+
     "migration:create": "npx prisma migrate dev --name",
-    "migrate:dev": "dotenv -e .env.development npx prisma migrate dev",
-    "migrate": "npx prisma migrate deploy && npx prisma generate",
-    "migrate:prod": "dotenv -e .env.production -- npm run migrate",
+    "migrate:dev": "npx prisma migrate dev",
+    "migrate:prod": "npx prisma migrate deploy && npx prisma generate",
     "migrate:reset": "npx prisma migrate reset",
+
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "docker:up": "docker compose up -d",
     "docker:down": "docker compose down",
-    "test:prepare": "npm run docker:down && npm run docker:up && dotenv -e .env.test -- npm run migrate",
-    "test": "npm run test:prepare && dotenv -e .env.test -- jest -i"
+    "test:db:prepare": "npm run docker:down && npm run docker:up && dotenv -e .env.test -- npm run migrate:prod",
+    "test": "npm run test:db:prepare && dotenv -e .env.test -- jest -i"
   },
   "dependencies": {
     "@nestjs-modules/mailer": "^2.0.2",
@@ -42,7 +43,6 @@
     "bcrypt": "^5.1.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
-    "dotenv": "^16.4.5",
     "hbs": "^4.2.0",
     "lodash": "^4.17.21",
     "nodemailer": "^6.9.13",

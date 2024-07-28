@@ -10,7 +10,7 @@ import { UploadsModule } from './uploads/uploads.module'
 @Module({
     imports: [
         ConfigModule.forRoot({
-            envFilePath: `.env.${process.env.NODE_ENV}`,
+            envFilePath: process.env.NODE_ENV == 'test' ? '.env.test' : '.env',
             isGlobal: true,
         }),
 
