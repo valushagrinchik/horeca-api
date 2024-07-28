@@ -48,6 +48,12 @@ enum PaymentType {
   PaymentUponDelivery
 }
 
+enum ChatType {
+  Support
+  Order
+  Private
+}
+
 model User {
   id Int @id @default(autoincrement())
 
@@ -65,6 +71,11 @@ model User {
   phone   String?
   profile Profile?
   mails   Mail[]
+
+  // // where user is a sender 
+  // chats   ChatMessage[] @relation("senderChat")
+  // // where user is a receiver 
+  // receiverChats ChatMessage[] @relation("receiverChat")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
@@ -181,8 +192,8 @@ model Uploads {
   productImage     ProductImage?
   applicationImage ApplicationImage?
 
-  createdAt       DateTime @default(now()) @map("created_at")
-  updatedAt       DateTime @default(now()) @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
   @@map("uploads")
 }
@@ -259,8 +270,8 @@ model Proposal {
   name  String
   phone String
 
-  createdAt   DateTime      @default(now()) @map("created_at")
-  updatedAt   DateTime      @default(now()) @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
   applications Application[]
 
@@ -344,4 +355,57 @@ model ApplicationImage {
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
   @@map("application_images")
+}
+
+model Order {
+  id Int @id @default(autoincrement())
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  chat Chat?
+
+  @@map("orders")
+}
+
+model Chat {
+  id Int @id @default(autoincrement())
+
+  messages ChatMessage[]
+
+  owner   User @relation("chat", fields: [userId], references: [id])
+  ownerId Int  @map("user_id")
+
+  opponent   User @relation("chat", fields: [opponentId], references: [id])
+  opponentId Int  @map("opponent_id")
+
+  type ChatType
+
+  order   Order? @relation(fields: [orderId], references: [id])
+  orderId Int?    @unique @map("order_id") 
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@map("chats")
+}
+
+model ChatMessage {
+  id Int @id @default(autoincrement())
+
+  chatId Int  @map("chat_id")
+  chat   Chat @relation(fields: [chatId], references: [id])
+
+  message String
+
+  sender   User @relation("senderChat", fields: [senderId], references: [id])
+  senderId Int  @map("sender_id")
+
+  receiver   User @relation("receiverChat", fields: [receiverId], references: [id])
+  receiverId Int  @map("receiver_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@map("chat_messages")
 }
