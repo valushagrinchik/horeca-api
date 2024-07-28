@@ -21,7 +21,7 @@ export class CreateProductProviderDto {
     @Validate(TypeValidate.NUMBER)
     count: number
 
-    @Validate(TypeValidate.STRING)
+    @Validate(TypeValidate.STRING, { enum: ProductPackagingType, enumName: 'ProductPackagingType' })
     packagingType: ProductPackagingType
 
     @Validate(TypeValidate.ARRAY, { type: [Number] })
