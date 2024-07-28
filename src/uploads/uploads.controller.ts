@@ -9,7 +9,7 @@ import { UserRole } from '@prisma/client'
 import { DockGet } from '../utils/swagger/decorators/swagger.decorators'
 import { Upload } from './dto/upload'
 
-@AuthUser(UserRole.Provider)
+@AuthUser(UserRole.Provider, UserRole.Horeca, UserRole.Admin)
 @Controller('uploads')
 @ApiTags('Uploads')
 export class UploadsController {

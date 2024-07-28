@@ -18,6 +18,8 @@
     "migrate:prod": "npx prisma migrate deploy && npx prisma generate",
     "migrate:reset": "npx prisma migrate reset",
 
+    "db:seed": "npx prisma db seed",
+
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
@@ -93,5 +95,8 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
+  },
+  "prisma": {
+    "seed": "ts-node --transpile-only prisma/seed.ts"
   }
 }
