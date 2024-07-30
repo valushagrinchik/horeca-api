@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common'
-import { ApiOperation, ApiTags } from '@nestjs/swagger'
+import { ApiExtraModels, ApiOperation, ApiTags } from '@nestjs/swagger'
 import { AuthUser } from '../utils/auth/decorators/auth.decorator'
 import { UserRole } from '@prisma/client'
 import { CreateProductProviderDto } from './dto/create-product.provider.dto'
@@ -8,7 +8,7 @@ import { UpdateProductProviderDto } from './dto/update-product.provider.dto'
 import { AuthInfoDto } from '../users/dto/auth.info.dto'
 import { AuthParamDecorator } from '../utils/auth/decorators/auth.param.decorator'
 import { DockGet, DockPost } from '../utils/swagger/decorators/swagger.decorators'
-import { ProductResponse } from './dto/product.response.dto'
+import { ProductImage, ProductResponse } from './dto/product.response.dto'
 
 @AuthUser(UserRole.Provider)
 @Controller('products/provider')

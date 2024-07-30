@@ -3,6 +3,27 @@ import { Product, ProductPackagingType, Uploads } from '@prisma/client'
 import { Expose } from 'class-transformer'
 import { Categories } from '../../utils/constants'
 
+export class Image implements Uploads {
+    @ApiProperty()
+    id: number
+    @ApiProperty()
+    name: string
+    @ApiProperty()
+    mimetype: string
+    @ApiProperty()
+    path: string
+    @ApiProperty()
+    size: number
+    @ApiProperty()
+    createdAt: Date
+    @ApiProperty()
+    updatedAt: Date
+}
+export class ProductImage {
+    @ApiProperty({type: Image})
+    image: Image
+}
+
 export class ProductResponse implements Product {
     @ApiProperty()
     id: number
@@ -26,11 +47,8 @@ export class ProductResponse implements Product {
     createdAt: Date
     @ApiProperty()
     updatedAt: Date
-
-    @ApiProperty()
-    productImage: {
-        image: Uploads
-    }[]
+    @ApiProperty({ type: [ProductImage] })
+    productImage: ProductImage[]
 
     @ApiProperty()
     @Expose()
