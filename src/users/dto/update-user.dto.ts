@@ -9,21 +9,21 @@ import { Match } from '../../utils/auth/decorators/match.decorator'
 
 export class UpdateUserDto {
     @Validate(TypeValidate.STRING, { required: false })
-    name: string
+    name?: string
 
     @Validate(TypeValidate.STRING, { required: false })
-    email: string
+    email?: string
 
     @Validate(TypeValidate.STRING, { required: false })
-    phone: string
+    phone?: string
 
     @Validate(TypeValidate.STRING, { required: false })
-    password: string
+    password?: string
 
-    @Validate(TypeValidate.STRING)
+    @Validate(TypeValidate.STRING, { required: false })
     @Match(UpdateUserDto, s => s.password)
     @ValidateIf(o => o.password && o.password !== o.repeatPassword)
-    repeatPassword: string
+    repeatPassword?: string
 
     @Validate(TypeValidate.OBJECT, {
         oneOf: [{ $ref: getSchemaPath(CreateHorecaProfileDto) }, { $ref: getSchemaPath(CreateProviderProfileDto) }],
