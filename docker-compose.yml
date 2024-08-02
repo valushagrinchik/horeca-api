@@ -1,15 +1,29 @@
-# Set the version of docker compose to use
-version: '2.27'
-
-# The containers that compose the project
 services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: horeca_api
+    environment:
+      - PORT=${PORT}
+    ports:
+      - '3000:3000'
+    depends_on:
+      - db
+
   db:
     image: postgres:14
     restart: always
-    container_name: horeca-tests-prisma
+    container_name: horeca_postgres
+    volumes:
+      - ./db_scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - horeca_postgres-data:/var/lib/postgresql/data
     ports:
-      - '5433:5432'
+      - '5432:5432'
     environment:
-      POSTGRES_USER: prisma
-      POSTGRES_PASSWORD: prisma
-      POSTGRES_DB: horeca-tests
+      POSTGRES_USER: horeca
+      POSTGRES_PASSWORD: horeca
+      POSTGRES_DB: horeca
+
+volumes:
+  horeca_postgres-data:
