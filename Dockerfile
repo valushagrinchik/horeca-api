@@ -2,9 +2,11 @@ FROM node:18
 
 WORKDIR /app
 
-COPY package.json ./
+COPY package*.json ./
 
-RUN npm install
+RUN npm config set registry https://registry.npmjs.org/
+
+RUN npm ci
 
 COPY . .
 
