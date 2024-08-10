@@ -5,18 +5,10 @@ on:
     branches: [ "master" ]
 
 jobs:
-  prepare-environment:
-    runs-on: self-hosted
-    steps:
-      - name: Stop and remove containers, networks
-        run: npm run docker:down
-      - name: Remove unused data
-        run: docker system prune -a -f
   deploy:
     runs-on: self-hosted
-    needs: prepare-environment
     steps:
       - name: checkout repo
         uses: actions/checkout@v3
-      - name: docker compose
+      - name: npm run docker
         run: npm run docker
