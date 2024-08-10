@@ -10,5 +10,5 @@ jobs:
     steps:
       - name: checkout repo
         uses: actions/checkout@v3
-      - name: npm run docker
-        run: npm run docker
+      - name: docker compose up
+        run: docker compose up --build -d
