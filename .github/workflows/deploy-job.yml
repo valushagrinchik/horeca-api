@@ -9,7 +9,7 @@ jobs:
     runs-on: self-hosted
     steps:
       - name: Stop and remove containers, networks
-        run: docker compose -f docker-compose.yml down
+        run: npm run docker:down
       - name: Remove unused data
         run: docker system prune -a -f
   deploy:
