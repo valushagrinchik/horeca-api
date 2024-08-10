@@ -1,6 +1,6 @@
 import { PaymentType, PrismaClient, ProductPackagingType, ProfileType, UserRole } from '@prisma/client'
 import { Categories, DeliveryMethods } from '../src/utils/constants'
-import * as bcrypt from 'bcrypt'
+import { generatePassword } from 'src/utils/crypto'
 
 const generateAcceptUntil = () => {
     const now = new Date()
@@ -17,7 +17,7 @@ async function main() {
         update: {},
         create: {
             email: 'horeca@test.com',
-            password: await bcrypt.hash('horeca!', 10),
+            password: generatePassword('horeca!'),
             activationLink: 'Horeca',
             isActivated: true,
             name: 'Horeca',
@@ -63,7 +63,7 @@ async function main() {
         update: {},
         create: {
             email: 'provider@test.com',
-            password: await bcrypt.hash('provider!', 10),
+            password: generatePassword('provider!'),
             activationLink: 'Provider',
             isActivated: true,
             name: 'Provider',
@@ -88,7 +88,7 @@ async function main() {
         update: {},
         create: {
             email: 'admin@test.com',
-            password: await bcrypt.hash('admin!', 10),
+            password: generatePassword('admin!'),
             activationLink: 'Admin',
             isActivated: true,
             name: 'Admin',

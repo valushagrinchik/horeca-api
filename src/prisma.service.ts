@@ -6,8 +6,8 @@ import { UpdateUserDto } from './users/dto/update-user.dto'
 import { CreateProviderProfileDto } from './users/dto/provider/create-provider-profile.dto'
 import { CreateHorecaProfileDto } from './users/dto/horeca/create-horeca-profile.dto'
 import { RegistrateUserDto } from './users/dto/registrate-user.dto'
-import * as bcrypt from 'bcrypt'
 import { v4 as uuidv4 } from 'uuid'
+import { generatePassword } from './utils/crypto'
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit {
@@ -19,7 +19,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
         return this.user.create({
             data: {
                 email: dto.email,
-                password: await bcrypt.hash(dto.password, 10),
+                password: generatePassword(dto.password),
                 name: dto.name,
                 tin: dto.tin,
                 phone: dto.phone,
@@ -82,7 +82,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
             include: { profile: { include: { addresses: true } } },
             data: {
                 ...mainInfo,
-                ...(password ? { password: await bcrypt.hash(password, 10) } : {}),
+                ...(password ? { password: generatePassword(password) } : {}),
                 profile: {
                     update: {
                         data: {
@@ -133,7 +133,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
             include: { profile: { include: { addresses: true } } },
             data: {
                 ...mainInfo,
-                ...(password ? { password: await bcrypt.hash(password, 10) } : {}),
+                ...(password ? { password: generatePassword(password) } : {}),
                 profile: {
                     update: {
                         data: profile,
