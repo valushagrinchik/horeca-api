@@ -1,10 +1,22 @@
 services:
   app:
-    env_file: ".env"
     build:
       context: .
       dockerfile: Dockerfile
     container_name: horeca_api
+    environment:
+      - DATABASE_URL=${{ vars.DATABASE_URL }}
+      - JWT_REFRESH_TOKEN_SECRET=${{ vars.JWT_REFRESH_TOKEN_SECRET }}
+      - JWT_ACCESS_TOKEN_SECRET=${{ vars.JWT_ACCESS_TOKEN_SECRET }}
+      - SMTP_HOST=${{ vars.SMTP_HOST }}
+      - SMTP_PORT=${{ vars.SMTP_PORT }}
+      - SMTP_USER=${{ vars.SMTP_USER }}
+      - SMTP_PASSWORD=${{ vars.SMTP_PASSWORD }}
+      - SUPPORT_MAIL=${{ vars.SUPPORT_MAIL }}
+      - BACKEND_URL=${{ vars.BACKEND_URL }}
+      - FRONTEND_URL=${{ vars.FRONTEND_URL }}
+      - CRYPTO_SALT=${{ vars.CRYPTO_SALT }}
+      - PORT=3001
     ports:
       - '3001:80'
     depends_on:
