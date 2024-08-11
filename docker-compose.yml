@@ -1,11 +1,10 @@
 services:
   app:
+    env_file: ".env"
     build:
       context: .
       dockerfile: Dockerfile
     container_name: horeca_api
-    environment:
-      - PORT=${PORT}
     ports:
       - '3001:80'
     depends_on:
