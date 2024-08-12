@@ -4,6 +4,8 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: horeca_api
+    volumes:
+      - ~/docker-volumes/horeca_api-uploads:/app/uploads
     env_file: ".env"
     environment:
       - PORT=3001
@@ -18,7 +20,7 @@ services:
     container_name: horeca_postgres
     volumes:
       - ./db_scripts:/docker-entrypoint-initdb.d
-      - /horeca_postgres-data:/var/lib/postgresql/data
+      - ~/docker-volumes/horeca_postgres-data:/var/lib/postgresql/data
     ports:
       - '5432:5432'
     environment:
@@ -26,4 +28,5 @@ services:
       - POSTGRES_PASSWORD=horeca
       - POSTGRES_DB=horeca
 volumes:
+  horeca_api-uploads:
   horeca_postgres-data:
