@@ -81,11 +81,12 @@ export class UsersService {
 
     async login(dto: LoginUserDto) {
         const user = await this.prisma.user.findFirst({ where: { email: dto.email } })
+
         if (!user) {
             throw new BadRequestException(new ErrorDto(ErrorCodeEnum.AUTH_FAIL))
         }
 
-        if (validPassword(dto.password, user.password)) {
+        if (!validPassword(dto.password, user.password)) {
             throw new BadRequestException(new ErrorDto(ErrorCodeEnum.AUTH_FAIL))
         }
 
