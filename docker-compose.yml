@@ -18,7 +18,7 @@ services:
     container_name: horeca_postgres
     volumes:
       - ./db_scripts:/docker-entrypoint-initdb.d
-      - ./horeca_pg-data:/var/lib/postgresql/data
+      - /horeca_postgres-data:/var/lib/postgresql/data
     ports:
       - '5432:5432'
     environment:
@@ -26,4 +26,4 @@ services:
       - POSTGRES_PASSWORD=horeca
       - POSTGRES_DB=horeca
 volumes:
-  horeca_pg-data:
+  horeca_postgres-data:
