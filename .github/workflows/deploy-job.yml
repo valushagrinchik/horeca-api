@@ -5,10 +5,12 @@ on:
     branches: [ "master" ]
 
 jobs:
-  create-envfile:
+  deploy:
     runs-on: self-hosted
     steps:
-      - name: Make envfile
+      - name: checkout repo
+        uses: actions/checkout@v3
+      - name: create env file
         uses: SpicyPizza/create-envfile@v2.0
         with:
           envkey_DATABASE_URL: ${{ vars.DATABASE_URL }}
@@ -22,16 +24,9 @@ jobs:
           envkey_BACKEND_URL: ${{ vars.BACKEND_URL }}
           envkey_FRONTEND_URL: ${{ vars.FRONTEND_URL }}
           envkey_CRYPTO_SALT: ${{ vars.CRYPTO_SALT }}
-          directory: ./_work/horeca-api/horeca-api
           file_name: .env
           fail_on_empty: false
           sort_keys: false
-  deploy:
-    runs-on: self-hosted
-    needs: create-envfile
-    steps:
-      - name: checkout repo
-        uses: actions/checkout@v3
       - name: run in docker
         run: docker compose up --build -d
 
