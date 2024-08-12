@@ -27,6 +27,7 @@ jobs:
           sort_keys: false
   deploy:
     runs-on: self-hosted
+    needs: create-envfile
     steps:
       - name: checkout repo
         uses: actions/checkout@v3
