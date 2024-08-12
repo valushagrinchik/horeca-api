@@ -2,8 +2,8 @@ import { PaymentType, PrismaClient, ProductPackagingType, ProfileType, UserRole 
 import { Categories, DeliveryMethods } from '../src/utils/constants'
 import { generatePassword } from '../src/utils/crypto'
 
-import dotenv from 'dotenv'; 
-dotenv.config();
+import * as dotenv from 'dotenv'
+dotenv.config()
 
 const generateAcceptUntil = () => {
     const now = new Date()
