@@ -1,1 +1,4 @@
+CREATE USER horeca;
 CREATE DATABASE horeca;
+GRANT ALL PRIVILEGES ON DATABASE horeca TO horeca;
+ALTER USER horeca with PASSWORD ‘horeca’;
