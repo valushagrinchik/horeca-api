@@ -1,6 +1,6 @@
 import { PaymentType, PrismaClient, ProductPackagingType, ProfileType, UserRole } from '@prisma/client'
 import { Categories, DeliveryMethods } from '../src/utils/constants'
-import { generatePassword } from 'src/utils/crypto'
+import { generatePassword } from '../src/utils/crypto'
 
 const generateAcceptUntil = () => {
     const now = new Date()
