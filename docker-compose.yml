@@ -17,8 +17,8 @@ services:
     restart: always
     container_name: horeca_postgres
     volumes:
-      - ./db_scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
-      - horeca_pg-data:/var/lib/postgresql/data
+      - ./db_scripts:/docker-entrypoint-initdb.d
+      - ./horeca_pg-data:/var/lib/postgresql/data
     ports:
       - '5432:5432'
     environment:
