@@ -16,7 +16,7 @@ jobs:
         with:
           envkey_DATABASE_URL: ${{ vars.DATABASE_URL }}
           envkey_JWT_REFRESH_TOKEN_SECRET: ${{ vars.JWT_REFRESH_TOKEN_SECRET }}
-          envkey_JWT_ACCESS_TOKEN_SECRET: ${{ secrets.JWT_ACCESS_TOKEN_SECRET }}
+          envkey_JWT_ACCESS_TOKEN_SECRET: ${{ vars.JWT_ACCESS_TOKEN_SECRET }}
           envkey_SMTP_HOST: ${{ vars.SMTP_HOST }}
           envkey_SMTP_PORT: ${{ vars.SMTP_PORT }}
           envkey_SMTP_USER: ${{ vars.SMTP_USER }}
