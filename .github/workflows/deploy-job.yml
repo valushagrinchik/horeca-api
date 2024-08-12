@@ -22,6 +22,7 @@ jobs:
           envkey_BACKEND_URL: ${{ vars.BACKEND_URL }}
           envkey_FRONTEND_URL: ${{ vars.FRONTEND_URL }}
           envkey_CRYPTO_SALT: ${{ vars.CRYPTO_SALT }}
+          directory: ${{ github.workspace }}
           file_name: .env
           fail_on_empty: false
           sort_keys: false
