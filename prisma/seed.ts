@@ -1,5 +1,5 @@
 import { PaymentType, PrismaClient, ProductPackagingType, ProfileType, UserRole } from '@prisma/client'
-import { Categories, DeliveryMethods } from '../src/utils/constants'
+import { Categories, DeliveryMethods } from '../src/utils/enums'
 import { generatePassword } from '../src/utils/crypto'
 
 import * as dotenv from 'dotenv'
@@ -102,7 +102,7 @@ async function main() {
     })
 
     const product = await prisma.product.upsert({
-        where: { id:  123},
+        where: { id:  123 },
         update: {},
         create: {
             profile:{
@@ -110,7 +110,6 @@ async function main() {
                     id: provider.profile.id
                 }
             },
-                 
             category : Categories.alcoholicDrinks,
             name: 'beer',
             description : 'beer',

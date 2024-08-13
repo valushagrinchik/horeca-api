@@ -6,6 +6,9 @@ import { ErrorDto } from '../utils/error.dto'
 import { ErrorCodeEnum } from '../utils/error.code.enum'
 import { AuthInfoDto } from '../users/dto/auth.info.dto'
 import { ProductResponse } from './dto/product.response.dto'
+import { PaginateValidateType } from 'src/utils/swagger/decorators'
+import { ProductSearchDto } from './dto/product.search.dto'
+import { skip } from 'node:test'
 
 @Injectable()
 export class ProductsProviderService {
@@ -40,12 +43,14 @@ export class ProductsProviderService {
         return new ProductResponse(product)
     }
 
-    async findAll(auth: AuthInfoDto) {
+    async findAll(auth: AuthInfoDto, paginate: PaginateValidateType<ProductSearchDto>) {
+        const search = paginate.search
         const profile = await this.prisma.profile.findUnique({ where: { userId: auth.id } })
 
         const products = await this.prisma.product.findMany({
             where: {
                 profileId: profile.id,
+                ...search,
             },
             include: {
                 productImage: {
@@ -54,6 +59,11 @@ export class ProductsProviderService {
                     },
                 },
             },
+            orderBy: {
+                [paginate.sort.field]: paginate.sort.order,
+            },
+            take: paginate.limit,
+            skip: paginate.offset,
         })
 
         return products.map(p => new ProductResponse(p))

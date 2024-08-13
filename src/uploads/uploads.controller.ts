@@ -6,8 +6,8 @@ import { join } from 'path'
 import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger'
 import { AuthUser } from '../utils/auth/decorators/auth.decorator'
 import { UserRole } from '@prisma/client'
-import { DockGet } from '../utils/swagger/decorators/swagger.decorators'
 import { Upload } from './dto/upload'
+import { RequestDecorator } from 'src/utils/swagger/decorators'
 
 @AuthUser(UserRole.Provider, UserRole.Horeca, UserRole.Admin)
 @Controller('uploads')
@@ -35,7 +35,7 @@ export class UploadsController {
     }
 
     @Get(':id')
-    @DockGet(StreamableFile)
+    @RequestDecorator(StreamableFile)
     async read(@Param('id') id: number): Promise<StreamableFile> {
         const upload = await this.uploadsService.findOne(id)
         const file = createReadStream(join(process.cwd(), upload.path))

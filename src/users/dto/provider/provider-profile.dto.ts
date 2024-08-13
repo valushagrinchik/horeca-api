@@ -1,7 +1,7 @@
 import { Address, Profile, ProfileType } from '@prisma/client'
 import { Exclude } from 'class-transformer'
 import { ArrayMinSize } from 'class-validator'
-import { Categories, DeliveryMethods } from '../../../utils/constants'
+import { Categories, DeliveryMethods } from '../../../utils/enums'
 import { TypeValidate, Validate } from '../../../utils/validation/validate.decotators'
 
 export class ProviderProfileDto implements Profile {

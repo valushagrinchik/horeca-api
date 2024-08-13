@@ -1,5 +1,5 @@
 import { ArrayMinSize, ValidateIf } from 'class-validator'
-import { Categories, DeliveryMethods } from '../../../utils/constants'
+import { Categories, DeliveryMethods } from '../../../utils/enums'
 import { TypeValidate, Validate } from '../../../utils/validation/validate.decotators'
 import { Profile } from '../profile.dto'
 

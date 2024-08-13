@@ -4,12 +4,12 @@ import { UpdateUserDto } from './dto/update-user.dto'
 import { ApiExtraModels, ApiOperation, ApiTags } from '@nestjs/swagger'
 import { HorecaProfileDto } from './dto/horeca/horeca-profile.dto'
 import { ProviderProfileDto } from './dto/provider/provider-profile.dto'
-import { DockGet, DockPost } from '../utils/swagger/decorators/swagger.decorators'
 import { UserDto } from './dto/user.dto'
 import { AuthUser } from '../utils/auth/decorators/auth.decorator'
 import { UserRole } from '@prisma/client'
 import { AuthInfoDto } from './dto/auth.info.dto'
 import { AuthParamDecorator } from '../utils/auth/decorators/auth.param.decorator'
+import { RequestDecorator } from 'src/utils/swagger/decorators'
 
 @Controller('users')
 @ApiTags('Users')
@@ -19,14 +19,14 @@ export class UsersController {
 
     @Put('me')
     @ApiOperation({ summary: 'Update users profile' })
-    @DockPost(UpdateUserDto, UserDto)
+    @RequestDecorator(UserDto, UpdateUserDto)
     async update(@AuthParamDecorator() auth: AuthInfoDto, @Body() dto: UpdateUserDto) {
         return this.usersService.update(auth, dto)
     }
 
     @Get('me')
     @ApiOperation({ summary: 'Get users profile' })
-    @DockGet(UserDto)
+    @RequestDecorator(UserDto)
     @ApiExtraModels(HorecaProfileDto, ProviderProfileDto)
     async get(@AuthParamDecorator() auth: AuthInfoDto) {
         return this.usersService.get(auth)

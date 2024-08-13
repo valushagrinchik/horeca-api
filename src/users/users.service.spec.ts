@@ -32,13 +32,13 @@ describe('UsersService', () => {
                 {
                     provide: ConfigService,
                     useValue: {
-                      get: jest.fn((key: string) => {
-                        return null;
-                      })
-                    }
-                }
+                        get: jest.fn((key: string) => {
+                            return null
+                        }),
+                    },
+                },
             ],
-       
+
             imports: [ConfigModule, MailModule, JwtModule],
         }).compile()
 
@@ -62,7 +62,7 @@ describe('UsersService', () => {
             expect(result).toEqual(existingUser)
             expect(prismaMock.user.findUnique).toHaveBeenCalledTimes(1)
             expect(prismaMock.user.findUnique).toHaveBeenCalledWith({
-                where: { id: existingUser.id  },
+                where: { id: existingUser.id },
                 include: { profile: { include: { addresses: true } } },
             })
         })

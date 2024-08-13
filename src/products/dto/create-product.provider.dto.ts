@@ -1,5 +1,5 @@
 import { ProductPackagingType } from '@prisma/client'
-import { Categories } from '../../utils/constants'
+import { Categories } from '../../utils/enums'
 import { TypeValidate, Validate } from '../../utils/validation/validate.decotators'
 
 export class CreateProductProviderDto {

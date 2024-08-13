@@ -1,7 +1,7 @@
 import { TypeValidate, Validate } from '../../utils/validation/validate.decotators'
 import { CreateProductProviderDto } from './create-product.provider.dto'
 import { ProductPackagingType } from '@prisma/client'
-import { Categories } from '../../utils/constants'
+import { Categories } from '../../utils/enums'
 
 export class UpdateProductProviderDto extends CreateProductProviderDto {
     @Validate(TypeValidate.STRING, { required: false, enum: Categories, enumName: 'Categories' })

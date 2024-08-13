@@ -1,0 +1,67 @@
+import { Type, applyDecorators } from '@nestjs/common'
+import { ApiExtraModels, ApiOkResponse, ApiQuery, ApiResponse, getSchemaPath } from '@nestjs/swagger'
+import { ErrorDto } from 'src/utils/error.dto'
+import { PaginatedDto } from 'src/utils/paginated.dto'
+
+// This function now accepts a DTO and a record of additional DTOs without requiring a specific base
+export function RequestPaginatedDecorator<DTO, ItemExtraDTO>(
+    dto: Type<DTO>,
+    argDtos?: Record<string, any>,
+    itemExtraDto?: Type<ItemExtraDTO>
+) {
+    const extraModels = argDtos ? Object.values(argDtos) : []
+    const requiredKeys = argDtos ? Object.keys(argDtos) : []
+
+    const argDtosOptions = argDtos
+        ? Object.entries(argDtos).reduce((acc, [name, type]) => {
+              if (Array.isArray(type)) {
+                  acc[name] = {
+                      type: 'array',
+                      items: {
+                          allOf: [{ $ref: getSchemaPath(type[0]) }],
+                      },
+                  }
+              } else {
+                  acc[name] = { $ref: getSchemaPath(type) }
+              }
+              return acc
+          }, {})
+        : {}
+
+    const decorators = [
+        ApiQuery({ name: 'offset', required: false, type: () => Number }),
+        ApiQuery({ name: 'limit', required: false, type: () => Number }),
+        ApiQuery({ name: 'search', required: false, type: () => String, description: '{"fieldName": value}' }),
+        ApiQuery({ name: 'sort', required: false, type: () => String, description: 'fieldName(numeric)|ASC/DESC' }),
+        ApiExtraModels(PaginatedDto, dto, ...extraModels),
+        itemExtraDto ? ApiExtraModels(itemExtraDto) : null,
+        ApiOkResponse({
+            schema: {
+                allOf: [
+                    {
+                        required: ['data', 'total', ...requiredKeys],
+                        properties: {
+                            data: {
+                                type: 'array',
+                                items: {
+                                    allOf: [
+                                        { $ref: getSchemaPath(dto) },
+                                        itemExtraDto ? { $ref: getSchemaPath(itemExtraDto) } : {},
+                                    ],
+                                },
+                            },
+                            // Add additional DTOs to properties
+                            ...argDtosOptions,
+                            total: {
+                                type: 'number',
+                            },
+                        },
+                    },
+                ],
+            },
+        }),
+        ApiResponse({ status: 400, type: ErrorDto }),
+    ]
+
+    return applyDecorators(...decorators.filter(d => !!d))
+}

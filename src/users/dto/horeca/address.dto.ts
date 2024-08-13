@@ -1,6 +1,6 @@
 import { ValidateIf } from 'class-validator'
-import { Weekday } from '../../../utils/constants'
 import { TypeValidate, Validate } from '../../../utils/validation/validate.decotators'
+import { Weekday } from 'src/utils/enums'
 
 export class Address {
     @Validate(TypeValidate.STRING, { required: false })

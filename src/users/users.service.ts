@@ -12,7 +12,6 @@ import { MailService } from '../mail/mail.service'
 import { User } from '@prisma/client'
 import { validPassword } from 'src/utils/crypto'
 
-
 @Injectable()
 export class UsersService {
     constructor(

@@ -4,12 +4,12 @@ import { RegistrateUserDto } from './dto/registrate-user.dto'
 import { ApiExtraModels, ApiOperation, ApiTags } from '@nestjs/swagger'
 import { LoginUserDto } from './dto/login-user.dto'
 import { AuthResultDto } from './dto/auth.result.dto'
-import { DockGet, DockPost } from '../utils/swagger/decorators/swagger.decorators'
 import { CreateHorecaProfileDto } from './dto/horeca/create-horeca-profile.dto'
 import { CreateProviderProfileDto } from './dto/provider/create-provider-profile.dto'
 import { SuccessDto } from '../utils/success.dto'
 import { Response } from 'express'
 import { ConfigService } from '@nestjs/config'
+import { RequestDecorator } from 'src/utils/swagger/decorators'
 
 @Controller('auth')
 @ApiTags('Authorization')
@@ -21,7 +21,7 @@ export class AuthorizationController {
 
     @Post('registration')
     @ApiOperation({ summary: 'Registrate user' })
-    @DockPost(RegistrateUserDto, AuthResultDto)
+    @RequestDecorator(AuthResultDto, RegistrateUserDto)
     @ApiExtraModels(CreateHorecaProfileDto, CreateProviderProfileDto)
     async registrate(@Body() dto: RegistrateUserDto) {
         return this.usersService.registrate(dto)
@@ -29,35 +29,35 @@ export class AuthorizationController {
 
     @Post('login')
     @ApiOperation({ summary: 'Authenticate user' })
-    @DockPost(LoginUserDto, AuthResultDto)
+    @RequestDecorator(AuthResultDto, LoginUserDto)
     async login(@Body() loginDto: LoginUserDto) {
         return this.usersService.login(loginDto)
     }
 
     @Get('activate/:uuid')
     @ApiOperation({ summary: 'Activate profile by link in the confirmation email' })
-    @DockGet(SuccessDto)
+    @RequestDecorator(SuccessDto)
     async activateAccount(@Res() res: Response, @Param('uuid') uuid: string) {
         await this.usersService.activateAccount(uuid)
         res.redirect(this.configService.get('FRONTEND_URL'))
     }
 
     // @Get('password-recovery')
-    // @DockGet(SuccessDto)
+    // @RequestDecorator(SuccessDto)
     // async passwordRecovery(@Query('email') email: string) {
     //     await this.usersService.passwordRecovery(email)
     //     return new SuccessDto('ok')
     // }
 
     // @Put('recover-password')
-    // @DockGet(SuccessDto)
+    // @RequestDecorator(SuccessDto)
     // async recoverPassword(@Body() dto: RecoverPasswordDto) {
     //     await this.usersService.recoverPassword(dto)
     //     return new SuccessDto('ok')
     // }
 
     // @Put('change-password')
-    // @DockPost(ChangePasswordDto)
+    // @RequestDecorator(null, ChangePasswordDto)
     // @AuthUser(UserRoles.USER)
     // async changePassword(@AuthDecorator() auth: AuthInfoDto, @Body() dto: ChangePasswordDto) {
     //     return await this.usersService.changePassword(auth, dto)

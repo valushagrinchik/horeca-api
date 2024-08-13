@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { Product, ProductPackagingType, Uploads } from '@prisma/client'
 import { Expose } from 'class-transformer'
-import { Categories } from '../../utils/constants'
+import { Categories } from '../../utils/enums'
 
 export class Image implements Uploads {
     @ApiProperty()
@@ -20,7 +20,7 @@ export class Image implements Uploads {
     updatedAt: Date
 }
 export class ProductImage {
-    @ApiProperty({type: Image})
+    @ApiProperty({ type: Image })
     image: Image
 }
 

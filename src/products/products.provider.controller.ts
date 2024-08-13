@@ -7,8 +7,14 @@ import { ProductsProviderService } from './products.provider.service'
 import { UpdateProductProviderDto } from './dto/update-product.provider.dto'
 import { AuthInfoDto } from '../users/dto/auth.info.dto'
 import { AuthParamDecorator } from '../utils/auth/decorators/auth.param.decorator'
-import { DockGet, DockPost } from '../utils/swagger/decorators/swagger.decorators'
 import { ProductImage, ProductResponse } from './dto/product.response.dto'
+import {
+    PaginateValidateType,
+    RequestDecorator,
+    RequestPaginatedDecorator,
+    RequestPaginatedValidateParamsDecorator,
+} from 'src/utils/swagger/decorators'
+import { ProductSearchDto } from './dto/product.search.dto'
 
 @AuthUser(UserRole.Provider)
 @Controller('products/provider')
@@ -17,28 +23,31 @@ export class ProductsProviderController {
     constructor(private readonly service: ProductsProviderService) {}
 
     @Post()
-    @DockPost(CreateProductProviderDto, ProductResponse)
-    @ApiOperation({ summary: 'Create product from provider\'s offer' })
+    @RequestDecorator(ProductResponse, CreateProductProviderDto)
+    @ApiOperation({ summary: "Create product from provider's offer" })
     async create(@AuthParamDecorator() auth: AuthInfoDto, @Body() dto: CreateProductProviderDto) {
         return this.service.create(auth, dto)
     }
 
     @Get()
-    @DockGet([ProductResponse])
-    @ApiOperation({ summary: 'Gat all products from provider\'s offer' })
-    async findAll(@AuthParamDecorator() auth: AuthInfoDto) {
-        return this.service.findAll(auth)
+    @RequestPaginatedDecorator(ProductResponse)
+    @ApiOperation({ summary: "Gat all products from provider's offer" })
+    async findAll(
+        @AuthParamDecorator() auth: AuthInfoDto,
+        @RequestPaginatedValidateParamsDecorator() paginate: PaginateValidateType<ProductSearchDto>
+    ) {
+        return this.service.findAll(auth, paginate)
     }
 
     @Get(':id')
-    @DockGet(ProductResponse)
+    @RequestDecorator(ProductResponse)
     @ApiOperation({ summary: 'Get the specific product' })
     async get(@AuthParamDecorator() auth: AuthInfoDto, @Param('id') id: number) {
         return this.service.get(auth, id)
     }
 
     @Put(':id')
-    @DockPost(UpdateProductProviderDto, ProductResponse)
+    @RequestDecorator(ProductResponse, UpdateProductProviderDto)
     @ApiOperation({ summary: 'Update the specific product' })
     async update(
         @AuthParamDecorator() auth: AuthInfoDto,

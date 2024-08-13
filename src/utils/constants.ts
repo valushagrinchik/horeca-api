@@ -1,3 +1,5 @@
+import { Categories, DeliveryMethods } from './enums'
+
 export const CategoryLabels: Record<Categories, string> = {
     alcoholicDrinks: 'Алкогольные напитки',
     grocerySpicesSeasonings: 'Бакалея, специи, приправы',
@@ -21,49 +23,9 @@ export const CategoryLabels: Record<Categories, string> = {
     teeAndCoffee: 'Чай, кофе, какао, заменители',
 }
 
-export enum Categories {
-    alcoholicDrinks = 'alcoholicDrinks',
-    grocerySpicesSeasonings = 'grocerySpicesSeasonings',
-    softDrinks = 'softDrinks',
-    readyMeals = 'readyMeals',
-    stationery = 'stationery',
-    confectionery = 'confectionery',
-    cannedFoods = 'cannedFoods',
-    dairyProducts = 'dairyProducts',
-    iceCream = 'iceCream',
-    meat = 'meat',
-    lowAlcoholDrinks = 'lowAlcoholDrinks',
-    semiFinishedProducts = 'semiFinishedProducts',
-    dishes = 'dishes',
-    cashDesk = 'cashDesk',
-    instantFoods = 'instantFoods',
-    fish = 'fish',
-    fruitsAndVegetables = 'fruitsAndVegetables',
-    cleaningProducts = 'cleaningProducts',
-    bakeryProducts = 'bakeryProducts',
-    teeAndCoffee = 'teeAndCoffee',
-}
-
 export const DeliveryMethodsLabels: Record<DeliveryMethods, string> = {
     selfPickup: 'самовывоз',
     deliveryBySupplier: 'доставка транспортом поставщика',
     sameDayDelivery: 'доставка в день заказа',
     weekends: 'выходные праздничные дни',
-}
-
-export enum DeliveryMethods {
-    selfPickup = 'selfPickup',
-    deliveryBySupplier = 'deliveryBySupplier',
-    sameDayDelivery = 'sameDayDelivery',
-    weekends = 'weekends',
-}
-
-export enum Weekday {
-    mo = 'mo',
-    tu = 'tu',
-    we = 'we',
-    th = 'th',
-    fr = 'fr',
-    sa = 'sa',
-    su = 'su',
 }
