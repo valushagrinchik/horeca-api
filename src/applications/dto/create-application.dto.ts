@@ -17,7 +17,7 @@ export class CreateApplicationDto {
     @Validate(TypeValidate.STRING)
     manufacturer: string
 
-    @Validate(TypeValidate.STRING, { type: PaymentType })
+    @Validate(TypeValidate.STRING, { enum: PaymentType, enumName: 'PaymentType' })
     paymentType: PaymentType
 
     @Validate(TypeValidate.NUMBER)

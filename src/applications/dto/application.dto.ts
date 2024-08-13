@@ -23,7 +23,7 @@ export class ApplicationDto implements Application {
     @ApiProperty()
     manufacturer: string
 
-    @ApiProperty()
+    @ApiProperty({ enum: PaymentType, enumName: 'PaymentType' })
     paymentType: PaymentType
 
     @ApiProperty()

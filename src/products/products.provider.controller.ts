@@ -30,7 +30,7 @@ export class ProductsProviderController {
     }
 
     @Get()
-    @RequestPaginatedDecorator(ProductResponse)
+    @RequestPaginatedDecorator(ProductResponse, ProductSearchDto)
     @ApiOperation({ summary: "Gat all products from provider's offer" })
     async findAll(
         @AuthParamDecorator() auth: AuthInfoDto,

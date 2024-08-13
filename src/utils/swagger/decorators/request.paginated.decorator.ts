@@ -4,10 +4,11 @@ import { ErrorDto } from 'src/utils/error.dto'
 import { PaginatedDto } from 'src/utils/paginated.dto'
 
 // This function now accepts a DTO and a record of additional DTOs without requiring a specific base
-export function RequestPaginatedDecorator<DTO, ItemExtraDTO>(
-    dto: Type<DTO>,
-    argDtos?: Record<string, any>,
-    itemExtraDto?: Type<ItemExtraDTO>
+export function RequestPaginatedDecorator<DTO, SearchDto, ItemExtraDTO>(
+    dto: Type<DTO>, // type of response array item
+    searchDto?: Type<SearchDto>,
+    argDtos?: Record<string, any>, // additional properties to response except 'data' and 'total'
+    itemExtraDto?: Type<ItemExtraDTO> // additional properties to response array item
 ) {
     const extraModels = argDtos ? Object.values(argDtos) : []
     const requiredKeys = argDtos ? Object.keys(argDtos) : []
@@ -31,9 +32,19 @@ export function RequestPaginatedDecorator<DTO, ItemExtraDTO>(
     const decorators = [
         ApiQuery({ name: 'offset', required: false, type: () => Number }),
         ApiQuery({ name: 'limit', required: false, type: () => Number }),
-        ApiQuery({ name: 'search', required: false, type: () => String, description: '{"fieldName": value}' }),
+        ApiQuery({
+            name: 'search',
+            required: false,
+            type: () => String,
+            ...(searchDto
+                ? {
+                      schema: { $ref: getSchemaPath(searchDto) },
+                  }
+                : {}),
+        }),
         ApiQuery({ name: 'sort', required: false, type: () => String, description: 'fieldName(numeric)|ASC/DESC' }),
         ApiExtraModels(PaginatedDto, dto, ...extraModels),
+        searchDto ? ApiExtraModels(searchDto) : null,
         itemExtraDto ? ApiExtraModels(itemExtraDto) : null,
         ApiOkResponse({
             schema: {

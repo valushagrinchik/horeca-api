@@ -11,13 +11,13 @@ import { RequestDecorator } from 'src/utils/swagger/decorators'
 
 @AuthUser(UserRole.Provider)
 @Controller('proposals/provider')
-@ApiTags('Proposals')
+@ApiTags('Applications')
 export class ApplicationsProviderController {
     constructor(private readonly service: ApplicationsProviderService) {}
 
     @Post()
     @RequestDecorator(ApplicationDto, CreateApplicationDto)
-    async findAppropriateProposals(@AuthParamDecorator() auth: AuthInfoDto, dto: CreateApplicationDto) {
+    async create(@AuthParamDecorator() auth: AuthInfoDto, dto: CreateApplicationDto) {
         return this.service.create(auth, dto)
     }
 }
