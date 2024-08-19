@@ -7,11 +7,12 @@ import { MailModule } from './mail/mail.module'
 import { ScheduleModule } from '@nestjs/schedule'
 import { UploadsModule } from './uploads/uploads.module'
 import { ChatModule } from './chat/chat.module'
+import { ApplicationsModule } from './applications/applications.module'
 
 @Module({
     imports: [
         ConfigModule.forRoot({
-            envFilePath: `.env.${process.env.NODE_ENV}`,
+            envFilePath: process.env.NODE_ENV == 'test' ? '.env.test' : '.env',
             isGlobal: true,
         }),
 
@@ -22,6 +23,7 @@ import { ChatModule } from './chat/chat.module'
         UploadsModule,
         UsersModule,
         ProposalsModule,
+        ApplicationsModule,
         ProductsModule,
         ChatModule
     ],

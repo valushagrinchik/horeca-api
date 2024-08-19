@@ -6,24 +6,26 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
+    "docker": "docker compose up --build -d",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\"",
     "start": "nest start",
-    "start:dev": "NODE_ENV=development nest start --watch",
-    "start:debug": "nest start --debug --watch",
-    "start:prod": "node dist/main",
+    "start:dev": "nest start --watch",
+    "start:prod": "node dist/src/main",
+    "start:migrate:prod": "prisma migrate deploy && npm run db:seed && npm run start:prod",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+
+    "migration:create": "npx prisma migrate dev --name",
+    "migrate:dev": "npx prisma migrate dev",
+    "migrate:prod": "npx prisma migrate deploy && npx prisma generate",
+    "migrate:reset": "npx prisma migrate reset",
+    "db:seed": "npx prisma db seed",
+
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "migration:create": "dotenv -e .env.development npx prisma migrate dev --name",
-    "migrate:dev": "dotenv -e .env.development npx prisma migrate dev",
-    "migrate:prod": "dotenv -e .env.production npx prisma migrate deploy && npx prisma generate",
-    "migrate:reset": "dotenv -e .env.development npx prisma migrate reset",
-    "docker:up": "docker compose up -d",
-    "docker:down": "docker compose down",
-    "test:prepare": "npm run docker:down && npm run docker:up && dotenv -e .env.test -- npm run migrate:prod",
-    "test": "npm run test:prepare && dotenv -e .env.test -- jest -i"
+    "test:db:prepare": "npm run docker compose -f docker-compose.dev.yml down && npm run docker compose -f docker-compose.dev.yml up -d && dotenv -e .env.test -- npm run migrate:prod",
+    "test": "npm run test:db:prepare && dotenv -e .env.test -- jest -i"
   },
   "dependencies": {
     "@nestjs-modules/mailer": "^2.0.2",
@@ -41,7 +43,6 @@
     "@prisma/client": "^5.14.0",
     "@types/lodash": "^4.17.4",
     "@types/multer": "^1.4.11",
-    "bcrypt": "^5.1.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "hbs": "^4.2.0",
@@ -55,13 +56,12 @@
     "@nestjs/cli": "^10.0.0",
     "@nestjs/schematics": "^10.0.0",
     "@nestjs/testing": "^10.3.9",
-    "@types/bcrypt": "^5.0.2",
     "@types/express": "^4.17.17",
     "@types/jest": "^29.5.2",
     "@types/node": "^20.3.1",
     "@types/nodemailer": "^6.4.15",
     "@types/passport-jwt": "^4.0.1",
-    "@types/supertest": "^6.0.0",
+    "@types/supertest": "2.0.12",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
     "eslint": "^8.42.0",
@@ -71,7 +71,7 @@
     "prettier": "^3.0.0",
     "prisma": "^5.14.0",
     "source-map-support": "^0.5.21",
-    "supertest": "^6.3.3",
+    "supertest": "7.0.0",
     "ts-jest": "^29.1.0",
     "ts-loader": "^9.4.3",
     "ts-node": "^10.9.1",
@@ -94,5 +94,8 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
+  },
+  "prisma": {
+    "seed": "ts-node --transpile-only prisma/seed.ts"
   }
 }

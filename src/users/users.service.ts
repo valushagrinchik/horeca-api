@@ -1,7 +1,6 @@
 import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common'
 import { RegistrateUserDto } from './dto/registrate-user.dto'
 import { PrismaService } from '../prisma.service'
-import * as bcrypt from 'bcrypt'
 import { AuthInfoDto } from '../users/dto/auth.info.dto'
 import { AuthorizationService } from './authorization.service'
 import { LoginUserDto } from './dto/login-user.dto'
@@ -11,6 +10,8 @@ import { UpdateUserDto } from './dto/update-user.dto'
 import { UserDto } from './dto/user.dto'
 import { MailService } from '../mail/mail.service'
 import { User } from '@prisma/client'
+import { validPassword } from 'src/utils/crypto'
+
 @Injectable()
 export class UsersService {
     constructor(
@@ -79,12 +80,12 @@ export class UsersService {
 
     async login(dto: LoginUserDto) {
         const user = await this.prisma.user.findFirst({ where: { email: dto.email } })
+
         if (!user) {
             throw new BadRequestException(new ErrorDto(ErrorCodeEnum.AUTH_FAIL))
         }
 
-        const isPasswordValid = await bcrypt.compare(dto.password, user.password)
-        if (!isPasswordValid) {
+        if (!validPassword(dto.password, user.password)) {
             throw new BadRequestException(new ErrorDto(ErrorCodeEnum.AUTH_FAIL))
         }
 

@@ -1,5 +1,5 @@
 import { ProductPackagingType } from '@prisma/client'
-import { Categories } from '../../utils/constants'
+import { Categories } from '../../utils/enums'
 import { TypeValidate, Validate } from '../../utils/validation/validate.decotators'
 
 export class CreateProductProviderDto {
@@ -21,7 +21,7 @@ export class CreateProductProviderDto {
     @Validate(TypeValidate.NUMBER)
     count: number
 
-    @Validate(TypeValidate.STRING)
+    @Validate(TypeValidate.STRING, { enum: ProductPackagingType, enumName: 'ProductPackagingType' })
     packagingType: ProductPackagingType
 
     @Validate(TypeValidate.ARRAY, { type: [Number] })
