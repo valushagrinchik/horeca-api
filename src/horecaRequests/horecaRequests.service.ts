@@ -5,9 +5,9 @@ import { HorecaRequestDto } from './dto/horecaRequest.dto'
 import { HorecaRequestTemplateCreateDto } from './dto/horecaRequest.template.create.dto'
 import { AuthInfoDto } from '../users/dto/auth.info.dto'
 import { UploadsLinkType } from '@prisma/client'
-import { PaginateValidateType } from '../utils/swagger/decorators'
+import { PaginateValidateType } from '../system/swagger/decorators'
 import { HorecaRequestTemplateDto } from './dto/horecaRequest.template.dto'
-import { UploadsLinkService } from 'src/uploads/uploads.link.service'
+import { UploadsLinkService } from '../uploads/uploads.link.service'
 import { HorecaRequestItemDto } from './dto/horecaRequest.item.dto'
 
 @Injectable()

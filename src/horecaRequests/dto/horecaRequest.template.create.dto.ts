@@ -1,4 +1,4 @@
-import { TypeValidate, Validate } from '../../utils/validation/validate.decotators'
+import { TypeValidate, Validate } from '../../system/validation/validate.decotators'
 import { HorecaRequestCreateDto } from './horecaRequest.create.dto'
 
 export class HorecaRequestTemplateCreateDto {

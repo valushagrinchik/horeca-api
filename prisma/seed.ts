@@ -1,6 +1,6 @@
 import { PaymentType, PrismaClient, ProductPackagingType, ProfileType, UserRole } from '@prisma/client'
-import { Categories, DeliveryMethods } from '../src/utils/enums'
-import { generatePassword } from '../src/utils/crypto'
+import { Categories, DeliveryMethods } from '../src/system/enums'
+import { generatePassword } from '../src/system/crypto'
 
 import * as dotenv from 'dotenv'
 dotenv.config()

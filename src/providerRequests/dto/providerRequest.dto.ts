@@ -1,5 +1,5 @@
 import { PaymentType, ProviderRequest } from '@prisma/client'
-import { SourceWithUploads } from 'src/system/dto/uploads.dto'
+import { SourceWithUploads } from '../../uploads/dto/upload.dto'
 
 export class ProviderRequestDto extends SourceWithUploads implements ProviderRequest {
     id: number

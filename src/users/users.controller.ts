@@ -5,11 +5,11 @@ import { ApiExtraModels, ApiOperation, ApiTags } from '@nestjs/swagger'
 import { HorecaProfileDto } from './dto/horeca/horeca-profile.dto'
 import { ProviderProfileDto } from './dto/provider/provider-profile.dto'
 import { UserDto } from './dto/user.dto'
-import { AuthUser } from '../utils/auth/decorators/auth.decorator'
+import { AuthUser } from '../system/auth/decorators/auth.decorator'
 import { UserRole } from '@prisma/client'
 import { AuthInfoDto } from './dto/auth.info.dto'
-import { AuthParamDecorator } from '../utils/auth/decorators/auth.param.decorator'
-import { RequestDecorator } from '../utils/swagger/decorators'
+import { AuthParamDecorator } from '../system/auth/decorators/auth.param.decorator'
+import { RequestDecorator } from '../system/swagger/decorators'
 
 @Controller('users')
 @ApiTags('Users')

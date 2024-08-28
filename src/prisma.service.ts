@@ -1,13 +1,13 @@
 import { BadRequestException, Injectable, OnModuleInit } from '@nestjs/common'
 import { Address, Prisma, PrismaClient, Profile, ProfileType, User, UserRole } from '@prisma/client'
-import { ErrorCodeEnum } from './utils/error.code.enum'
-import { ErrorDto } from './utils/error.dto'
+import { ErrorCodeEnum } from './system/error.code.enum'
+import { ErrorDto } from './system/dto/error.dto'
 import { UpdateUserDto } from './users/dto/update-user.dto'
 import { CreateProviderProfileDto } from './users/dto/provider/create-provider-profile.dto'
 import { CreateHorecaProfileDto } from './users/dto/horeca/create-horeca-profile.dto'
 import { RegistrateUserDto } from './users/dto/registrate-user.dto'
 import { v4 as uuidv4 } from 'uuid'
-import { generatePassword } from './utils/crypto'
+import { generatePassword } from './system/crypto'
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit {

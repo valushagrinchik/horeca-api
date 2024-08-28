@@ -4,9 +4,9 @@ import { FileInterceptor } from '@nestjs/platform-express/multer'
 import { createReadStream } from 'fs'
 import { join } from 'path'
 import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger'
-import { AuthUser } from '../utils/auth/decorators/auth.decorator'
+import { AuthUser } from '../system/auth/decorators/auth.decorator'
 import { UserRole } from '@prisma/client'
-import { RequestDecorator } from '../utils/swagger/decorators'
+import { RequestDecorator } from '../system/swagger/decorators'
 import { UploadDto } from './dto/upload.dto'
 
 @AuthUser(UserRole.Provider, UserRole.Horeca, UserRole.Admin)

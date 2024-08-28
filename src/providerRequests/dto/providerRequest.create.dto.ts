@@ -1,5 +1,5 @@
 import { PaymentType } from '@prisma/client'
-import { TypeValidate, Validate } from '../../utils/validation/validate.decotators'
+import { TypeValidate, Validate } from '../../system/validation/validate.decotators'
 
 export class ProviderRequestCreateDto {
     @Validate(TypeValidate.NUMBER)

@@ -1,7 +1,7 @@
 import { BadRequestException, ExecutionContext, createParamDecorator } from '@nestjs/common'
 import type { Request as ExpressRequest } from 'express'
-import { ErrorCodeEnum } from '../../../utils/error.code.enum'
-import { ErrorDto } from '../../../utils/error.dto'
+import { ErrorCodeEnum } from '../../../system/error.code.enum'
+import { ErrorDto } from '../../../system/dto/error.dto'
 
 export const RequestPaginatedValidateParamsDecorator = createParamDecorator((data: unknown, ctx: ExecutionContext) => {
     const request: ExpressRequest = ctx.switchToHttp().getRequest()

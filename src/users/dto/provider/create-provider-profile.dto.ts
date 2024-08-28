@@ -1,6 +1,6 @@
 import { ArrayMinSize, ValidateIf } from 'class-validator'
-import { Categories, DeliveryMethods } from '../../../utils/enums'
-import { TypeValidate, Validate } from '../../../utils/validation/validate.decotators'
+import { Categories, DeliveryMethods } from '../../../system/enums'
+import { TypeValidate, Validate } from '../../../system/validation/validate.decotators'
 import { Profile } from '../profile.dto'
 
 export class CreateProviderProfileDto extends Profile {

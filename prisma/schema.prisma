@@ -318,6 +318,7 @@ model ProviderRequest {
   paymentType  PaymentType @map("payment_type")
   cost         Float
 
+  // indicates whitch provider requests was approved by horeca to start chating
   approvedByHoreca Boolean @default(false) @map("approved_by_horeca")
   chat             Chat?
 

@@ -19,3 +19,8 @@ export class UploadDto implements Upload {
         Object.assign(this, partial)
     }
 }
+
+
+export class SourceWithUploads {
+    images: UploadDto[]
+}

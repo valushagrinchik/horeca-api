@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { Product, ProductPackagingType } from '@prisma/client'
-import { Categories } from '../../utils/enums'
-import { SourceWithUploads } from '../../system/dto/uploads.dto'
+import { Categories } from '../../system/enums'
+import { SourceWithUploads } from '../../uploads/dto/upload.dto'
 
 
 export class ProductDto extends SourceWithUploads implements Product {

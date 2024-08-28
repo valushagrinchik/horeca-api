@@ -1,6 +1,6 @@
 import { applyDecorators } from '@nestjs/common'
 import { ApiBody, ApiResponse } from '@nestjs/swagger'
-import { ErrorDto } from '../../error.dto'
+import { ErrorDto } from '../../dto/error.dto'
 
 export function RequestDecorator(success = null, dto = null, error = ErrorDto) {
     const decorators: ClassDecorator | MethodDecorator[] = [

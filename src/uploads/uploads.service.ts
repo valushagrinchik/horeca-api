@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { PrismaService } from '../prisma.service'
-import { ErrorCodeEnum } from '../utils/error.code.enum'
-import { ErrorDto } from '../utils/error.dto'
+import { ErrorCodeEnum } from '../system/error.code.enum'
+import { ErrorDto } from '../system/dto/error.dto'
 
 @Injectable()
 export class UploadsService {

@@ -1,16 +1,16 @@
-import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common'
+import { BadRequestException, Injectable } from '@nestjs/common'
 import { RegistrateUserDto } from './dto/registrate-user.dto'
 import { PrismaService } from '../prisma.service'
 import { AuthInfoDto } from '../users/dto/auth.info.dto'
 import { AuthorizationService } from './authorization.service'
 import { LoginUserDto } from './dto/login-user.dto'
-import { ErrorDto } from '../utils/error.dto'
-import { ErrorCodeEnum } from '../utils/error.code.enum'
+import { ErrorDto } from '../system/dto/error.dto'
+import { ErrorCodeEnum } from '../system/error.code.enum'
 import { UpdateUserDto } from './dto/update-user.dto'
 import { UserDto } from './dto/user.dto'
 import { MailService } from '../mail/mail.service'
 import { User } from '@prisma/client'
-import { validPassword } from '../utils/crypto'
+import { validPassword } from '../system/crypto'
 
 @Injectable()
 export class UsersService {

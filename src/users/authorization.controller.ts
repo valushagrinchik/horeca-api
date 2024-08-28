@@ -6,10 +6,10 @@ import { LoginUserDto } from './dto/login-user.dto'
 import { AuthResultDto } from './dto/auth.result.dto'
 import { CreateHorecaProfileDto } from './dto/horeca/create-horeca-profile.dto'
 import { CreateProviderProfileDto } from './dto/provider/create-provider-profile.dto'
-import { SuccessDto } from '../utils/success.dto'
+import { SuccessDto } from '../system/dto/success.dto'
 import { Response } from 'express'
 import { ConfigService } from '@nestjs/config'
-import { RequestDecorator } from '../utils/swagger/decorators'
+import { RequestDecorator } from '../system/swagger/decorators'
 
 @Controller('auth')
 @ApiTags('Authorization')

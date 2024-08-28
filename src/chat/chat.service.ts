@@ -1,6 +1,6 @@
 import { PrismaService } from '../prisma.service'
 import { AuthInfoDto } from '../users/dto/auth.info.dto'
-import { PaginateValidateType } from '../utils/swagger/decorators'
+import { PaginateValidateType } from '../system/swagger/decorators'
 import { WebsocketGateway } from '../system/websocket/websocket.gateway'
 import { ChatCreateDto } from './dto/chat.create.dto'
 import { Chat, ChatType } from '@prisma/client'

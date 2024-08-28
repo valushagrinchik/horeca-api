@@ -1,5 +1,5 @@
 import { ProductPackagingType } from '@prisma/client'
-import { Categories } from '../../utils/enums'
+import { Categories } from '../../system/enums'
 
 export class ProductCreateDto {
     category: Categories

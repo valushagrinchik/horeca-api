@@ -5,7 +5,7 @@ import { AuthInfoDto } from '../users/dto/auth.info.dto'
 import { UploadsLinkType } from '@prisma/client'
 import { ProviderRequestCreateDto } from './dto/providerRequest.create.dto'
 import { ProviderRequestDto } from './dto/providerRequest.dto'
-import { UploadsLinkService } from 'src/uploads/uploads.link.service'
+import { UploadsLinkService } from '../uploads/uploads.link.service'
 
 @Injectable()
 export class ProviderRequestsService {
@@ -39,6 +39,13 @@ export class ProviderRequestsService {
         return new ProviderRequestDto({
             ...providerRequest,
             images: images[id].map(image => image.image),
+        })
+    }
+
+    async approveByHoreca(auth: AuthInfoDto, id: number) {
+        await this.prisma.providerRequest.update({
+            where: { id },
+            data: { approvedByHoreca: true }
         })
     }
 

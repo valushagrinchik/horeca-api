@@ -2,7 +2,7 @@ import { ArgumentsHost, Catch, HttpStatus } from '@nestjs/common'
 import { BaseExceptionFilter } from '@nestjs/core'
 import { Prisma } from '@prisma/client'
 import { Response } from 'express'
-import { ErrorCodeEnum } from './utils/error.code.enum'
+import { ErrorCodeEnum } from './system/error.code.enum'
 
 @Catch(Prisma.PrismaClientKnownRequestError)
 export class PrismaClientExceptionFilter extends BaseExceptionFilter {
