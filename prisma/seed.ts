@@ -122,7 +122,7 @@ async function main() {
 
     const futureDate = generateAcceptUntil()
 
-    const proposal = await prisma.proposal.upsert({
+    const horecaRequest = await prisma.horecaRequest.upsert({
         where: { id:  123},
         update: {},
         create: {
@@ -152,7 +152,7 @@ async function main() {
         }
     })
 
-    const application = await prisma.application.upsert({
+    const providerRequest = await prisma.providerRequest.upsert({
         where: { id:  123},
         update: {},
         create: {
@@ -161,9 +161,9 @@ async function main() {
                     id: provider.profile.id
                 }
             },
-            proposal: {
+            horecaRequest: {
                 connect: {
-                    id: proposal.id
+                    id: horecaRequest.id
                 }
             },
             manufacturer: 'OOO sdadfsd',
@@ -173,7 +173,7 @@ async function main() {
     })
       
     console.log('Users:', { horeca, provider, admin })
-    console.log('Products:', { product, proposal, application })
+    console.log('Products:', { product, horecaRequest, providerRequest })
 }
 main()
     .then(async () => {

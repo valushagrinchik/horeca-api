@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common'
 import { UsersModule } from './users/users.module'
 import { ConfigModule } from '@nestjs/config'
-import { ProposalsModule } from './proposals/proposals.module'
 import { ProductsModule } from './products/products.module'
 import { MailModule } from './mail/mail.module'
 import { ScheduleModule } from '@nestjs/schedule'
 import { UploadsModule } from './uploads/uploads.module'
 import { ChatModule } from './chat/chat.module'
-import { ApplicationsModule } from './applications/applications.module'
+import { ProviderRequestsModule } from './providerRequests/providerRequests.module'
+import { HorecaRequestsModule } from './horecaRequests/horecaRequests.module'
 
 @Module({
     imports: [
@@ -22,8 +22,8 @@ import { ApplicationsModule } from './applications/applications.module'
         MailModule,
         UploadsModule,
         UsersModule,
-        ProposalsModule,
-        ApplicationsModule,
+        HorecaRequestsModule,
+        ProviderRequestsModule,
         ProductsModule,
         ChatModule
     ],

@@ -1,7 +1,7 @@
 import { Type, applyDecorators } from '@nestjs/common'
 import { ApiExtraModels, ApiOkResponse, ApiQuery, ApiResponse, getSchemaPath } from '@nestjs/swagger'
-import { ErrorDto } from 'src/utils/error.dto'
-import { PaginatedDto } from 'src/utils/paginated.dto'
+import { ErrorDto } from '../../../utils/error.dto'
+import { PaginatedDto } from '../../../utils/paginated.dto'
 
 // This function now accepts a DTO and a record of additional DTOs without requiring a specific base
 export function RequestPaginatedDecorator<DTO, SearchDto, ItemExtraDTO>(

@@ -8,7 +8,7 @@ export class UploadsService {
     constructor(private prisma: PrismaService) {}
 
     async upload(file: Express.Multer.File) {
-        const upload = await this.prisma.uploads.create({
+        const upload = await this.prisma.upload.create({
             data: {
                 name: file.originalname,
                 mimetype: file.mimetype,
@@ -20,7 +20,7 @@ export class UploadsService {
     }
 
     async findOne(id: number) {
-        const upload = await this.prisma.uploads.findUnique({
+        const upload = await this.prisma.upload.findUnique({
             where: { id },
         })
         if (!upload) {
@@ -28,9 +28,15 @@ export class UploadsService {
         }
         return upload
     }
+
     async delete(id: number) {
-        return this.prisma.uploads.delete({
+        return this.prisma.upload.delete({
             where: { id },
         })
     }
+
+
+
+
+    
 }

@@ -6,8 +6,8 @@ import { join } from 'path'
 import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger'
 import { AuthUser } from '../utils/auth/decorators/auth.decorator'
 import { UserRole } from '@prisma/client'
-import { Upload } from './dto/upload'
-import { RequestDecorator } from 'src/utils/swagger/decorators'
+import { RequestDecorator } from '../utils/swagger/decorators'
+import { UploadDto } from './dto/upload.dto'
 
 @AuthUser(UserRole.Provider, UserRole.Horeca, UserRole.Admin)
 @Controller('uploads')
@@ -31,7 +31,7 @@ export class UploadsController {
     @UseInterceptors(FileInterceptor('file'))
     async upload(@UploadedFile() file: Express.Multer.File) {
         const upload = await this.uploadsService.upload(file)
-        return new Upload(upload)
+        return new UploadDto(upload)
     }
 
     @Get(':id')

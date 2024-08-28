@@ -9,7 +9,7 @@ import { CreateProviderProfileDto } from './dto/provider/create-provider-profile
 import { SuccessDto } from '../utils/success.dto'
 import { Response } from 'express'
 import { ConfigService } from '@nestjs/config'
-import { RequestDecorator } from 'src/utils/swagger/decorators'
+import { RequestDecorator } from '../utils/swagger/decorators'
 
 @Controller('auth')
 @ApiTags('Authorization')

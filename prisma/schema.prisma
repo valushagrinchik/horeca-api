@@ -18,6 +18,12 @@ enum ProfileType {
   Horeca
 }
 
+enum UploadsLinkType {
+  ProviderRequest
+  HorecaRequest
+  Product
+}
+
 enum UserRole {
   Admin
   Horeca
@@ -50,7 +56,7 @@ enum PaymentType {
 
 enum ChatType {
   Support
-  Order
+  Order // Aggrement between horeca and provider requests
   Private
 }
 
@@ -72,11 +78,6 @@ model User {
   profile Profile?
   mails   Mail[]
 
-  // // where user is a sender 
-  // chats   ChatMessage[] @relation("senderChat")
-  // // where user is a receiver 
-  // receiverChats ChatMessage[] @relation("receiverChat")
-
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
@@ -91,16 +92,16 @@ model Profile {
   profileType ProfileType @map("profile_type")
 
   // Provider 
-  minOrderAmount  Int?          @map("min_order_amount")
-  deliveryMethods String[]      @map("delivery_methods")
-  categories      String[]
-  products        Product[]
-  applications    Application[]
+  minOrderAmount   Int?              @map("min_order_amount")
+  deliveryMethods  String[]          @map("delivery_methods")
+  categories       String[]
+  products         Product[]
+  providerRequests ProviderRequest[]
 
   // Horeca
-  info      String?
-  addresses Address[]
-  proposals Proposal[]
+  info           String?
+  addresses      Address[]
+  horecaRequests HorecaRequest[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
@@ -154,7 +155,7 @@ model Product {
   count         Int
   packagingType ProductPackagingType @map("packaging_type")
 
-  productImage ProductImage[]
+  // images - could be loaded on runtime from UploadsLink
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
@@ -162,22 +163,7 @@ model Product {
   @@map("products")
 }
 
-model ProductImage {
-  id Int @id @default(autoincrement())
-
-  product   Product @relation(fields: [productId], references: [id])
-  productId Int     @map("product_id")
-
-  image   Uploads? @relation(fields: [imageId], references: [id])
-  imageId Int?     @unique
-
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
-
-  @@map("products_images")
-}
-
-model Uploads {
+model Upload {
   id       Int    @id @default(autoincrement())
   // originalname
   name     String
@@ -186,16 +172,27 @@ model Uploads {
   size     Int
 
   // Horeca
-  proposalImage ProposalImage?
-
-  // Provider
-  productImage     ProductImage?
-  applicationImage ApplicationImage?
+  uploadsLink UploadsLink?
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
   @@map("uploads")
+}
+
+model UploadsLink {
+  id Int @id @default(autoincrement())
+
+  sourceType UploadsLinkType
+  sourceId   Int             @map("proposal_id")
+
+  image   Upload? @relation(fields: [imageId], references: [id])
+  imageId Int      @unique
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@map("uploads_links")
 }
 
 model CronTask {
@@ -250,15 +247,14 @@ model MailLog {
   @@map("mail_logs")
 }
 
-// Horeca
-model Proposal {
+model HorecaRequest {
   id Int @id @default(autoincrement())
 
   profile   Profile @relation(fields: [profileId], references: [id])
   profileId Int     @map("profile_id")
 
-  items  ProposalItem[]
-  images ProposalImage[]
+  items HorecaRequestItem[]
+  // images - could be loaded on runtime from UploadsLink
 
   address      String
   deliveryTime DateTime    @map("delivery_time")
@@ -273,42 +269,27 @@ model Proposal {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
-  applications Application[]
+  providerRequest ProviderRequest?
 
-  @@map("proposals")
+  @@map("horeca_requests")
 }
 
-model ProposalItem {
-  id       Int      @id @default(autoincrement())
-  appId    Int      @map("app_id")
-  app      Proposal @relation(fields: [appId], references: [id])
-  name     String
-  amount   Float
-  unit     String
-  category String
+model HorecaRequestItem {
+  id              Int           @id @default(autoincrement())
+  horecaRequestId Int           @map("horeca_request_id")
+  horecaRequest   HorecaRequest @relation(fields: [horecaRequestId], references: [id])
+  name            String
+  amount          Float
+  unit            String
+  category        String
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
-  @@map("proposal_items")
+  @@map("horeca_request_items")
 }
 
-model ProposalImage {
-  id Int @id @default(autoincrement())
-
-  proposalId Int      @map("proposal_id")
-  proposal   Proposal @relation(fields: [proposalId], references: [id])
-
-  image   Uploads? @relation(fields: [imageId], references: [id])
-  imageId Int      @unique
-
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
-
-  @@map("proposal_images")
-}
-
-model ProposalTemplate {
+model HorecaRequestTemplate {
   id Int @id @default(autoincrement())
 
   content Json
@@ -317,72 +298,44 @@ model ProposalTemplate {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
-  @@map("proposal_templates")
+  @@map("horeca_request_templates")
 }
 
-model Application {
+// Provider Application
+model ProviderRequest {
   id Int @id @default(autoincrement())
 
   profile   Profile @relation(fields: [profileId], references: [id])
   profileId Int     @map("profile_id")
 
-  proposal   Proposal @relation(fields: [proposalId], references: [id])
-  proposalId Int      @map("proposal_d")
+  horecaRequest   HorecaRequest @relation(fields: [horecaRequestId], references: [id])
+  horecaRequestId Int           @unique @map("horeca_request_id")
 
-  images       ApplicationImage[]
+  // images - could be loaded on runtime from UploadsLink     
   comment      String?
-  available    Boolean            @default(true)
+  available    Boolean     @default(true)
   manufacturer String
-  paymentType  PaymentType        @map("payment_type")
+  paymentType  PaymentType @map("payment_type")
   cost         Float
 
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
-
-  @@map("applications")
-}
-
-model ApplicationImage {
-  id Int @id @default(autoincrement())
-
-  applicationId Int         @map("application_id")
-  application   Application @relation(fields: [applicationId], references: [id])
-
-  image   Uploads? @relation(fields: [imageId], references: [id])
-  imageId Int      @unique
+  approvedByHoreca Boolean @default(false) @map("approved_by_horeca")
+  chat             Chat?
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
-  @@map("application_images")
-}
-
-model Order {
-  id Int @id @default(autoincrement())
-
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
-
-  chat Chat?
-
-  @@map("orders")
+  @@map("provider_requests")
 }
 
 model Chat {
   id Int @id @default(autoincrement())
 
-  messages ChatMessage[]
+  messages  ChatMessage[]
+  opponents Int[]
+  type      ChatType
 
-  owner   User @relation("chat", fields: [userId], references: [id])
-  ownerId Int  @map("user_id")
-
-  opponent   User @relation("chat", fields: [opponentId], references: [id])
-  opponentId Int  @map("opponent_id")
-
-  type ChatType
-
-  order   Order? @relation(fields: [orderId], references: [id])
-  orderId Int?    @unique @map("order_id") 
+  providerRequest   ProviderRequest? @relation(fields: [providerRequestId], references: [id])
+  providerRequestId Int?             @unique @map("provider_request_id")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
@@ -398,11 +351,10 @@ model ChatMessage {
 
   message String
 
-  sender   User @relation("senderChat", fields: [senderId], references: [id])
-  senderId Int  @map("sender_id")
-
-  receiver   User @relation("receiverChat", fields: [receiverId], references: [id])
-  receiverId Int  @map("receiver_id")
+  // as it can be server message
+  authorId Int?    @map("author_id")
+  // indicates that this is server message
+  isServer Boolean @default(false) @map("is_server")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")

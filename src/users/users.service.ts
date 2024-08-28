@@ -10,7 +10,7 @@ import { UpdateUserDto } from './dto/update-user.dto'
 import { UserDto } from './dto/user.dto'
 import { MailService } from '../mail/mail.service'
 import { User } from '@prisma/client'
-import { validPassword } from 'src/utils/crypto'
+import { validPassword } from '../utils/crypto'
 
 @Injectable()
 export class UsersService {

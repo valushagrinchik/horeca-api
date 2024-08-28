@@ -4,6 +4,7 @@ import { UploadsService } from './uploads.service'
 import { MulterModule } from '@nestjs/platform-express'
 import { PrismaService } from '../prisma.service'
 import { UsersModule } from '../users/users.module'
+import { UploadsLinkService } from './uploads.link.service'
 
 @Module({
     imports: [
@@ -13,6 +14,7 @@ import { UsersModule } from '../users/users.module'
         UsersModule,
     ],
     controllers: [UploadsController],
-    providers: [PrismaService, UploadsService],
+    providers: [PrismaService, UploadsService, UploadsLinkService],
+    exports: [UploadsLinkService]
 })
 export class UploadsModule {}

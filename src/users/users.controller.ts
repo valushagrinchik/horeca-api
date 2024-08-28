@@ -9,7 +9,7 @@ import { AuthUser } from '../utils/auth/decorators/auth.decorator'
 import { UserRole } from '@prisma/client'
 import { AuthInfoDto } from './dto/auth.info.dto'
 import { AuthParamDecorator } from '../utils/auth/decorators/auth.param.decorator'
-import { RequestDecorator } from 'src/utils/swagger/decorators'
+import { RequestDecorator } from '../utils/swagger/decorators'
 
 @Controller('users')
 @ApiTags('Users')
