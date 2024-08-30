@@ -1,5 +1,5 @@
 import { ProfileType } from '@prisma/client'
-import { TypeValidate, Validate, ValidateEnum } from '../../system/validation/validate.decotators'
+import { TypeValidate, Validate, ValidateEnum } from '../../system/utils/validation/validate.decotators'
 
 export class Profile {
     @Validate(TypeValidate.STRING)

@@ -1,12 +1,15 @@
-import { TypeValidate, Validate } from '../../system/validation/validate.decotators'
+import { TypeValidate, Validate } from '../../system/utils/validation/validate.decotators'
 
 export class ChatMessageCreateDto {
-    @Validate(TypeValidate.STRING)
+    // @Validate(TypeValidate.NUMBER)
+    chatId: number
+
+    // @Validate(TypeValidate.STRING)
     message: string
 
-    @Validate(TypeValidate.NUMBER, {required: false})
+    // @Validate(TypeValidate.NUMBER, {required: false})
     authorId?: number
 
-    @Validate(TypeValidate.BOOLEAN, { default: false })
-    isServer: boolean
+    // @Validate(TypeValidate.BOOLEAN, { default: false })
+    isServer: boolean = false
 }

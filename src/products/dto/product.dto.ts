@@ -1,8 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { Product, ProductPackagingType } from '@prisma/client'
-import { Categories } from '../../system/enums'
+import { Categories } from '../../system/utils/enums'
 import { SourceWithUploads } from '../../uploads/dto/upload.dto'
-
 
 export class ProductDto extends SourceWithUploads implements Product {
     id: number
@@ -13,11 +12,11 @@ export class ProductDto extends SourceWithUploads implements Product {
     producer: string
     cost: number
     count: number
-    @ApiProperty({enum: ProductPackagingType})
+    @ApiProperty({ enum: ProductPackagingType })
     packagingType: ProductPackagingType
     createdAt: Date
     updatedAt: Date
-    
+
     @ApiProperty()
     get isEditable(): boolean {
         return new Date().getTime() - new Date(this.createdAt).getTime() < 3 * 24 * 60 * 60 * 1000

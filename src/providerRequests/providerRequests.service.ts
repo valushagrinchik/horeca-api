@@ -1,15 +1,18 @@
 import { Injectable } from '@nestjs/common'
-import { PrismaService } from '../prisma.service'
 
 import { AuthInfoDto } from '../users/dto/auth.info.dto'
 import { UploadsLinkType } from '@prisma/client'
 import { ProviderRequestCreateDto } from './dto/providerRequest.create.dto'
 import { ProviderRequestDto } from './dto/providerRequest.dto'
 import { UploadsLinkService } from '../uploads/uploads.link.service'
+import { DatabaseService } from '../system/database/database.service'
 
 @Injectable()
 export class ProviderRequestsService {
-    constructor(private prisma: PrismaService, private uploadsLinkService: UploadsLinkService) {}
+    constructor(
+        private prisma: DatabaseService,
+        private uploadsLinkService: UploadsLinkService
+    ) {}
 
     async create(auth: AuthInfoDto, { imageIds, proposalId, ...dto }: ProviderRequestCreateDto) {
         const profile = await this.prisma.profile.findUnique({ where: { userId: auth.id } })
@@ -45,8 +48,7 @@ export class ProviderRequestsService {
     async approveByHoreca(auth: AuthInfoDto, id: number) {
         await this.prisma.providerRequest.update({
             where: { id },
-            data: { approvedByHoreca: true }
+            data: { approvedByHoreca: true },
         })
     }
-
 }

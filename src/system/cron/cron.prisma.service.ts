@@ -1,13 +1,13 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { CronStatus, CronTask } from '@prisma/client'
-import { PrismaService } from '../../prisma.service'
+import { DatabaseService } from '../database/database.service'
 
 @Injectable()
 export class CronPrismaService {
     constructor(
         private readonly configService: ConfigService,
-        private prisma: PrismaService,
+        private prisma: DatabaseService,
         private readonly logger: Logger = new Logger()
     ) {
         this.MAX_TRIES = this.configService.get('CRON_MAX_TRIES') || 100

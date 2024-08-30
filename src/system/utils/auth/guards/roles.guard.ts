@@ -1,11 +1,11 @@
 import { CanActivate, ExecutionContext, ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
 
-import { AuthorizationService } from '../../../users/authorization.service'
-import { AuthInfoDto } from '../../../users/dto/auth.info.dto'
+import { AuthInfoDto } from '../../../../users/dto/auth.info.dto'
 import { ROLES_KEY } from '../decorators/roles.decorator'
-import { UsersService } from '../../../users/users.service'
+import { UsersService } from '../../../../users/services/users.service'
 import { UserRole } from '@prisma/client'
+import { AuthorizationService } from '../../../../users/services/authorization.service'
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -17,7 +17,8 @@ export class RolesGuard implements CanActivate {
 
     async canActivate(context: ExecutionContext) {
         const request = context.switchToHttp().getRequest()
-        const token = request.headers.authorization
+
+        const token = request.headers?.authorization || request.handshake?.headers?.authorization
 
         if (!token) {
             throw new UnauthorizedException({ code: 401 })

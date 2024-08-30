@@ -1,20 +1,20 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
-import { PrismaService } from '../prisma.service'
-import { ErrorDto } from '../system/dto/error.dto'
-import { ErrorCodeEnum } from '../system/error.code.enum'
+import { ErrorDto } from '../system/utils/dto/error.dto'
+import { ErrorCodes } from '../system/utils/enums/errorCodes.enum'
 import { AuthInfoDto } from '../users/dto/auth.info.dto'
 import { ProductDto } from './dto/product.dto'
-import { PaginateValidateType } from '../system/swagger/decorators'
+import { PaginateValidateType } from '../system/utils/swagger/decorators'
 import { ProductSearchDto } from './dto/product.search.dto'
 import { UploadsLinkType } from '@prisma/client'
 import { UploadsLinkService } from '../uploads/uploads.link.service'
 import { ProductUpdateDto } from './dto/product.update.dto'
 import { ProductCreateDto } from './dto/product.create.dto'
+import { DatabaseService } from '../system/database/database.service'
 
 @Injectable()
 export class ProductsService {
     constructor(
-        private prisma: PrismaService,
+        private prisma: DatabaseService,
         private uploadsLinkService: UploadsLinkService
     ) {}
 
@@ -94,7 +94,7 @@ export class ProductsService {
         })
 
         if (!product) {
-            throw new BadRequestException(new ErrorDto(ErrorCodeEnum.ITEM_NOT_FOUND))
+            throw new BadRequestException(new ErrorDto(ErrorCodes.ITEM_NOT_FOUND))
         }
         await this.prisma.product.update({
             where: { id },
@@ -108,7 +108,7 @@ export class ProductsService {
                 sourceId: id,
             },
         })
-        await this.uploadsLinkService.createMany(UploadsLinkType.Product, product.id, imageIds )
+        await this.uploadsLinkService.createMany(UploadsLinkType.Product, product.id, imageIds)
         return this.get(auth, id)
     }
 

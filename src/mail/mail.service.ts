@@ -7,15 +7,15 @@ import { MailerService } from '@nestjs-modules/mailer'
 import * as hbs from 'hbs'
 
 import { MailDto, MailParamsDto } from './dto/mail.dto'
-import { PrismaService } from '../prisma.service'
 import { CronTask, Mail } from '@prisma/client'
+import { DatabaseService } from '../system/database/database.service'
 
 @Injectable()
 export class MailService {
     constructor(
         private configService: ConfigService,
         private readonly mailerService: MailerService,
-        private prisma: PrismaService,
+        private prisma: DatabaseService,
         private readonly logger: Logger = new Logger(MailService.name)
     ) {}
 

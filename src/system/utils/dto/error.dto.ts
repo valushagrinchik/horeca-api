@@ -1,11 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger'
 
-import { ErrorCodeEnum } from '../error.code.enum'
+import { ErrorCodes } from '../enums/errorCodes.enum'
 import { ErrorValidationCodeEnum } from '../validation/error.validation.code.enum'
 
 export class ErrorDto {
-    @ApiProperty({ enum: ErrorCodeEnum, required: false, example: ErrorCodeEnum.AUTH_FAIL })
-    errorMessage?: ErrorCodeEnum
+    @ApiProperty({ enum: ErrorCodes, required: false, example: ErrorCodes.AUTH_FAIL })
+    errorMessage?: ErrorCodes
 
     @ApiProperty({
         type: () => String,
@@ -21,7 +21,7 @@ export class ErrorDto {
     @ApiProperty({ example: 400 })
     statusCode: number
 
-    constructor(message: ErrorCodeEnum) {
+    constructor(message: ErrorCodes) {
         this.statusCode = 400
         this.error = 'Bad Request'
         this.errorMessage = message

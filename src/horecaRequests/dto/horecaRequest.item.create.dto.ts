@@ -1,5 +1,5 @@
-import { Categories } from '../../system/enums'
-import { TypeValidate, Validate } from '../../system/validation/validate.decotators'
+import { Categories } from '../../system/utils/enums'
+import { TypeValidate, Validate } from '../../system/utils/validation/validate.decotators'
 
 export class HorecaRequestItemCreateDto {
     @Validate(TypeValidate.STRING)

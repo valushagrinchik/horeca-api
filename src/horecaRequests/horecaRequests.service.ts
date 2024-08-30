@@ -1,19 +1,19 @@
 import { Injectable } from '@nestjs/common'
 import { HorecaRequestCreateDto } from './dto/horecaRequest.create.dto'
-import { PrismaService } from '../prisma.service'
 import { HorecaRequestDto } from './dto/horecaRequest.dto'
 import { HorecaRequestTemplateCreateDto } from './dto/horecaRequest.template.create.dto'
 import { AuthInfoDto } from '../users/dto/auth.info.dto'
 import { UploadsLinkType } from '@prisma/client'
-import { PaginateValidateType } from '../system/swagger/decorators'
+import { PaginateValidateType } from '../system/utils/swagger/decorators'
 import { HorecaRequestTemplateDto } from './dto/horecaRequest.template.dto'
 import { UploadsLinkService } from '../uploads/uploads.link.service'
 import { HorecaRequestItemDto } from './dto/horecaRequest.item.dto'
+import { DatabaseService } from '../system/database/database.service'
 
 @Injectable()
 export class HorecaRequestsService {
     constructor(
-        private prisma: PrismaService,
+        private prisma: DatabaseService,
         private uploadsLinkService: UploadsLinkService
     ) {}
 

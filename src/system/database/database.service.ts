@@ -1,18 +1,17 @@
 import { BadRequestException, Injectable, OnModuleInit } from '@nestjs/common'
 import { Address, Prisma, PrismaClient, Profile, ProfileType, User, UserRole } from '@prisma/client'
-import { ErrorCodes } from './system/utils/enums/errorCodes.enum'
-import { ErrorDto } from './system/utils/dto/error.dto'
-import { UpdateUserDto } from './users/dto/update-user.dto'
-import { CreateProviderProfileDto } from './users/dto/provider/create-provider-profile.dto'
-import { CreateHorecaProfileDto } from './users/dto/horeca/create-horeca-profile.dto'
-import { RegistrateUserDto } from './users/dto/registrate-user.dto'
+import { ErrorCodes } from '../utils/enums/errorCodes.enum'
+import { ErrorDto } from '../utils/dto/error.dto'
+import { UpdateUserDto } from '../../users/dto/update-user.dto'
+import { CreateProviderProfileDto } from '../../users/dto/provider/create-provider-profile.dto'
+import { CreateHorecaProfileDto } from '../../users/dto/horeca/create-horeca-profile.dto'
+import { RegistrateUserDto } from '../../users/dto/registrate-user.dto'
 import { v4 as uuidv4 } from 'uuid'
-import { generatePassword } from './system/crypto'
+import { generatePassword } from '../../system/crypto'
 
 @Injectable()
-export class PrismaService extends PrismaClient implements OnModuleInit {
+export class DatabaseService extends PrismaClient implements OnModuleInit {
     async onModuleInit() {
-        console.log('PrismaService initialization...')
         await this.$connect()
     }
 

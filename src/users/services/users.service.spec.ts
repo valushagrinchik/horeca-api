@@ -1,12 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing'
 import { UsersService } from './users.service'
-import { PrismaService } from '../prisma.service'
 import { AuthorizationService } from './authorization.service'
-import { MailService } from '../mail/mail.service'
+import { MailService } from '../../mail/mail.service'
 import { JwtModule } from '@nestjs/jwt'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { Logger } from '@nestjs/common'
-import { MailModule } from '../mail/mail.module'
+import { MailModule } from '../../mail/mail.module'
+import { DatabaseService } from '../../system/database/database.service'
 
 const prismaMock = {
     user: {
@@ -25,7 +25,7 @@ describe('UsersService', () => {
                 MailService,
                 UsersService,
                 {
-                    provide: PrismaService,
+                    provide: DatabaseService,
                     useValue: prismaMock,
                 },
                 Logger,

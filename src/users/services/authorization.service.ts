@@ -2,7 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { JwtService } from '@nestjs/jwt'
 
-import { AuthInfoDto } from './dto/auth.info.dto'
+import { AuthInfoDto } from '../dto/auth.info.dto'
 // import { RefreshDto } from './dto/refresh.dto'
 import { User } from '@prisma/client'
 // import { ErrorDto } from '../../helpers/dto/error.dto'

@@ -1,13 +1,18 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common'
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { HorecaRequestCreateDto } from './dto/horecaRequest.create.dto'
-import { AuthUser } from '../system/auth/decorators/auth.decorator'
+import { AuthUser } from '../system/utils/auth/decorators/auth.decorator'
 import { UserRole } from '@prisma/client'
 import { HorecaRequestDto } from './dto/horecaRequest.dto'
 import { HorecaRequestTemplateDto } from './dto/horecaRequest.template.dto'
-import { AuthParamDecorator } from '../system/auth/decorators/auth.param.decorator'
+import { AuthParamDecorator } from '../system/utils/auth/decorators/auth.param.decorator'
 import { AuthInfoDto } from '../users/dto/auth.info.dto'
-import { PaginateValidateType, RequestDecorator, RequestPaginatedDecorator, RequestPaginatedValidateParamsDecorator } from '../system/swagger/decorators'
+import {
+    PaginateValidateType,
+    RequestDecorator,
+    RequestPaginatedDecorator,
+    RequestPaginatedValidateParamsDecorator,
+} from '../system/utils/swagger/decorators'
 import { HorecaRequestsService } from './HorecaRequests.service'
 import { HorecaRequestTemplateCreateDto } from './dto/horecaRequest.template.create.dto'
 
@@ -37,8 +42,6 @@ export class HorecaRequestsController {
     async getTemplate(@Param('id') id: number) {
         return this.service.getTemplate(id)
     }
-
-
 
     @AuthUser(UserRole.Provider)
     @RequestPaginatedDecorator(HorecaRequestDto)

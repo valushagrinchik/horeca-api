@@ -1,4 +1,4 @@
-export enum ErrorCodeEnum {
+export enum ErrorCodes {
     AUTH_FAIL = 'AUTH_FAIL', // ошибка авторизации
     ITEM_NOT_FOUND = 'ITEM_NOT_FOUND', // элемент не найден
     MAIL_IS_BUSY = 'MAIL_IS_BUSY', // почта занята

@@ -1,14 +1,14 @@
 import { Controller, Param, Post } from '@nestjs/common'
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
-import { AuthUser } from '../system/auth/decorators/auth.decorator'
+import { AuthUser } from '../system/utils/auth/decorators/auth.decorator'
 import { UserRole } from '@prisma/client'
 import { AuthInfoDto } from '../users/dto/auth.info.dto'
-import { AuthParamDecorator } from '../system/auth/decorators/auth.param.decorator'
-import { RequestDecorator } from '../system/swagger/decorators'
+import { AuthParamDecorator } from '../system/utils/auth/decorators/auth.param.decorator'
+import { RequestDecorator } from '../system/utils/swagger/decorators'
 import { ProviderRequestsService } from './providerRequests.service'
 import { ProviderRequestCreateDto } from './dto/providerRequest.create.dto'
 import { ProviderRequestDto } from './dto/providerRequest.dto'
-import { SuccessDto } from '../system/dto/success.dto'
+import { SuccessDto } from '../system/utils/dto/success.dto'
 
 @AuthUser(UserRole.Provider)
 @Controller('requests/provider')
@@ -18,7 +18,7 @@ export class ProviderRequestsController {
 
     @Post()
     @RequestDecorator(ProviderRequestDto, ProviderRequestCreateDto)
-    @ApiOperation({ summary: 'Create provider request on horeca\'s one' })
+    @ApiOperation({ summary: "Create provider request on horeca's one" })
     async create(@AuthParamDecorator() auth: AuthInfoDto, dto: ProviderRequestCreateDto) {
         return this.service.create(auth, dto)
     }

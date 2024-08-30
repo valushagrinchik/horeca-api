@@ -1,17 +1,17 @@
 import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common'
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
-import { AuthUser } from '../system/auth/decorators/auth.decorator'
+import { AuthUser } from '../system/utils/auth/decorators/auth.decorator'
 import { UserRole } from '@prisma/client'
 import { ProductsService } from './products.service'
 import { AuthInfoDto } from '../users/dto/auth.info.dto'
-import { AuthParamDecorator } from '../system/auth/decorators/auth.param.decorator'
+import { AuthParamDecorator } from '../system/utils/auth/decorators/auth.param.decorator'
 import { ProductDto } from './dto/product.dto'
 import {
     PaginateValidateType,
     RequestDecorator,
     RequestPaginatedDecorator,
     RequestPaginatedValidateParamsDecorator,
-} from '../system/swagger/decorators'
+} from '../system/utils/swagger/decorators'
 import { ProductSearchDto } from './dto/product.search.dto'
 import { ProductUpdateDto } from './dto/product.update.dto'
 import { ProductCreateDto } from './dto/product.create.dto'
@@ -48,11 +48,7 @@ export class ProductsController {
     @Put(':id')
     @RequestDecorator(ProductDto, ProductUpdateDto)
     @ApiOperation({ summary: 'Update the specific product' })
-    async update(
-        @AuthParamDecorator() auth: AuthInfoDto,
-        @Param('id') id: number,
-        @Body() dto: ProductUpdateDto
-    ) {
+    async update(@AuthParamDecorator() auth: AuthInfoDto, @Param('id') id: number, @Body() dto: ProductUpdateDto) {
         return this.service.update(auth, id, dto)
     }
 

@@ -1,12 +1,12 @@
 import { Test } from '@nestjs/testing'
-import { PrismaService } from '../prisma.service'
 import { PaymentType, ProfileType, User, UserRole } from '@prisma/client'
-import { Categories } from '../system/enums'
+import { Categories } from '../system/utils/enums'
 import { HorecaRequestsService } from './HorecaRequests.service'
+import { DatabaseService } from '../system/database/database.service'
 
 describe('ProposalsProviderService', () => {
     let service: HorecaRequestsService
-    let prismaService: PrismaService
+    let prismaService: DatabaseService
 
     let horecaUser: User
     let horecaUser2: User
@@ -14,11 +14,11 @@ describe('ProposalsProviderService', () => {
 
     beforeAll(async () => {
         const module = await Test.createTestingModule({
-            providers: [HorecaRequestsService, PrismaService],
+            providers: [HorecaRequestsService, DatabaseService],
         }).compile()
 
         service = module.get<HorecaRequestsService>(HorecaRequestsService)
-        prismaService = module.get<PrismaService>(PrismaService)
+        prismaService = module.get<DatabaseService>(DatabaseService)
     })
 
     beforeAll(async () => {
@@ -149,7 +149,7 @@ describe('ProposalsProviderService', () => {
 
     describe('findAppropriateProposals', () => {
         it('should return all appropriate horeca proposals for provider', async () => {
-            const response = await service.find({ id: providerUser.id })
+            const response = await service.findForProvider({ id: providerUser.id })
             expect(response.length).toBe(1)
             expect(response[0].name).toBe('Something delishious')
         })

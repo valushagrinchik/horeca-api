@@ -1,6 +1,6 @@
 import { Type } from 'class-transformer'
 import { ArrayMinSize, ValidateIf, ValidateNested } from 'class-validator'
-import { TypeValidate, Validate } from '../../../system/validation/validate.decotators'
+import { TypeValidate, Validate } from '../../../system/utils/validation/validate.decotators'
 import { Address } from './address.dto'
 import { Profile } from '../profile.dto'
 

@@ -1,11 +1,11 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
-import { PrismaService } from '../prisma.service'
-import { ErrorCodeEnum } from '../system/error.code.enum'
-import { ErrorDto } from '../system/dto/error.dto'
+import { ErrorCodes } from '../system/utils/enums/errorCodes.enum'
+import { ErrorDto } from '../system/utils/dto/error.dto'
+import { DatabaseService } from '../system/database/database.service'
 
 @Injectable()
 export class UploadsService {
-    constructor(private prisma: PrismaService) {}
+    constructor(private prisma: DatabaseService) {}
 
     async upload(file: Express.Multer.File) {
         const upload = await this.prisma.upload.create({
@@ -24,7 +24,7 @@ export class UploadsService {
             where: { id },
         })
         if (!upload) {
-            throw new BadRequestException(new ErrorDto(ErrorCodeEnum.UPLOAD_NOT_FOUND))
+            throw new BadRequestException(new ErrorDto(ErrorCodes.UPLOAD_NOT_FOUND))
         }
         return upload
     }
@@ -34,9 +34,4 @@ export class UploadsService {
             where: { id },
         })
     }
-
-
-
-
-    
 }

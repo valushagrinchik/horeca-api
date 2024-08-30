@@ -1,4 +1,4 @@
-import { TypeValidate, Validate } from '../../system/validation/validate.decotators'
+import { TypeValidate, Validate } from '../../system/utils/validation/validate.decotators'
 
 export class LoginUserDto {
     @Validate(TypeValidate.STRING)

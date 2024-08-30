@@ -1,12 +1,12 @@
 import { UserRole } from '@prisma/client'
 import { UsersController } from './users.controller'
-import { UsersService } from './users.service'
+import { UsersService } from './services/users.service'
 import { Test } from '@nestjs/testing'
-import { PrismaService } from '../prisma.service'
 import { AuthorizationService } from './authorization.service'
 import { MailModule } from '../mail/mail.module'
 import { JwtModule } from '@nestjs/jwt'
 import { ConfigModule, ConfigService } from '@nestjs/config'
+import { DatabaseService } from '../system/database/database.service'
 
 describe('UsersController', () => {
     let usersController: UsersController
@@ -17,7 +17,7 @@ describe('UsersController', () => {
             controllers: [UsersController],
             providers: [
                 UsersService,
-                PrismaService,
+                DatabaseService,
                 AuthorizationService,
                 {
                     provide: ConfigService,
