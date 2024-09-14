@@ -1,4 +1,4 @@
-import { Controller, Param, Post } from '@nestjs/common'
+import { Body, Controller, Param, Post } from '@nestjs/common'
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { AuthUser } from '../system/utils/auth/decorators/auth.decorator'
 import { UserRole } from '@prisma/client'
@@ -19,7 +19,7 @@ export class ProviderRequestsController {
     @Post()
     @RequestDecorator(ProviderRequestDto, ProviderRequestCreateDto)
     @ApiOperation({ summary: "Create provider request on horeca's one" })
-    async create(@AuthParamDecorator() auth: AuthInfoDto, dto: ProviderRequestCreateDto) {
+    async create(@AuthParamDecorator() auth: AuthInfoDto, @Body() dto: ProviderRequestCreateDto) {
         return this.service.create(auth, dto)
     }
 
@@ -28,7 +28,7 @@ export class ProviderRequestsController {
     @RequestDecorator(SuccessDto)
     @ApiOperation({ summary: 'Approve by HoReCa to be able to start chat with' })
     async approveByHoreca(@AuthParamDecorator() auth: AuthInfoDto, @Param('id') id: number) {
-        await this.service.approveByHoreca(auth, id)
+        await this.service.approveByHoreca(auth, +id)
         return new SuccessDto('ok')
     }
 }

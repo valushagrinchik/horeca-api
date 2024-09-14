@@ -18,12 +18,10 @@ export class HorecaRequestsService {
     ) {}
 
     async create(auth: AuthInfoDto, { imageIds, ...dto }: HorecaRequestCreateDto) {
-        const profile = await this.prisma.profile.findUnique({ where: { userId: auth.id } })
-
         const horecaRequest = await this.prisma.horecaRequest.create({
             data: {
                 ...dto,
-                profileId: profile.id,
+                userId: auth.id,
                 items: {
                     create: dto.items,
                 },
@@ -44,7 +42,7 @@ export class HorecaRequestsService {
         return new HorecaRequestDto({
             ...horecaRequest,
             items: horecaRequest.items.map(item => new HorecaRequestItemDto(item)),
-            images: images[id].map(image => image.image),
+            images: (images[id] || []).map(image => image.image),
         })
     }
 
@@ -99,7 +97,7 @@ export class HorecaRequestsService {
                 new HorecaRequestDto({
                     ...p,
                     items: p.items.map(item => new HorecaRequestItemDto(item)),
-                    images: images[p.id].map(image => image.image),
+                    images: (images[p.id] || []).map(image => image.image),
                 })
         )
     }

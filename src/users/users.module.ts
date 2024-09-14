@@ -8,6 +8,7 @@ import { JwtStrategy } from './jwtStrategy'
 import { AuthorizationController } from './authorization.controller'
 import { MailService } from '../mail/mail.service'
 import { MailModule } from '../mail/mail.module'
+import { UsersDbService } from './services/users.db.service'
 
 @Module({
     imports: [
@@ -21,7 +22,7 @@ import { MailModule } from '../mail/mail.module'
         MailModule,
     ],
     controllers: [UsersController, AuthorizationController],
-    providers: [UsersService, MailService, AuthorizationService, JwtStrategy, Logger],
+    providers: [UsersDbService, UsersService, MailService, AuthorizationService, JwtStrategy, Logger],
     exports: [AuthorizationService, UsersService, JwtModule],
 })
 export class UsersModule {}

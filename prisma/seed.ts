@@ -105,9 +105,9 @@ async function main() {
         where: { id:  123 },
         update: {},
         create: {
-            profile:{
+            user: {
                 connect: {
-                    id: provider.profile.id
+                    id: provider.id,
                 }
             },
             category : Categories.alcoholicDrinks,
@@ -126,9 +126,9 @@ async function main() {
         where: { id:  123},
         update: {},
         create: {
-            profile:{
+            user: {
                 connect: {
-                    id: horeca.profile.id
+                    id: horeca.id,
                 }
             },
             items :{
@@ -156,9 +156,9 @@ async function main() {
         where: { id:  123},
         update: {},
         create: {
-            profile:{
+            user:{
                 connect: {
-                    id: provider.profile.id
+                    id: provider.id,
                 }
             },
             horecaRequest: {

@@ -1,14 +1,10 @@
-# Set the version of docker compose to use
-version: '2.27'
-
-# The containers that compose the project
 services:
   db:
     image: postgres:14
     restart: always
     container_name: horeca-tests-prisma
     ports:
-      - '5433:5432'
+      - '5432:5432'
     environment:
       POSTGRES_USER: prisma
       POSTGRES_PASSWORD: prisma

@@ -14,14 +14,12 @@ export class ProviderRequestsService {
         private uploadsLinkService: UploadsLinkService
     ) {}
 
-    async create(auth: AuthInfoDto, { imageIds, proposalId, ...dto }: ProviderRequestCreateDto) {
-        const profile = await this.prisma.profile.findUnique({ where: { userId: auth.id } })
-
+    async create(auth: AuthInfoDto, { imageIds, horecaRequestId, ...dto }: ProviderRequestCreateDto) {
         const providerRequest = await this.prisma.providerRequest.create({
             data: {
                 ...dto,
-                profileId: profile.id,
-                horecaRequestId: proposalId,
+                userId: auth.id,
+                horecaRequestId,
             },
         })
 
@@ -41,7 +39,7 @@ export class ProviderRequestsService {
 
         return new ProviderRequestDto({
             ...providerRequest,
-            images: images[id].map(image => image.image),
+            images: (images[id] || []).map(image => image.image),
         })
     }
 

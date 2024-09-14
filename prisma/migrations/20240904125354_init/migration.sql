@@ -80,7 +80,7 @@ CREATE TABLE "addresses" (
 -- CreateTable
 CREATE TABLE "products" (
     "id" SERIAL NOT NULL,
-    "profile_id" INTEGER NOT NULL,
+    "user_id" INTEGER NOT NULL,
     "category" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "description" TEXT NOT NULL,
@@ -163,7 +163,7 @@ CREATE TABLE "mail_logs" (
 -- CreateTable
 CREATE TABLE "horeca_requests" (
     "id" SERIAL NOT NULL,
-    "profile_id" INTEGER NOT NULL,
+    "user_id" INTEGER NOT NULL,
     "address" TEXT NOT NULL,
     "delivery_time" TIMESTAMP(3) NOT NULL,
     "accept_untill" TIMESTAMP(3) NOT NULL,
@@ -205,7 +205,7 @@ CREATE TABLE "horeca_request_templates" (
 -- CreateTable
 CREATE TABLE "provider_requests" (
     "id" SERIAL NOT NULL,
-    "profile_id" INTEGER NOT NULL,
+    "user_id" INTEGER NOT NULL,
     "horeca_request_id" INTEGER NOT NULL,
     "comment" TEXT,
     "available" BOOLEAN NOT NULL DEFAULT true,
@@ -269,7 +269,7 @@ ALTER TABLE "profiles" ADD CONSTRAINT "profiles_user_id_fkey" FOREIGN KEY ("user
 ALTER TABLE "addresses" ADD CONSTRAINT "addresses_profile_id_fkey" FOREIGN KEY ("profile_id") REFERENCES "profiles"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "products" ADD CONSTRAINT "products_profile_id_fkey" FOREIGN KEY ("profile_id") REFERENCES "profiles"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "products" ADD CONSTRAINT "products_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "uploads_links" ADD CONSTRAINT "uploads_links_imageId_fkey" FOREIGN KEY ("imageId") REFERENCES "uploads"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -284,13 +284,13 @@ ALTER TABLE "mails" ADD CONSTRAINT "mails_cron_id_fkey" FOREIGN KEY ("cron_id") 
 ALTER TABLE "mail_logs" ADD CONSTRAINT "mail_logs_mail_id_fkey" FOREIGN KEY ("mail_id") REFERENCES "mails"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "horeca_requests" ADD CONSTRAINT "horeca_requests_profile_id_fkey" FOREIGN KEY ("profile_id") REFERENCES "profiles"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "horeca_requests" ADD CONSTRAINT "horeca_requests_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "horeca_request_items" ADD CONSTRAINT "horeca_request_items_horeca_request_id_fkey" FOREIGN KEY ("horeca_request_id") REFERENCES "horeca_requests"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "provider_requests" ADD CONSTRAINT "provider_requests_profile_id_fkey" FOREIGN KEY ("profile_id") REFERENCES "profiles"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "provider_requests" ADD CONSTRAINT "provider_requests_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "provider_requests" ADD CONSTRAINT "provider_requests_horeca_request_id_fkey" FOREIGN KEY ("horeca_request_id") REFERENCES "horeca_requests"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

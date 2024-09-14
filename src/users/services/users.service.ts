@@ -10,21 +10,21 @@ import { UserDto } from '../dto/user.dto'
 import { MailService } from '../../mail/mail.service'
 import { User } from '@prisma/client'
 import { validPassword } from '../../system/crypto'
-import { DatabaseService } from '../../system/database/database.service'
+import { UsersDbService } from './users.db.service'
 
 @Injectable()
 export class UsersService {
     constructor(
-        private prisma: DatabaseService,
+        private usersRep: UsersDbService,
         private authService: AuthorizationService,
-        private mailService?: MailService
+        private mailService?: MailService,
     ) {}
 
     async registrate(dto: RegistrateUserDto) {
         if (!dto.GDPRApproved) {
             throw new BadRequestException(new ErrorDto(ErrorCodes.GDPR_IS_NOT_APPROVED))
         }
-        const user = await this.prisma.createUser(dto)
+        const user = await this.usersRep.createUser(dto)
 
         // send activation link
         await this.mailService?.sendActivationMail({
@@ -34,11 +34,11 @@ export class UsersService {
             link: user.activationLink,
         })
 
-        return this.authService.login(user)
+        return new UserDto(user)
     }
 
     async activateAccount(uuid: string) {
-        const user = await this.prisma.user.findFirst({ where: { activationLink: uuid } })
+        const user = await this.usersRep.getUserByActivationLink(uuid)  
         if (!user) {
             throw new ErrorDto(ErrorCodes.ACTIVATION_LINK_ERROR)
         }
@@ -46,31 +46,23 @@ export class UsersService {
     }
 
     async activateUser(user: User) {
-        await this.prisma.user.update({
-            where: { id: user.id },
-            data: { isActivated: true },
-        })
+        await this.usersRep.updateUser(user.id, { isActivated: true })
     }
 
     async update(auth: AuthInfoDto, dto: UpdateUserDto) {
-        const user = await this.prisma.user.findUnique({
-            where: { id: auth.id },
-            include: { profile: { include: { addresses: true } } },
-        })
+        const user = await this.usersRep.getUserWithProfile( auth.id )
         if (!user) {
             throw new BadRequestException(new ErrorDto(ErrorCodes.USER_DOES_NOT_EXISTS))
         }
 
-        const updated = await this.prisma.updateProfile(auth.id, dto)
+        const updated = await this.usersRep.updateProfile(auth.id, dto)
 
         return new UserDto(updated)
     }
 
     async get(auth: AuthInfoDto): Promise<UserDto> {
-        const user = await this.prisma.user.findUnique({
-            where: { id: auth.id },
-            include: { profile: { include: { addresses: true } } },
-        })
+        const user = await this.usersRep.getUserWithProfile( auth.id )
+
         if (!user) {
             throw new BadRequestException(new ErrorDto(ErrorCodes.AUTH_FAIL))
         }
@@ -79,9 +71,9 @@ export class UsersService {
     }
 
     async login(dto: LoginUserDto) {
-        const user = await this.prisma.user.findFirst({ where: { email: dto.email } })
+        const user = await this.usersRep.getUserByEmail( dto.email )
 
-        if (!user) {
+        if (!user?.isActivated) {
             throw new BadRequestException(new ErrorDto(ErrorCodes.AUTH_FAIL))
         }
 
@@ -93,8 +85,6 @@ export class UsersService {
     }
 
     findByAuth(auth: AuthInfoDto) {
-        return this.prisma.user.findFirst({
-            where: { id: auth.id },
-        })
+        return this.usersRep.getUser(auth.id)
     }
 }

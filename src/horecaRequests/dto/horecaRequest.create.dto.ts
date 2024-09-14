@@ -31,4 +31,7 @@ export class HorecaRequestCreateDto {
 
     @Validate(TypeValidate.STRING, { required: false })
     comment: string
+
+    @Validate(TypeValidate.NUMBER)
+    userId: number
 }

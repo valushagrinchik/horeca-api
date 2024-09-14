@@ -1,14 +1,15 @@
-#HORECA API
+# HORECA API
 
-API for HoReCa
+
+
 
 ```
 <!-- docker -->
-npm run docker
+pnpm run docker
 
 <!-- pm2 -->
-npm run db:seed
-npm run build
+pnpm run db:seed
+pnpm run build
 pm2 start dist/src/main.js --name horeca-api
 
 ```
@@ -29,6 +30,3 @@ horeca!
 #### Admin
 admin@test.com
 admin!
-
-
-

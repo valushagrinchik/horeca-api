@@ -2,38 +2,18 @@ import { AuthInfoDto } from '../../users/dto/auth.info.dto'
 import { PaginateValidateType } from '../../system/utils/swagger/decorators'
 import { ChatCreateDto } from '../dto/chat.create.dto'
 import { ChatType } from '@prisma/client'
-import { WebsocketEvents } from '../../system/utils/enums/websocketEvents.enum'
 import { ChatMessageCreateDto } from '../dto/chat.message.create.dto'
 import { ChatDto } from '../dto/chat.dto'
 import { ChatMessageDto } from '../dto/chat.message.dto'
-import { ChatWsGateway } from '../chat.ws.gateway'
-import { forwardRef, Inject } from '@nestjs/common'
 import { ChatDBService } from './chat.db.service'
+import { Inject, forwardRef } from '@nestjs/common'
 
 export class ChatService {
     constructor(
-        private chatRep: ChatDBService,
-        @Inject(forwardRef(() => ChatWsGateway))
-        private websocketGateway: ChatWsGateway
-    ) {}
+        @Inject(forwardRef(() => ChatDBService)) private chatRep: ChatDBService) {}
 
-    async createChat(auth: AuthInfoDto, dto: ChatCreateDto) {
-        const chat = await this.chatRep.createChat({
-            ...dto,
-            opponents: [auth.id, dto.opponentId],
-            type: ChatType.Order,
-        })
-
-        await this.createMessage(
-            auth,
-            {
-                chatId: chat.id,
-                message: 'Chat is created',
-                isServer: true,
-            },
-            WebsocketEvents.CHAT
-        )
-        return new ChatDto(chat)
+    async getChats(auth: AuthInfoDto, paginate: PaginateValidateType) {
+        return this.chatRep.getChats(auth.id, paginate)
     }
 
     async getChat(auth: AuthInfoDto, id: number) {
@@ -41,20 +21,28 @@ export class ChatService {
         return new ChatDto({ ...chat, messages: chat.messages.map(m => new ChatMessageDto(m)) })
     }
 
-    async createMessage(
-        auth: AuthInfoDto,
-        { chatId, ...dto }: ChatMessageCreateDto,
-        event: WebsocketEvents = WebsocketEvents.MESSAGE
-    ) {
-        const chat = await this.chatRep.getChat(chatId, undefined)
-        const message = await this.chatRep.createMessage({ ...dto, chatId })
+    /** Returns chat object and latest just created message */
+    async createChat(auth: AuthInfoDto, { opponentId, providerRequestId }: ChatCreateDto) {
+        const chat = await this.chatRep.createChat({
+            providerRequest: {
+                connect: { id: providerRequestId },
+            },
+            opponents: [auth.id, opponentId],
+            type: ChatType.Order,
+        })
+        const message = await this.chatRep.createMessage({
+            message: 'Chat is created',
+            isServer: true,
+            chatId: chat.id,
+        })
 
-        this.websocketGateway.emitToUsers(chat.opponents, event, message)
-
-        return message
+        return new ChatDto({ ...chat, messages: [message] })
     }
 
-    async getChats(auth: AuthInfoDto, paginate: PaginateValidateType) {
-        return this.chatRep.getChats(auth.id, paginate)
+    /** Returns chat object and latest just created message */
+    async createMessage(auth: AuthInfoDto, dto: ChatMessageCreateDto) {
+        const chat = await this.chatRep.getChat(dto.chatId)
+        const message = await this.chatRep.createMessage(dto)
+        return new ChatDto({ ...chat, messages: [message] })
     }
 }

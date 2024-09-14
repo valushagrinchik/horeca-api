@@ -78,6 +78,10 @@ model User {
   profile Profile?
   mails   Mail[]
 
+  Product          Product[]
+  providerRequests ProviderRequest[]
+  horecaRequests   HorecaRequest[]
+
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
@@ -92,16 +96,13 @@ model Profile {
   profileType ProfileType @map("profile_type")
 
   // Provider 
-  minOrderAmount   Int?              @map("min_order_amount")
-  deliveryMethods  String[]          @map("delivery_methods")
-  categories       String[]
-  products         Product[]
-  providerRequests ProviderRequest[]
+  minOrderAmount  Int?     @map("min_order_amount")
+  deliveryMethods String[] @map("delivery_methods")
+  categories      String[]
 
   // Horeca
-  info           String?
-  addresses      Address[]
-  horecaRequests HorecaRequest[]
+  info      String?
+  addresses Address[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
@@ -144,8 +145,8 @@ model Address {
 model Product {
   id Int @id @default(autoincrement())
 
-  profile   Profile @relation(fields: [profileId], references: [id])
-  profileId Int     @map("profile_id")
+  user   User @relation(fields: [userId], references: [id])
+  userId Int  @map("user_id")
 
   category      String
   name          String
@@ -187,7 +188,7 @@ model UploadsLink {
   sourceId   Int             @map("proposal_id")
 
   image   Upload? @relation(fields: [imageId], references: [id])
-  imageId Int      @unique
+  imageId Int     @unique
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
@@ -248,12 +249,10 @@ model MailLog {
 }
 
 model HorecaRequest {
-  id Int @id @default(autoincrement())
-
-  profile   Profile @relation(fields: [profileId], references: [id])
-  profileId Int     @map("profile_id")
-
-  items HorecaRequestItem[]
+  id     Int                 @id @default(autoincrement())
+  user   User                @relation(fields: [userId], references: [id])
+  userId Int                 @map("user_id")
+  items  HorecaRequestItem[]
   // images - could be loaded on runtime from UploadsLink
 
   address      String
@@ -305,8 +304,8 @@ model HorecaRequestTemplate {
 model ProviderRequest {
   id Int @id @default(autoincrement())
 
-  profile   Profile @relation(fields: [profileId], references: [id])
-  profileId Int     @map("profile_id")
+  user   User @relation(fields: [userId], references: [id])
+  userId Int  @map("user_id")
 
   horecaRequest   HorecaRequest @relation(fields: [horecaRequestId], references: [id])
   horecaRequestId Int           @unique @map("horeca_request_id")

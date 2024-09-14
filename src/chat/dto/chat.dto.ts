@@ -6,10 +6,11 @@ export class ChatDto implements Chat {
     opponents: number[]
     type: ChatType
     providerRequestId: number | null
+    messages?: ChatMessageDto[]
+
     createdAt: Date
     updatedAt: Date
 
-    messages?: ChatMessageDto[]
     constructor(partial: Partial<Chat & { messages?: ChatMessageDto[] }>) {
         Object.assign(this, partial)
     }

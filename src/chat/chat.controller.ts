@@ -34,9 +34,10 @@ export class ChatsController {
         return this.service.getChat(auth, id)
     }
 
-    @Post()
-    @RequestDecorator(ChatDto, ChatCreateDto)
-    async createChat(@AuthParamDecorator() auth: AuthInfoDto, @Body() dto: ChatCreateDto) {
-        return this.service.createChat(auth, dto)
-    }
+    // Moved to WS
+    // @Post()
+    // @RequestDecorator(ChatDto, ChatCreateDto)
+    // async createChat(@AuthParamDecorator() auth: AuthInfoDto, @Body() dto: ChatCreateDto) {
+    //     return this.service.createChat(auth, dto)
+    // }
 }

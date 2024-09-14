@@ -2,9 +2,13 @@ import { PaginateValidateType } from '../../system/utils/swagger/decorators'
 import { Prisma } from '@prisma/client'
 import { ChatMessageCreateDto } from '../dto/chat.message.create.dto'
 import { DatabaseService } from '../../system/database/database.service'
+import { forwardRef, Inject } from '@nestjs/common'
 
 export class ChatDBService {
-    constructor(private db: DatabaseService) {}
+    constructor( 
+        @Inject(forwardRef(() => DatabaseService)) // TODO: try to delete after migration of using db repository approach
+        private db: DatabaseService
+    ) {}
 
     async createChat(input: Prisma.ChatCreateInput) {
         return this.db.chat.create({

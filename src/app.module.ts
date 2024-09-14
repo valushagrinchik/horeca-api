@@ -2,18 +2,17 @@ import { Module } from '@nestjs/common'
 import { UsersModule } from './users/users.module'
 import { ConfigModule } from '@nestjs/config'
 import { ProductsModule } from './products/products.module'
-// import { MailModule } from './mail/mail.module'
+import { MailModule } from './mail/mail.module'
 import { ScheduleModule } from '@nestjs/schedule'
-// import { UploadsModule } from './uploads/uploads.module'
+import { UploadsModule } from './uploads/uploads.module'
 import { ChatModule } from './chat/chat.module'
-// import { ProviderRequestsModule } from './providerRequests/providerRequests.module'
-// import { HorecaRequestsModule } from './horecaRequests/horecaRequests.module'
+import { ProviderRequestsModule } from './providerRequests/providerRequests.module'
+import { HorecaRequestsModule } from './horecaRequests/horecaRequests.module'
 import { DatabaseModule } from './system/database/database.module'
 
 @Module({
     imports: [
         ConfigModule.forRoot({
-            envFilePath: process.env.NODE_ENV == 'test' ? '.env.test' : '.env',
             isGlobal: true,
         }),
 
@@ -21,11 +20,11 @@ import { DatabaseModule } from './system/database/database.module'
         ScheduleModule.forRoot(),
 
         // Services
-        // MailModule,
-        // UploadsModule,
+        MailModule,
+        UploadsModule,
         UsersModule,
-        // HorecaRequestsModule,
-        // ProviderRequestsModule,
+        HorecaRequestsModule,
+        ProviderRequestsModule,
         ProductsModule,
         ChatModule,
     ],

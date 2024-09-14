@@ -4,7 +4,7 @@ import { Weekday } from '../../../system/utils/enums'
 
 export class Address {
     @Validate(TypeValidate.STRING, { required: false })
-    id: number
+    id?: number
 
     @Validate(TypeValidate.STRING)
     address: string

@@ -5,7 +5,7 @@ import { SourceWithUploads } from '../../uploads/dto/upload.dto'
 
 export class ProductDto extends SourceWithUploads implements Product {
     id: number
-    profileId: number
+    userId: number
     category: Categories
     name: string
     description: string

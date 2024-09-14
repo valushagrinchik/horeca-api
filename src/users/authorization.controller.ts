@@ -10,6 +10,7 @@ import { SuccessDto } from '../system/utils/dto/success.dto'
 import { Response } from 'express'
 import { ConfigService } from '@nestjs/config'
 import { RequestDecorator } from '../system/utils/swagger/decorators'
+import { UserDto } from './dto/user.dto'
 
 @Controller('auth')
 @ApiTags('Authorization')
@@ -21,7 +22,7 @@ export class AuthorizationController {
 
     @Post('registration')
     @ApiOperation({ summary: 'Registrate user' })
-    @RequestDecorator(AuthResultDto, RegistrateUserDto)
+    @RequestDecorator(UserDto, RegistrateUserDto)
     @ApiExtraModels(CreateHorecaProfileDto, CreateProviderProfileDto)
     async registrate(@Body() dto: RegistrateUserDto) {
         return this.usersService.registrate(dto)

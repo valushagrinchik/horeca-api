@@ -89,7 +89,7 @@ describe('ProposalsProviderService', () => {
         await prismaService.horecaRequest.create({
             data: {
                 name: 'Something delishious',
-                profileId: horecaUser.id,
+                userId: horecaUser.id,
                 deliveryTime: validAcceptUntill,
                 acceptUntill: validAcceptUntill,
                 paymentType: PaymentType.PaymentUponDelivery,
@@ -125,7 +125,7 @@ describe('ProposalsProviderService', () => {
         await prismaService.horecaRequest.create({
             data: {
                 name: 'Something delishious2',
-                profileId: horecaUser2.id,
+                userId: horecaUser2.id,
                 deliveryTime: invalidAcceptUntill,
                 acceptUntill: invalidAcceptUntill,
                 paymentType: PaymentType.PaymentUponDelivery,

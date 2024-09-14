@@ -4,7 +4,7 @@ import { HorecaRequestItemDto } from './horecaRequest.item.dto'
 
 export class HorecaRequestDto extends SourceWithUploads implements HorecaRequest {
     id: number
-    profileId: number
+    userId: number
     address: string
     deliveryTime: Date
     acceptUntill: Date

@@ -19,12 +19,11 @@ export class ProductsService {
     ) {}
 
     async create(auth: AuthInfoDto, { imageIds, ...dto }: ProductCreateDto) {
-        const profile = await this.prisma.profile.findUnique({ where: { userId: auth.id } })
         const product = await this.prisma.product.create({
             data: {
                 ...dto,
-                profile: {
-                    connect: { id: profile.id },
+                user: {
+                    connect: { id: auth.id },
                 },
                 ...(imageIds
                     ? {
@@ -47,11 +46,10 @@ export class ProductsService {
 
     async findAll(auth: AuthInfoDto, paginate: PaginateValidateType<ProductSearchDto>) {
         const search = paginate.search
-        const profile = await this.prisma.profile.findUnique({ where: { userId: auth.id } })
 
         const products = await this.prisma.product.findMany({
             where: {
-                profileId: profile.id,
+                userId: auth.id,
                 ...search,
             },
             orderBy: {
@@ -70,7 +68,7 @@ export class ProductsService {
             p =>
                 new ProductDto({
                     ...p,
-                    images: images[p.id].map(image => image.image),
+                    images: (images[p.id] || []).map(image => image.image),
                 })
         )
     }
@@ -84,7 +82,7 @@ export class ProductsService {
 
         return new ProductDto({
             ...product,
-            images: images[product.id].map(image => image.image),
+            images: (images[product.id] || []).map(image => image.image),
         })
     }
 

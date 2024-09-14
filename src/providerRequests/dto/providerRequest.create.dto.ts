@@ -3,7 +3,7 @@ import { TypeValidate, Validate } from '../../system/utils/validation/validate.d
 
 export class ProviderRequestCreateDto {
     @Validate(TypeValidate.NUMBER)
-    proposalId: number
+    horecaRequestId: number
 
     @Validate(TypeValidate.ARRAY, { type: [Number] })
     imageIds: number[]

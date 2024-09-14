@@ -3,7 +3,7 @@ import { SourceWithUploads } from '../../uploads/dto/upload.dto'
 
 export class ProviderRequestDto extends SourceWithUploads implements ProviderRequest {
     id: number
-    profileId: number
+    userId: number
     horecaRequestId: number
     comment: string
     available: boolean // in stock
