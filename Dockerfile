@@ -2,13 +2,13 @@ FROM node:22
 
 WORKDIR /app
 
-COPY package*.json ./
-
-RUN npm install 
+RUN npm install -g pnpm
 
 COPY . .
 
-RUN npx prisma generate
-RUN npm run build
+RUN pnpm install 
 
-CMD [ "npm", "run", "start:migrate:prod" ]
+RUN pnpm exec npx prisma generate
+RUN pnpm build
+
+CMD [ "pnpm", "start:migrate:prod" ]

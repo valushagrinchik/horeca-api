@@ -1,7 +1,7 @@
 import { Test } from '@nestjs/testing'
 import { PaymentType, ProfileType, User, UserRole } from '@prisma/client'
 import { Categories } from '../system/utils/enums'
-import { HorecaRequestsService } from './HorecaRequests.service'
+import { HorecaRequestsService } from './horecaRequests.service'
 import { DatabaseService } from '../system/database/database.service'
 
 describe('ProposalsProviderService', () => {

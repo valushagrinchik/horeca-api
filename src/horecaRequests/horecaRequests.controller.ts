@@ -13,7 +13,7 @@ import {
     RequestPaginatedDecorator,
     RequestPaginatedValidateParamsDecorator,
 } from '../system/utils/swagger/decorators'
-import { HorecaRequestsService } from './HorecaRequests.service'
+import { HorecaRequestsService } from './horecaRequests.service'
 import { HorecaRequestTemplateCreateDto } from './dto/horecaRequest.template.create.dto'
 
 @AuthUser(UserRole.Horeca)
