@@ -29,6 +29,7 @@ export class ProductsController {
         return this.service.create(auth, dto)
     }
 
+    @Get()
     @RequestPaginatedDecorator(ProductDto, ProductSearchDto)
     @ApiOperation({ summary: "Gat all products from provider's offer" })
     async findAll(
