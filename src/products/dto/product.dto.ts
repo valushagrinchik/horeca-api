@@ -12,7 +12,7 @@ export class ProductDto extends SourceWithUploads implements Product {
     producer: string
     cost: number
     count: number
-    @ApiProperty({ enum: ProductPackagingType })
+    @ApiProperty({ enum: ProductPackagingType, enumName: 'ProductPackagingType' })
     packagingType: ProductPackagingType
     createdAt: Date
     updatedAt: Date

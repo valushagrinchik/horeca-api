@@ -14,8 +14,8 @@ export class ProductCreateDto {
     cost: number
 
     count: number
-    
-    @ApiProperty({ enum: ProductPackagingType })
+
+    @ApiProperty({ enum: ProductPackagingType, enumName: 'ProductPackagingType' })
     packagingType: ProductPackagingType
 
     imageIds: number[]
