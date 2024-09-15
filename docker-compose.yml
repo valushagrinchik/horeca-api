@@ -1,24 +1,22 @@
 services:
-    app:
+    horeca_api:
+        container_name: horeca_api
         build:
             context: .
             dockerfile: Dockerfile
-        container_name: horeca_api
         volumes:
             - ~/docker-volumes/horeca_api-uploads:/app/uploads
         env_file: '.env'
-        environment:
-            - PORT=3001
         ports:
-            - '80:3001'
-            - '8080:4000'
+            - '3001:3001'
+            - '4001:4001'
         depends_on:
-            - db
+            - horeca_ps
 
-    db:
+    horeca_ps:
+        container_name: horeca_ps
         image: postgres:14
         restart: always
-        container_name: horeca_postgres
         volumes:
             - ./db_scripts:/docker-entrypoint-initdb.d
             - ~/docker-volumes/horeca_postgres-data:/var/lib/postgresql/data
