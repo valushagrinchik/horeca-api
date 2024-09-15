@@ -1,5 +1,6 @@
 import { ProductPackagingType } from '@prisma/client'
 import { Categories } from '../../system/utils/enums'
+import { ApiProperty } from '@nestjs/swagger'
 
 export class ProductCreateDto {
     category: Categories
@@ -13,7 +14,8 @@ export class ProductCreateDto {
     cost: number
 
     count: number
-
+    
+    @ApiProperty({ enum: ProductPackagingType })
     packagingType: ProductPackagingType
 
     imageIds: number[]
