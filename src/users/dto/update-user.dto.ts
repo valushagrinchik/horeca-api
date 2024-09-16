@@ -33,5 +33,5 @@ export class UpdateUserDto {
     @Type(({ object }) =>
         object.profile.profileType == ProfileType.Horeca ? CreateHorecaProfileDto : CreateProviderProfileDto
     )
-    profile: CreateHorecaProfileDto | CreateProviderProfileDto
+    profile: Partial<CreateHorecaProfileDto | CreateProviderProfileDto>
 }

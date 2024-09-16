@@ -3,6 +3,7 @@ import { ENDPOINTS } from './constants'
 import * as request from 'supertest'
 import { LoginUserDto } from './../src/users/dto/login-user.dto'
 import { RegistrateUserDto } from './../src/users/dto/registrate-user.dto'
+import { UpdateUserDto } from './../src/users/dto/update-user.dto'
 
 export const registrateUser = async (app: INestApplication, payload: RegistrateUserDto) => {
     return request(app.getHttpServer())
@@ -90,4 +91,20 @@ export const prepareForChat = async ( app: INestApplication ) => {
         providerRequestId: providerCreateRequestRes.id,
         opponentId: providerCreateRequestRes.userId,
     }
+}
+
+
+export const getProfile = async (app: INestApplication, accessToken: string) => {
+    return request(app.getHttpServer())
+        .get(ENDPOINTS.PROFILE)
+        .set('Authorization', 'Bearer ' + accessToken)
+        .then(res => res.body)
+}
+
+export const updateProfile = async (app: INestApplication, accessToken: string, payload: UpdateUserDto) => {
+    return request(app.getHttpServer())
+        .put(ENDPOINTS.PROFILE)
+        .set('Authorization', 'Bearer ' + accessToken)
+        .send(payload)
+        .then(res => res.body)
 }

@@ -56,7 +56,7 @@ describe('AuthorizationController (e2e)', () => {
             expect(res.email).toEqual(payload.email)
         })
 
-        it('auth should throw an AUTH_FAIL in case of profile is not activated', async () => {
+        it('login should throw an AUTH_FAIL in case of profile is not activated', async () => {
             const res = await authUser(app, {
                 email: payload.email,
                 password: payload.password,
@@ -65,7 +65,7 @@ describe('AuthorizationController (e2e)', () => {
             expect(res.statusCode).toEqual(400)
             expect(res.errorMessage).toEqual(ErrorCodes.AUTH_FAIL)
         })
-        it('auth should return accessToken and refreshToken', async () => {
+        it('login should return accessToken and refreshToken', async () => {
             const user = users.find(user => user.email == payload.email)
             await activateUser(app, user.activationLink)
 
