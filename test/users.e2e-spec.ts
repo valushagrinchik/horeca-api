@@ -1,32 +1,15 @@
 import { INestApplication } from '@nestjs/common'
 import { AppModule } from '../src/app.module'
 import { Test, TestingModule } from '@nestjs/testing'
-import { UsersDbService } from '../src/users/services/users.db.service'
-import { DatabaseService } from '../src/system/database/database.service'
 import { authUser, getProfile, updateProfile } from './helpers'
 
 let moduleFixture: TestingModule
 let app: INestApplication
 
-let users = []
-
 beforeAll(async () => {
-    // const dbService = new DatabaseService()
-    // const usersDbServiceMocked = new UsersDbService(dbService)
-    // usersDbServiceMocked.createUser = new Proxy(usersDbServiceMocked.createUser, {
-    //     async apply(target, thisArg, argumentsList) {
-    //         const user = await Reflect.apply(target, thisArg, argumentsList)
-    //         users.push(user)
-    //         return user
-    //     },
-    // })
-
     moduleFixture = await Test.createTestingModule({
         imports: [AppModule],
-    })
-        // .overrideProvider(UsersDbService)
-        // .useValue(usersDbServiceMocked)
-        .compile()
+    }).compile()
 
     app = moduleFixture.createNestApplication()
     await app.init()
