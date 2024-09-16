@@ -14,20 +14,20 @@ jobs:
       - name: create env file
         uses: SpicyPizza/create-envfile@v2.0
         with:
-          envkey_DATABASE_URL: ${{ vars.DATABASE_URL }}
-          envkey_JWT_REFRESH_TOKEN_SECRET: ${{ vars.JWT_REFRESH_TOKEN_SECRET }}
-          envkey_JWT_ACCESS_TOKEN_SECRET: ${{ vars.JWT_ACCESS_TOKEN_SECRET }}
-          envkey_SMTP_HOST: ${{ vars.SMTP_HOST }}
-          envkey_SMTP_PORT: ${{ vars.SMTP_PORT }}
-          envkey_SMTP_USER: ${{ vars.SMTP_USER }}
-          envkey_SMTP_PASSWORD: ${{ vars.SMTP_PASSWORD }}
-          envkey_SUPPORT_MAIL: ${{ vars.SUPPORT_MAIL }}
-          envkey_BACKEND_URL: ${{ vars.BACKEND_URL }}
-          envkey_FRONTEND_URL: ${{ vars.FRONTEND_URL }}
-          envkey_CRYPTO_SALT: ${{ vars.CRYPTO_SALT }}
-          envkey_WS_PORT: ${{ vars.WS_PORT }}
+          envkey_DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          envkey_JWT_REFRESH_TOKEN_SECRET: ${{ secrets.JWT_REFRESH_TOKEN_SECRET }}
+          envkey_JWT_ACCESS_TOKEN_SECRET: ${{ secrets.JWT_ACCESS_TOKEN_SECRET }}
+          envkey_SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          envkey_SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          envkey_SMTP_USER: ${{ secrets.SMTP_USER }}
+          envkey_SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          envkey_SUPPORT_MAIL: ${{ secrets.SUPPORT_MAIL }}
+          envkey_BACKEND_URL: ${{ secrets.BACKEND_URL }}
+          envkey_FRONTEND_URL: ${{ secrets.FRONTEND_URL }}
+          envkey_CRYPTO_SALT: ${{ secrets.CRYPTO_SALT }}
+          envkey_WS_PORT: ${{ secrets.WS_PORT }}
           file_name: .env
-          fail_on_empty: false
+          fail_on_empty: true
           sort_keys: false
       - name: run in docker
         run: docker compose up --build -d
