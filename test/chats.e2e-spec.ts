@@ -32,13 +32,13 @@ describe('ChatWsGateway (e2e)', () => {
     it('Horeca can start chat and receive message from Provider', async () => {
         const { horecaToken, providerToken, ...createChatInput } = await prepareForChat(app)
 
-        const horecaWsClient = io('http://localhost:4000/chats', {
+        const horecaWsClient = io(process.env.WS_URL, {
             autoConnect: false,
             transports: ['websocket'],
             extraHeaders: { authorization: 'Bearer ' + horecaToken },
         })
 
-        const providerWsClient = io('http://localhost:4000/chats', {
+        const providerWsClient = io(process.env.WS_URL, {
             autoConnect: false,
             transports: ['websocket'],
             extraHeaders: { authorization: 'Bearer ' + providerToken },
