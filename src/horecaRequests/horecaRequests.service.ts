@@ -36,7 +36,7 @@ export class HorecaRequestsService {
     }
 
     async get(auth: AuthInfoDto, id: number) {
-        const horecaRequest = await this.prisma.horecaRequest.findUnique({ where: { id }, include: { items: true } })
+        const horecaRequest = await this.prisma.horecaRequest.findUnique({ where: { id, userId: auth.id }, include: { items: true } })
         const images = await this.uploadsLinkService.getImages(UploadsLinkType.HorecaRequest, [horecaRequest.id])
 
         return new HorecaRequestDto({

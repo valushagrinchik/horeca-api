@@ -6,7 +6,7 @@ import { UploadsModule } from '../uploads/uploads.module'
 
 @Module({
     imports: [UsersModule, UploadsModule],
-    controllers: [HorecaRequestsController],
+    controllers: [ HorecaRequestsController],
     providers: [HorecaRequestsService],
 })
 export class HorecaRequestsModule {}
