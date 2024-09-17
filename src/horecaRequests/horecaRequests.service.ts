@@ -63,6 +63,35 @@ export class HorecaRequestsService {
         return new HorecaRequestTemplateDto(proposalTemplate)
     }
 
+    async findAll(auth: AuthInfoDto, paginate: Partial<PaginateValidateType> = {}) {
+        const horecaRequests = await this.prisma.horecaRequest.findMany({
+            include: { items: true },
+            where: {
+                userId: auth.id,
+            },
+            orderBy: {
+                createdAt: 'desc',
+                [paginate.sort.field]: paginate.sort.order,
+            },
+            take: paginate.limit,
+            skip: paginate.offset,
+        })
+
+        const images = await this.uploadsLinkService.getImages(
+            UploadsLinkType.HorecaRequest,
+            horecaRequests.map(p => p.id)
+        )
+
+        return horecaRequests.map(
+            p =>
+                new HorecaRequestDto({
+                    ...p,
+                    items: p.items.map(item => new HorecaRequestItemDto(item)),
+                    images: (images[p.id] || []).map(image => image.image),
+                })
+        )
+    }
+
     async findForProvider(auth: AuthInfoDto, paginate: Partial<PaginateValidateType> = {}) {
         const now = new Date()
         const provider = await this.prisma.user.findUnique({ where: { id: auth.id }, include: { profile: true } })

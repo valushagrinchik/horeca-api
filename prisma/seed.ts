@@ -1,17 +1,12 @@
 import { PaymentType, PrismaClient, ProductPackagingType, ProfileType, UserRole } from '@prisma/client'
 import { Categories, DeliveryMethods } from '../src/system/utils/enums'
 import { generatePassword } from '../src/system/crypto'
+import { generateAcceptUntil } from '../src/system/utils/date'
 
 import * as dotenv from 'dotenv'
 dotenv.config()
 
-const generateAcceptUntil = () => {
-    const now = new Date()
-    const validAcceptUntill = new Date()
-    validAcceptUntill.setDate(now.getDate() + 7)
-    validAcceptUntill.setUTCHours(0, 0, 0, 0)
-    return validAcceptUntill
-}
+
 
 const prisma = new PrismaClient()
 async function main() {

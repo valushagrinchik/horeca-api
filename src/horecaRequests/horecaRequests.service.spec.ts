@@ -3,6 +3,7 @@ import { PaymentType, ProfileType, User, UserRole } from '@prisma/client'
 import { Categories } from '../system/utils/enums'
 import { HorecaRequestsService } from './horecaRequests.service'
 import { DatabaseService } from '../system/database/database.service'
+import { generateAcceptUntil } from 'src/system/utils/date'
 
 describe('ProposalsProviderService', () => {
     let service: HorecaRequestsService
@@ -76,14 +77,8 @@ describe('ProposalsProviderService', () => {
             data: data.providerUsers[0],
         })
 
-        const now = new Date()
-        const validAcceptUntill = new Date()
-        validAcceptUntill.setDate(now.getDate() + 7)
-        validAcceptUntill.setUTCHours(0, 0, 0, 0)
-
-        const invalidAcceptUntill = new Date()
-        invalidAcceptUntill.setDate(now.getDate() - 7)
-        invalidAcceptUntill.setUTCHours(0, 0, 0, 0)
+        const validAcceptUntill = generateAcceptUntil()
+        const invalidAcceptUntill = generateAcceptUntil(-7)
 
         // create products
         await prismaService.horecaRequest.create({

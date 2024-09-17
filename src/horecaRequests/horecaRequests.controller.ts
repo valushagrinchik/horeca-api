@@ -43,6 +43,18 @@ export class HorecaRequestsController {
         return this.service.getTemplate(id)
     }
 
+
+    @Get()
+    @RequestPaginatedDecorator(HorecaRequestDto)
+    @ApiOperation({ summary: "All Horeca requests" })
+    async findAll(
+        @AuthParamDecorator() auth: AuthInfoDto,
+        @RequestPaginatedValidateParamsDecorator() paginate: PaginateValidateType
+    ) {
+        return this.service.findAll(auth, paginate)
+    }
+
+    @Get('provider')
     @AuthUser(UserRole.Provider)
     @RequestPaginatedDecorator(HorecaRequestDto)
     @ApiOperation({ summary: "List of HoReCa proposals that matches with provider's offers" })

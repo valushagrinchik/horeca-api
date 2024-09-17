@@ -1,23 +1,16 @@
 import { INestApplication } from '@nestjs/common'
-import { AppModule } from '../src/app.module'
-import { Test, TestingModule } from '@nestjs/testing'
 import { io } from 'socket.io-client'
 import { ChatWsGateway } from '../src/chat/chat.ws.gateway'
 import { WebsocketEvents } from '../src/system/utils/enums/websocketEvents.enum'
-import { prepareForChat } from './helpers'
+import { initApp, prepareForChat } from './helpers'
 
-let moduleFixture: TestingModule
 let app: INestApplication
 let gateway: ChatWsGateway
 
 beforeAll(async () => {
-    moduleFixture = await Test.createTestingModule({
-        imports: [AppModule],
-    }).compile()
-
-    gateway = moduleFixture.get<ChatWsGateway>(ChatWsGateway)
-    app = moduleFixture.createNestApplication()
-    await app.init()
+    app = await initApp(undefined, tm => {
+        gateway = tm.get<ChatWsGateway>(ChatWsGateway)
+    })
 })
 
 afterAll(async () => {

@@ -1,13 +1,10 @@
 import { INestApplication } from '@nestjs/common'
-import { AppModule } from '../src/app.module'
-import { Test, TestingModule } from '@nestjs/testing'
 import { horecaRegistgrationPayload, providerRegistgrationPayload } from './data'
 import { ErrorCodes } from './../src/system/utils/enums/errorCodes.enum'
 import { UsersDbService } from './../src/users/services/users.db.service'
 import { DatabaseService } from './../src/system/database/database.service'
-import { activateUser, authUser, registrateUser } from './helpers'
+import { activateUser, authUser, initApp, registrateUser } from './helpers'
 
-let moduleFixture: TestingModule
 let app: INestApplication
 
 let users = []
@@ -23,15 +20,9 @@ beforeAll(async () => {
         },
     })
 
-    moduleFixture = await Test.createTestingModule({
-        imports: [AppModule],
+    app = await initApp(mb => {
+        mb.overrideProvider(UsersDbService).useValue(usersDbServiceMocked)
     })
-        .overrideProvider(UsersDbService)
-        .useValue(usersDbServiceMocked)
-        .compile()
-
-    app = moduleFixture.createNestApplication()
-    await app.init()
 })
 
 afterAll(async () => {
@@ -48,12 +39,14 @@ describe('AuthorizationController (e2e)', () => {
 
             expect(res.statusCode).toEqual(400)
             expect(res.errorMessage).toEqual(ErrorCodes.GDPR_IS_NOT_APPROVED)
+            return
         })
         it('registration should return just created user', async () => {
             const res = await registrateUser(app, payload)
 
             expect(res).toHaveProperty('id')
             expect(res.email).toEqual(payload.email)
+            return
         })
 
         it('login should throw an AUTH_FAIL in case of profile is not activated', async () => {
@@ -64,6 +57,7 @@ describe('AuthorizationController (e2e)', () => {
 
             expect(res.statusCode).toEqual(400)
             expect(res.errorMessage).toEqual(ErrorCodes.AUTH_FAIL)
+            return
         })
         it('login should return accessToken and refreshToken', async () => {
             const user = users.find(user => user.email == payload.email)
@@ -76,6 +70,7 @@ describe('AuthorizationController (e2e)', () => {
 
             expect(res).toHaveProperty('accessToken')
             expect(res).toHaveProperty('refreshToken')
+            return
         })
     })
 })

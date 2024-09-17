@@ -8,8 +8,8 @@ export class HorecaRequestCreateDto {
     @ValidateNested()
     items: HorecaRequestItemCreateDto[]
 
-    @Validate(TypeValidate.ARRAY, { type: [Number] })
-    imageIds: number[]
+    @Validate(TypeValidate.ARRAY, { type: [Number], default: [] })
+    imageIds?: number[] = []
 
     @Validate(TypeValidate.STRING)
     address: string
@@ -31,7 +31,4 @@ export class HorecaRequestCreateDto {
 
     @Validate(TypeValidate.STRING, { required: false })
     comment: string
-
-    @Validate(TypeValidate.NUMBER)
-    userId: number
 }

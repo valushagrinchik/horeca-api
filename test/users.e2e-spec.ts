@@ -1,18 +1,10 @@
 import { INestApplication } from '@nestjs/common'
-import { AppModule } from '../src/app.module'
-import { Test, TestingModule } from '@nestjs/testing'
-import { authUser, getProfile, updateProfile } from './helpers'
+import { authUser, getProfile, initApp, updateProfile } from './helpers'
 
-let moduleFixture: TestingModule
 let app: INestApplication
 
 beforeAll(async () => {
-    moduleFixture = await Test.createTestingModule({
-        imports: [AppModule],
-    }).compile()
-
-    app = moduleFixture.createNestApplication()
-    await app.init()
+    app = await initApp()
 })
 
 afterAll(async () => {
