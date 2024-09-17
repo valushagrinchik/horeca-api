@@ -10,6 +10,7 @@ import { generateAcceptUntil } from './../src/system/utils/date'
 import { PaginateValidateType } from './../src/system/utils/swagger/decorators'
 import { Test, TestingModule, TestingModuleBuilder } from '@nestjs/testing'
 import { AppModule } from './../src/app.module'
+import { AuthResultDto } from './../src/users/dto/auth.result.dto'
 
 export const initApp = async (overwriteCb?: (mb: TestingModuleBuilder) => void, tmCb?: (tm: TestingModule) => void) => {
     const tmBuilder = Test.createTestingModule({
@@ -36,7 +37,7 @@ export const registrateUser = async (app: INestApplication, payload: RegistrateU
         .then(res => res.body)
 }
 
-export const authUser = async (app: INestApplication, payload: LoginUserDto) => {
+export const authUser = async (app: INestApplication, payload: LoginUserDto): Promise<AuthResultDto | any> => {
     return request(app.getHttpServer())
         .post(ENDPOINTS.SIGNIN)
         .send({
@@ -77,6 +78,21 @@ export const findAllHorecaRequest = async (
             return res.body
         })
 }
+
+export const findAllHorecaRequestForProvider = async (
+    app: INestApplication,
+    accessToken: string,
+    paginate: Partial<PaginateValidateType> = {}
+) => {
+    return request(app.getHttpServer())
+        .get(ENDPOINTS.HOREKA_REQUESTS_FOR_PROVIDER)
+        .set('Authorization', 'Bearer ' + accessToken)
+        .query(paginate)
+        .then(res => {
+            return res.body
+        })
+}
+
 
 export const prepareForChat = async (app: INestApplication) => {
     const horecaAuthRes = await request(app.getHttpServer())
