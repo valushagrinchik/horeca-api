@@ -3,9 +3,6 @@ import {
     horecaUserInput,
     providerUserInput,
     adminUserInput,
-    productsInput,
-    horecaRequestsInput,
-    providerRequestsInput,
 } from '../test/mock/seedData'
 
 import * as dotenv from 'dotenv'
@@ -46,38 +43,5 @@ export const runTestSeeds = async (prisma: PrismaClient) => {
         data: { ...adminUserInput, password: generatePassword(adminUserInput.password), isActivated: true },
     })
 
-    const products = await Promise.all(
-        productsInput.map(product =>
-            prisma.product.create({
-                data: { ...product, userId: provider.id },
-            })
-        )
-    )
-
-    const horecaRequests = await Promise.all(
-        horecaRequestsInput.map(horecaRequest =>
-            prisma.horecaRequest.create({
-                data: {
-                    ...horecaRequest,
-                    items: { createMany: { data: horecaRequest.items } },
-                    userId: horeca.id,
-                },
-            })
-        )
-    )
-
-    const providerRequests = await Promise.all(
-        providerRequestsInput.map(providerRequest =>
-            prisma.providerRequest.create({
-                data: {
-                    ...providerRequest,
-                    userId: horeca.id,
-                    horecaRequestId: horecaRequests[0].id,
-                },
-            })
-        )
-    )
-
     console.log('Users:', { horeca, provider, admin })
-    console.log('Products:', { products, horecaRequests, providerRequests })
 }

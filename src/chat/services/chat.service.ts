@@ -10,7 +10,7 @@ import { Inject, forwardRef } from '@nestjs/common'
 
 export class ChatService {
     constructor(
-        @Inject(forwardRef(() => ChatDBService)) 
+        @Inject(forwardRef(() => ChatDBService))
         private chatRep: ChatDBService
     ) {}
 

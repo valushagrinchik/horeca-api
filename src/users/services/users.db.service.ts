@@ -12,10 +12,9 @@ import { v4 as uuidv4 } from 'uuid'
 
 @Injectable()
 export class UsersDbService {
-
     constructor(private db: DatabaseService) {}
 
-    createUser = async (dto: Omit<RegistrateUserDto,'repeatPassword' | 'GDPRApproved'>) => {
+    createUser = async (dto: Omit<RegistrateUserDto, 'repeatPassword' | 'GDPRApproved'>) => {
         return this.db.user.create({
             data: {
                 email: dto.email,
@@ -56,7 +55,7 @@ export class UsersDbService {
     updateUser = async (id: number, data: Prisma.UserUpdateInput) => {
         return this.db.user.update({
             where: { id },
-            data
+            data,
         })
     }
 
@@ -78,8 +77,6 @@ export class UsersDbService {
     getUserByActivationLink = async (activationLink: string) => {
         return this.db.user.findFirst({ where: { activationLink } })
     }
-
-
 
     updateProfile = async (id: number, dto: UpdateUserDto) => {
         const user = await this.db.user.findUnique({
@@ -171,4 +168,3 @@ export class UsersDbService {
         })
     }
 }
-

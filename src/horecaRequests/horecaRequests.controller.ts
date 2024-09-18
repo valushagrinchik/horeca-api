@@ -56,17 +56,14 @@ export class HorecaRequestsController {
 
     @Get(':id')
     @RequestDecorator(HorecaRequestDto)
-    @ApiOperation({ summary: "Get Horeca request" })
-    async get(
-        @AuthParamDecorator() auth: AuthInfoDto,
-        @Param('id') id: number
-    ) {
+    @ApiOperation({ summary: 'Get Horeca request' })
+    async get(@AuthParamDecorator() auth: AuthInfoDto, @Param('id') id: number) {
         return this.service.get(auth, +id)
     }
 
     @Get()
     @RequestPaginatedDecorator(HorecaRequestDto)
-    @ApiOperation({ summary: "All Horeca requests" })
+    @ApiOperation({ summary: 'All Horeca requests' })
     async findAll(
         @AuthParamDecorator() auth: AuthInfoDto,
         @RequestPaginatedValidateParamsDecorator() paginate: PaginateValidateType

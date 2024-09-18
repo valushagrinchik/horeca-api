@@ -4,8 +4,10 @@ import { Prisma } from '@prisma/client'
 
 @Injectable()
 export class HorecaRequestsTemplateDbService {
-    constructor( //@Inject(forwardRef(() => DatabaseService)) 
-    private db: DatabaseService) {}
+    constructor(
+        //@Inject(forwardRef(() => DatabaseService))
+        private db: DatabaseService
+    ) {}
 
     create = async (data: Prisma.HorecaRequestTemplateCreateInput) => {
         return this.db.horecaRequestTemplate.create({
@@ -15,8 +17,7 @@ export class HorecaRequestsTemplateDbService {
 
     get = async (id: number) => {
         return this.db.horecaRequestTemplate.findUnique({
-            where: {id},
+            where: { id },
         })
     }
 }
-

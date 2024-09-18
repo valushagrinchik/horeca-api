@@ -17,7 +17,7 @@ export class UsersService {
     constructor(
         private usersRep: UsersDbService,
         private authService: AuthorizationService,
-        private mailService?: MailService,
+        private mailService?: MailService
     ) {}
 
     async registrate(dto: RegistrateUserDto) {
@@ -38,7 +38,7 @@ export class UsersService {
     }
 
     async activateAccount(uuid: string) {
-        const user = await this.usersRep.getUserByActivationLink(uuid)  
+        const user = await this.usersRep.getUserByActivationLink(uuid)
         if (!user) {
             throw new ErrorDto(ErrorCodes.ACTIVATION_LINK_ERROR)
         }
@@ -50,7 +50,7 @@ export class UsersService {
     }
 
     async update(auth: AuthInfoDto, dto: UpdateUserDto) {
-        const user = await this.usersRep.getUserWithProfile( auth.id )
+        const user = await this.usersRep.getUserWithProfile(auth.id)
         if (!user) {
             throw new BadRequestException(new ErrorDto(ErrorCodes.USER_DOES_NOT_EXISTS))
         }
@@ -61,7 +61,7 @@ export class UsersService {
     }
 
     async get(auth: AuthInfoDto): Promise<UserDto> {
-        const user = await this.usersRep.getUserWithProfile( auth.id )
+        const user = await this.usersRep.getUserWithProfile(auth.id)
 
         if (!user) {
             throw new BadRequestException(new ErrorDto(ErrorCodes.AUTH_FAIL))
@@ -71,7 +71,7 @@ export class UsersService {
     }
 
     async login(dto: LoginUserDto) {
-        const user = await this.usersRep.getUserByEmail( dto.email )
+        const user = await this.usersRep.getUserByEmail(dto.email)
 
         if (!user?.isActivated) {
             throw new BadRequestException(new ErrorDto(ErrorCodes.AUTH_FAIL))

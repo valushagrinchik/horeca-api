@@ -14,7 +14,6 @@ import { ConfigModule } from '@nestjs/config'
         }),
         UsersModule,
         // forwardRef(() => DatabaseModule)
-
     ],
     providers: [ChatWsGateway, ChatDBService, ChatService],
     controllers: [ChatsController],

@@ -8,7 +8,7 @@ import { HorecaRequestsTemplateDbService } from './services/horecaRequestsTempla
 
 @Module({
     imports: [UsersModule, UploadsModule],
-    controllers: [ HorecaRequestsController],
+    controllers: [HorecaRequestsController],
     providers: [HorecaRequestsTemplateDbService, HorecaRequestsDbService, HorecaRequestsService],
 })
 export class HorecaRequestsModule {}

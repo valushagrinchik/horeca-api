@@ -5,7 +5,7 @@ import { DatabaseService } from '../../system/database/database.service'
 import { forwardRef, Inject } from '@nestjs/common'
 
 export class ChatDBService {
-    constructor( 
+    constructor(
         @Inject(forwardRef(() => DatabaseService)) // TODO: try to delete after migration of using db repository approach
         private db: DatabaseService
     ) {}

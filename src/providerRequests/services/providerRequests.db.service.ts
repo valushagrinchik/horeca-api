@@ -1,0 +1,33 @@
+import { Injectable } from '@nestjs/common'
+import { Prisma } from '@prisma/client'
+import { DatabaseService } from '../../system/database/database.service'
+
+@Injectable()
+export class ProviderRequestsDbService {
+    constructor(private prisma: DatabaseService) {}
+
+    async create(data: Prisma.ProviderRequestCreateInput) {
+        return this.prisma.providerRequest.create({
+            data,
+            include: {
+                items: true,
+            },
+        })
+    }
+
+    async get(id: number) {
+        return this.prisma.providerRequest.findUnique({
+            where: { id },
+            include: {
+                items: true,
+            },
+        })
+    }
+
+    async update(id: number, data: Prisma.ProviderRequestUpdateInput) {
+        await this.prisma.providerRequest.update({
+            where: { id },
+            data,
+        })
+    }
+}

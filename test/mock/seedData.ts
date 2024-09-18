@@ -18,17 +18,15 @@ export const providerUserInput = {
     },
 }
 
-export const productsInput = [
-    {
-        category: Categories.alcoholicDrinks,
-        name: 'beer',
-        description: 'beer',
-        producer: 'OOO cool beer',
-        cost: 5000,
-        count: 200,
-        packagingType: ProductPackagingType.Bottle,
-    },
-]
+export const productInput = {
+    category: Categories.alcoholicDrinks,
+    name: 'beer',
+    description: 'beer',
+    producer: 'OOO cool beer',
+    cost: 5000,
+    count: 200,
+    packagingType: ProductPackagingType.Bottle,
+}
 
 export const horecaUserInput = {
     email: 'horeca-test2@test.com',
@@ -64,46 +62,47 @@ export const horecaUserInput = {
 }
 
 export const futureDate = generateAcceptUntil()
-export const horecaRequestsInput = [
-    {
-        items: [
-            {
-                name: 'B',
-                amount: 200,
-                unit: 'df',
-                category: Categories.alcoholicDrinks,
-            },
-            {
-                name: 'D',
-                amount: 2000,
-                unit: 'df',
-                category: Categories.dishes,
-            },
-            {
-                name: 'C',
-                amount: 208,
-                unit: 'df',
-                category: Categories.cannedFoods,
-            },
-        ],
+export const horecaRequestInput = {
+    items: [
+        {
+            name: 'B',
+            amount: 200,
+            unit: 'df',
+            category: Categories.alcoholicDrinks,
+        },
+        {
+            name: 'D',
+            amount: 2000,
+            unit: 'df',
+            category: Categories.dishes,
+        },
+        {
+            name: 'C',
+            amount: 208,
+            unit: 'df',
+            category: Categories.cannedFoods,
+        },
+    ],
 
-        address: 'address string',
-        deliveryTime: futureDate,
-        acceptUntill: futureDate,
-        paymentType: PaymentType.Deferment,
-        comment: '',
-        name: 'OOO smth',
-        phone: '123123124',
-    },
-]
+    address: 'address string',
+    deliveryTime: futureDate,
+    acceptUntill: futureDate,
+    paymentType: PaymentType.Deferment,
+    comment: '',
+    name: 'OOO smth',
+    phone: '123123124',
+}
 
-export const providerRequestsInput = [
-    {
-        manufacturer: 'OOO sdadfsd',
-        paymentType: PaymentType.Prepayment,
-        cost: 10000,
-    },
-]
+// export const providerRequestsInput = [
+//     {
+//         comment: '',
+//         items: [{
+//             manufacturer: 'OOO sdadfsd',
+//             available: true,
+//             cost: 10000,
+//         }]
+//     },
+// ]
 
 export const adminUserInput = {
     email: 'admin@test.com',

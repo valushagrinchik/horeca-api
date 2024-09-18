@@ -19,7 +19,7 @@ enum ProfileType {
 }
 
 enum UploadsLinkType {
-  ProviderRequest
+  ProviderRequestItem
   HorecaRequest
   Product
 }
@@ -282,8 +282,9 @@ model HorecaRequestItem {
   unit            String
   category        String
 
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+  createdAt           DateTime              @default(now()) @map("created_at")
+  updatedAt           DateTime              @default(now()) @updatedAt @map("updated_at")
+  providerRequestItem ProviderRequestItem[]
 
   @@map("horeca_request_items")
 }
@@ -307,15 +308,13 @@ model ProviderRequest {
   user   User @relation(fields: [userId], references: [id])
   userId Int  @map("user_id")
 
+  items ProviderRequestItem[]
+
   horecaRequest   HorecaRequest @relation(fields: [horecaRequestId], references: [id])
   horecaRequestId Int           @unique @map("horeca_request_id")
 
   // images - could be loaded on runtime from UploadsLink     
-  comment      String?
-  available    Boolean     @default(true)
-  manufacturer String
-  paymentType  PaymentType @map("payment_type")
-  cost         Float
+  comment String?
 
   // indicates whitch provider requests was approved by horeca to start chating
   approvedByHoreca Boolean @default(false) @map("approved_by_horeca")
@@ -325,6 +324,24 @@ model ProviderRequest {
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
   @@map("provider_requests")
+}
+
+model ProviderRequestItem {
+  id                Int             @id @default(autoincrement())
+  providerRequestId Int             @map("provider_request_id")
+  providerRequest   ProviderRequest @relation(fields: [providerRequestId], references: [id])
+
+  horecaRequestItemId Int               @map("horeca_request_item_id")
+  horecaRequestItem   HorecaRequestItem @relation(fields: [horecaRequestItemId], references: [id])
+
+  available    Boolean @default(true)
+  manufacturer String
+  cost         Float
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@map("provider_requests_items")
 }
 
 model Chat {

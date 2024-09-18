@@ -22,7 +22,7 @@ export class RolesGuard implements CanActivate {
         if (!token) {
             throw new UnauthorizedException({ code: 401 })
         }
-        
+
         const user = await this.getUserFromToken(token)
 
         const roles =

@@ -11,7 +11,7 @@ import { PaginateValidateType } from './../src/system/utils/swagger/decorators'
 import { Test, TestingModule, TestingModuleBuilder } from '@nestjs/testing'
 import { AppModule } from './../src/app.module'
 import { AuthResultDto } from './../src/users/dto/auth.result.dto'
-import { horecaUsers, providerUsers } from './mock/authData'
+import { ProviderRequestCreateDto } from './../src/providerRequests/dto/providerRequest.create.dto'
 
 export const initApp = async (overwriteCb?: (mb: TestingModuleBuilder) => void, tmCb?: (tm: TestingModule) => void) => {
     const tmBuilder = Test.createTestingModule({
@@ -100,6 +100,20 @@ export const findAllHorecaRequestForProvider = async (
         })
 }
 
+export const createProviderRequest = async (
+    app: INestApplication,
+    accessToken: string,
+    payload: ProviderRequestCreateDto
+) => {
+    return request(app.getHttpServer())
+        .post(ENDPOINTS.PROVIDER_REQUEST)
+        .set('Authorization', 'Bearer ' + accessToken)
+        .send(payload)
+        .then(res => {
+            return res.body
+        })
+}
+
 export const prepareForChat = async (app: INestApplication, horecaAccessToken: string, providerAccessToken: string) => {
     const validAcceptUntill = generateAcceptUntil()
 
@@ -121,20 +135,17 @@ export const prepareForChat = async (app: INestApplication, horecaAccessToken: s
         comment: 'string',
     })
 
-    const providerCreateRequestRes = await request(app.getHttpServer())
-        .post(ENDPOINTS.CREATE_PROVIDER_REQUEST)
-        .set('Authorization', 'Bearer ' + providerAccessToken)
-        .send({
-            horecaRequestId: horecaCreateRequestRes.id,
-            comment: 'string',
+    const providerCreateRequestRes = await createProviderRequest(app, providerAccessToken, {
+        horecaRequestId: horecaCreateRequestRes.id,
+        comment: 'string',
+        items: [{
             available: true,
             manufacturer: 'string',
-            paymentType: 'Prepayment',
             cost: 2000,
-        })
-        .then(res => {
-            return res.body
-        })
+            horecaRequestItemId: horecaCreateRequestRes.items[0].id
+        }]
+
+    })
 
     await request(app.getHttpServer())
         .post(ENDPOINTS.APPROVE_PROVIDER_REQUEST.replace(':id', providerCreateRequestRes.id))
