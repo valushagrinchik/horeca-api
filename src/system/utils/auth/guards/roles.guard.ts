@@ -19,20 +19,17 @@ export class RolesGuard implements CanActivate {
         const request = context.switchToHttp().getRequest()
 
         const token = request.headers?.authorization || request.handshake?.headers?.authorization
-
         if (!token) {
             throw new UnauthorizedException({ code: 401 })
         }
-
+        
         const user = await this.getUserFromToken(token)
 
         const roles =
             this.reflector.getAllAndOverride<UserRole[]>(ROLES_KEY, [context.getHandler(), context.getClass()]) || []
-
         if (!roles.includes(user.role)) {
             throw new ForbiddenException()
         }
-
         return true
     }
 
@@ -46,11 +43,9 @@ export class RolesGuard implements CanActivate {
         }
 
         const user = await this.usersService.findByAuth(auth)
-
         if (!user) {
             throw new UnauthorizedException({ code: 401 })
         }
-
         return user
     }
 }

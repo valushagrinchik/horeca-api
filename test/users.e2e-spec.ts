@@ -2,16 +2,14 @@ import { INestApplication } from '@nestjs/common'
 import { authUser, getProfile, initApp, updateProfile } from './helpers'
 import { AuthResultDto } from './../src/users/dto/auth.result.dto'
 import { ENDPOINTS } from './constants'
+import { horecaUserInput } from './mock/seedData'
 
 let app: INestApplication
 let horecaAuth: AuthResultDto
 
 beforeAll(async () => {
     app = await initApp()
-    horecaAuth = await authUser(app, {
-        email: 'horeca@test.com',
-        password: 'horeca!',
-    })
+    horecaAuth = await authUser(app, horecaUserInput)
 })
 
 afterAll(async () => {
@@ -24,7 +22,7 @@ describe('UsersController (e2e)', () => {
             const res = await getProfile(app, horecaAuth.accessToken)
 
             expect(res).toHaveProperty('id')
-            expect(res.email).toBe('horeca@test.com')
+            expect(res.email).toBe(horecaUserInput.email)
         })
     })
 
@@ -36,7 +34,7 @@ describe('UsersController (e2e)', () => {
                     info: 'updated',
                 },
             })
-            expect(res.email).toBe('horeca@test.com')
+            expect(res.email).toBe(horecaUserInput.email)
             expect(res).toHaveProperty('id')
             expect(res.phone).toBe('123123')
             expect(res.profile.info).toBe('updated')

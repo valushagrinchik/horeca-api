@@ -15,7 +15,7 @@ export class UsersDbService {
 
     constructor(private db: DatabaseService) {}
 
-    createUser = async (dto: RegistrateUserDto) => {
+    createUser = async (dto: Omit<RegistrateUserDto,'repeatPassword' | 'GDPRApproved'>) => {
         return this.db.user.create({
             data: {
                 email: dto.email,

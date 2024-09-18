@@ -11,6 +11,7 @@ import { PaginateValidateType } from './../src/system/utils/swagger/decorators'
 import { Test, TestingModule, TestingModuleBuilder } from '@nestjs/testing'
 import { AppModule } from './../src/app.module'
 import { AuthResultDto } from './../src/users/dto/auth.result.dto'
+import { horecaUsers, providerUsers } from './mock/authData'
 
 export const initApp = async (overwriteCb?: (mb: TestingModuleBuilder) => void, tmCb?: (tm: TestingModule) => void) => {
     const tmBuilder = Test.createTestingModule({
@@ -40,10 +41,7 @@ export const registrateUser = async (app: INestApplication, payload: RegistrateU
 export const authUser = async (app: INestApplication, payload: LoginUserDto): Promise<AuthResultDto | any> => {
     return request(app.getHttpServer())
         .post(ENDPOINTS.SIGNIN)
-        .send({
-            email: payload.email,
-            password: payload.password,
-        })
+        .send(payload)
         .then(res => res.body)
 }
 
@@ -65,11 +63,7 @@ export const createHorecaRequest = async (
         })
 }
 
-export const getHorecaRequest = async (
-    app: INestApplication,
-    accessToken: string,
-    id: number
-) => {
+export const getHorecaRequest = async (app: INestApplication, accessToken: string, id: number) => {
     return request(app.getHttpServer())
         .get(ENDPOINTS.HOREKA_REQUEST.replace(':id', id.toString()))
         .set('Authorization', 'Bearer ' + accessToken)
@@ -77,7 +71,6 @@ export const getHorecaRequest = async (
             return res.body
         })
 }
-
 
 export const findAllHorecaRequest = async (
     app: INestApplication,
@@ -107,18 +100,10 @@ export const findAllHorecaRequestForProvider = async (
         })
 }
 
-
-export const prepareForChat = async (app: INestApplication) => {
-    const horecaAuthRes = await request(app.getHttpServer())
-        .post(ENDPOINTS.SIGNIN)
-        .send({ email: 'horeca@test.com', password: 'horeca!' })
-        .then(res => {
-            return res.body
-        })
-
+export const prepareForChat = async (app: INestApplication, horecaAccessToken: string, providerAccessToken: string) => {
     const validAcceptUntill = generateAcceptUntil()
 
-    const horecaCreateRequestRes = await createHorecaRequest(app, horecaAuthRes.accessToken, {
+    const horecaCreateRequestRes = await createHorecaRequest(app, horecaAccessToken, {
         items: [
             {
                 name: 'string',
@@ -136,15 +121,9 @@ export const prepareForChat = async (app: INestApplication) => {
         comment: 'string',
     })
 
-    const providerAuthRes = await request(app.getHttpServer())
-        .post(ENDPOINTS.SIGNIN)
-        .send({ email: 'provider@test.com', password: 'provider!' })
-        .then(res => {
-            return res.body
-        })
     const providerCreateRequestRes = await request(app.getHttpServer())
         .post(ENDPOINTS.CREATE_PROVIDER_REQUEST)
-        .set('Authorization', 'Bearer ' + providerAuthRes.accessToken)
+        .set('Authorization', 'Bearer ' + providerAccessToken)
         .send({
             horecaRequestId: horecaCreateRequestRes.id,
             comment: 'string',
@@ -159,14 +138,12 @@ export const prepareForChat = async (app: INestApplication) => {
 
     await request(app.getHttpServer())
         .post(ENDPOINTS.APPROVE_PROVIDER_REQUEST.replace(':id', providerCreateRequestRes.id))
-        .set('Authorization', 'Bearer ' + horecaAuthRes.accessToken)
+        .set('Authorization', 'Bearer ' + horecaAccessToken)
         .then(res => {
             return res.body
         })
 
     return {
-        horecaToken: horecaAuthRes.accessToken,
-        providerToken: providerAuthRes.accessToken,
         providerRequestId: providerCreateRequestRes.id,
         opponentId: providerCreateRequestRes.userId,
     }

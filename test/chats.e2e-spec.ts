@@ -2,15 +2,22 @@ import { INestApplication } from '@nestjs/common'
 import { io } from 'socket.io-client'
 import { ChatWsGateway } from '../src/chat/chat.ws.gateway'
 import { WebsocketEvents } from '../src/system/utils/enums/websocketEvents.enum'
-import { initApp, prepareForChat } from './helpers'
+import { authUser, initApp, prepareForChat } from './helpers'
+import { AuthResultDto } from '../src/users/dto/auth.result.dto'
+import { horecaUserInput, providerUserInput } from './mock/seedData'
 
 let app: INestApplication
 let gateway: ChatWsGateway
+let horecaAuth: AuthResultDto
+let providerAuth: AuthResultDto
 
 beforeAll(async () => {
     app = await initApp(undefined, tm => {
         gateway = tm.get<ChatWsGateway>(ChatWsGateway)
     })
+
+    horecaAuth = await authUser(app, horecaUserInput)
+    providerAuth = await authUser(app, providerUserInput)
 })
 
 afterAll(async () => {
@@ -23,18 +30,18 @@ describe('ChatWsGateway (e2e)', () => {
     })
 
     it('Horeca can start chat and receive message from Provider', async () => {
-        const { horecaToken, providerToken, ...createChatInput } = await prepareForChat(app)
+        const createChatInput = await prepareForChat(app, horecaAuth.accessToken, providerAuth.accessToken)
 
         const horecaWsClient = io(process.env.WS_URL, {
             autoConnect: false,
             transports: ['websocket'],
-            extraHeaders: { authorization: 'Bearer ' + horecaToken },
+            extraHeaders: { authorization: 'Bearer ' + horecaAuth.accessToken },
         })
 
         const providerWsClient = io(process.env.WS_URL, {
             autoConnect: false,
             transports: ['websocket'],
-            extraHeaders: { authorization: 'Bearer ' + providerToken },
+            extraHeaders: { authorization: 'Bearer ' + providerAuth.accessToken },
         })
 
         horecaWsClient.connect()

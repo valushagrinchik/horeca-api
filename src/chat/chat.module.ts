@@ -5,7 +5,7 @@ import { UsersModule } from '../users/users.module'
 import { ChatWsGateway } from './chat.ws.gateway'
 import { ChatDBService } from './services/chat.db.service'
 import { ConfigModule } from '@nestjs/config'
-import { DatabaseModule } from './../system/database/database.module'
+// import { DatabaseModule } from './../system/database/database.module'
 
 @Module({
     imports: [
@@ -13,7 +13,7 @@ import { DatabaseModule } from './../system/database/database.module'
             isGlobal: true,
         }),
         UsersModule,
-        forwardRef(() => DatabaseModule)
+        // forwardRef(() => DatabaseModule)
 
     ],
     providers: [ChatWsGateway, ChatDBService, ChatService],

@@ -1,30 +1,36 @@
 import { Injectable } from '@nestjs/common'
-import { HorecaRequestCreateDto } from './dto/horecaRequest.create.dto'
-import { HorecaRequestDto } from './dto/horecaRequest.dto'
-import { HorecaRequestTemplateCreateDto } from './dto/horecaRequest.template.create.dto'
-import { AuthInfoDto } from '../users/dto/auth.info.dto'
+import { HorecaRequestCreateDto } from '../dto/horecaRequest.create.dto'
+import { HorecaRequestDto } from '../dto/horecaRequest.dto'
+import { HorecaRequestTemplateCreateDto } from '../dto/horecaRequest.template.create.dto'
+import { AuthInfoDto } from '../../users/dto/auth.info.dto'
 import { UploadsLinkType } from '@prisma/client'
-import { PaginateValidateType } from '../system/utils/swagger/decorators'
-import { HorecaRequestTemplateDto } from './dto/horecaRequest.template.dto'
-import { UploadsLinkService } from '../uploads/uploads.link.service'
-import { HorecaRequestItemDto } from './dto/horecaRequest.item.dto'
-import { DatabaseService } from '../system/database/database.service'
+import { PaginateValidateType } from '../../system/utils/swagger/decorators'
+import { HorecaRequestTemplateDto } from '../dto/horecaRequest.template.dto'
+import { UploadsLinkService } from '../../uploads/uploads.link.service'
+import { HorecaRequestItemDto } from '../dto/horecaRequest.item.dto'
+import { HorecaRequestsDbService } from './horecaRequests.db.service'
+import { HorecaRequestsTemplateDbService } from './horecaRequestsTemplate.db.service'
+import { UsersService } from '../../users/services/users.service'
 
 @Injectable()
 export class HorecaRequestsService {
     constructor(
-        private prisma: DatabaseService,
-        private uploadsLinkService: UploadsLinkService
+        private horecaRequestsRep: HorecaRequestsDbService,
+        private horecaRequestsTemplateRep: HorecaRequestsTemplateDbService,
+        private uploadsLinkService: UploadsLinkService,
+        private usersService: UsersService
     ) {}
 
     async create(auth: AuthInfoDto, { imageIds, ...dto }: HorecaRequestCreateDto) {
-        const horecaRequest = await this.prisma.horecaRequest.create({
-            data: {
-                ...dto,
-                userId: auth.id,
-                items: {
-                    create: dto.items,
+        const horecaRequest = await this.horecaRequestsRep.create({
+            ...dto,
+            user: {
+                connect: {
+                    id: auth.id,
                 },
+            },
+            items: {
+                create: dto.items,
             },
         })
 
@@ -36,7 +42,7 @@ export class HorecaRequestsService {
     }
 
     async get(auth: AuthInfoDto, id: number) {
-        const horecaRequest = await this.prisma.horecaRequest.findUnique({ where: { id, userId: auth.id }, include: { items: true } })
+        const horecaRequest = await this.horecaRequestsRep.get(id)
         const images = await this.uploadsLinkService.getImages(UploadsLinkType.HorecaRequest, [horecaRequest.id])
 
         return new HorecaRequestDto({
@@ -47,25 +53,20 @@ export class HorecaRequestsService {
     }
 
     async createTemplate({ content, ...dto }: HorecaRequestTemplateCreateDto) {
-        const proposalTemplate = await this.prisma.horecaRequestTemplate.create({
-            data: {
-                ...dto,
-                content: JSON.stringify(content),
-            },
+        const proposalTemplate = await this.horecaRequestsTemplateRep.create({
+            ...dto,
+            content: JSON.stringify(content),
         })
         return new HorecaRequestTemplateDto(proposalTemplate)
     }
 
     async getTemplate(id: number) {
-        const proposalTemplate = await this.prisma.horecaRequestTemplate.findUnique({
-            where: { id },
-        })
+        const proposalTemplate = await this.horecaRequestsTemplateRep.get(id)
         return new HorecaRequestTemplateDto(proposalTemplate)
     }
 
     async findAll(auth: AuthInfoDto, paginate: Partial<PaginateValidateType> = {}) {
-        const horecaRequests = await this.prisma.horecaRequest.findMany({
-            include: { items: true },
+        const horecaRequests = await this.horecaRequestsRep.findManyWithItems({
             where: {
                 userId: auth.id,
             },
@@ -94,10 +95,9 @@ export class HorecaRequestsService {
 
     async findForProvider(auth: AuthInfoDto, paginate: Partial<PaginateValidateType> = {}) {
         const now = new Date()
-        const provider = await this.prisma.user.findUnique({ where: { id: auth.id }, include: { profile: true } })
+        const provider = await this.usersService.get(auth)
         const categories = provider.profile.categories
-        const horecaRequests = await this.prisma.horecaRequest.findMany({
-            include: { items: true },
+        const horecaRequests = await this.horecaRequestsRep.findManyWithItems({
             where: {
                 items: {
                     some: {

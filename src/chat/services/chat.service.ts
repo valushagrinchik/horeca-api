@@ -10,7 +10,9 @@ import { Inject, forwardRef } from '@nestjs/common'
 
 export class ChatService {
     constructor(
-        @Inject(forwardRef(() => ChatDBService)) private chatRep: ChatDBService) {}
+        @Inject(forwardRef(() => ChatDBService)) 
+        private chatRep: ChatDBService
+    ) {}
 
     async getChats(auth: AuthInfoDto, paginate: PaginateValidateType) {
         return this.chatRep.getChats(auth.id, paginate)

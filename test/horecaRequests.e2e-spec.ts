@@ -11,6 +11,7 @@ import { generateAcceptUntil } from './../src/system/utils/date'
 import { Categories } from './../src/system/utils/enums'
 import { ENDPOINTS } from './constants'
 import { AuthResultDto } from './../src/users/dto/auth.result.dto'
+import { horecaUserInput, providerUserInput } from './mock/seedData'
 
 let app: INestApplication
 let horecaAuth: AuthResultDto
@@ -20,15 +21,8 @@ let createdRequestId: number
 beforeAll(async () => {
     app = await initApp()
 
-    horecaAuth = await authUser(app, {
-        email: 'horeca@test.com',
-        password: 'horeca!',
-    })
-
-    providerAuth = await authUser(app, {
-        email: 'provider@test.com',
-        password: 'provider!',
-    })
+    horecaAuth = await authUser(app, horecaUserInput)
+    providerAuth = await authUser(app, providerUserInput)
 })
 
 afterAll(async () => {
@@ -36,6 +30,9 @@ afterAll(async () => {
 })
 
 describe('HorecaRequestsController (e2e)', () => {
+
+
+
     describe('POST ' + ENDPOINTS.HOREKA_REQUESTS, () => {
         it('should return just created request data', async () => {
             const validAcceptUntill = generateAcceptUntil()
@@ -57,6 +54,7 @@ describe('HorecaRequestsController (e2e)', () => {
                 phone: 'string',
                 comment: 'string',
             })
+
             createdRequestId = res.id
 
             expect(res).toHaveProperty('id')
@@ -86,7 +84,7 @@ describe('HorecaRequestsController (e2e)', () => {
     })
 
     describe('GET ' + ENDPOINTS.HOREKA_REQUESTS_FOR_PROVIDER, () => {
-        it('should return array of requests', async () => {
+        it('should return array of horeca requests that matche with providers categories', async () => {
             const res = await findAllHorecaRequestForProvider(app, providerAuth.accessToken)
 
             expect(res.length).toBeGreaterThan(0)
