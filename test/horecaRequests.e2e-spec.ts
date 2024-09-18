@@ -11,7 +11,7 @@ import { generateAcceptUntil } from './../src/system/utils/date'
 import { Categories } from './../src/system/utils/enums'
 import { ENDPOINTS } from './constants'
 import { AuthResultDto } from './../src/users/dto/auth.result.dto'
-import { horecaUserInput, providerUserInput } from './mock/seedData'
+import { horecaRequestsInput, horecaUserInput, providerUserInput } from './mock/seedData'
 
 let app: INestApplication
 let horecaAuth: AuthResultDto
@@ -30,9 +30,6 @@ afterAll(async () => {
 })
 
 describe('HorecaRequestsController (e2e)', () => {
-
-
-
     describe('POST ' + ENDPOINTS.HOREKA_REQUESTS, () => {
         it('should return just created request data', async () => {
             const validAcceptUntill = generateAcceptUntil()
@@ -69,6 +66,7 @@ describe('HorecaRequestsController (e2e)', () => {
 
             expect(res.id).toBe(createdRequestId)
             expect(res).toHaveProperty('items')
+            expect(res.items.length).toBe(1)
             return
         })
     })
@@ -89,6 +87,8 @@ describe('HorecaRequestsController (e2e)', () => {
 
             expect(res.length).toBeGreaterThan(0)
             expect(res[0]).toHaveProperty('items')
+            expect(res[0].items.length).toBe(1)
+
             return
         })
     })

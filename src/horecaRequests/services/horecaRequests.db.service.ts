@@ -21,6 +21,6 @@ export class HorecaRequestsDbService {
     }
 
     findManyWithItems = async (args: Prisma.HorecaRequestFindManyArgs) => {
-        return this.db.horecaRequest.findMany({...args, include: {items: true}})
+        return this.db.horecaRequest.findMany({include: {items: true}, ...args })
     }
 }

@@ -109,6 +109,13 @@ export class HorecaRequestsService {
                     gte: now,
                 },
             },
+            include: {
+                items: {
+                    where: {
+                        category: { in: categories },
+                    },
+                },
+            },
             orderBy: {
                 [paginate.sort.field]: paginate.sort.order,
             },

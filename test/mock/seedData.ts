@@ -68,10 +68,22 @@ export const horecaRequestsInput = [
     {
         items: [
             {
-                name: 'asdsa',
+                name: 'B',
                 amount: 200,
                 unit: 'df',
                 category: Categories.alcoholicDrinks,
+            },
+            {
+                name: 'D',
+                amount: 2000,
+                unit: 'df',
+                category: Categories.dishes,
+            },
+            {
+                name: 'C',
+                amount: 208,
+                unit: 'df',
+                category: Categories.cannedFoods,
             },
         ],
 
