@@ -4,6 +4,7 @@ import { generateAcceptUntil } from './../src/system/utils/date'
 import { DeliveryMethods, Categories } from './../src/system/utils/enums'
 
 import * as dotenv from 'dotenv'
+import { includes } from 'lodash'
 dotenv.config()
 
 export const runDevSeeds = async (prisma: PrismaClient) => {
@@ -127,7 +128,6 @@ export const runDevSeeds = async (prisma: PrismaClient) => {
                 createMany: {
                     data: [
                         {
-                            id: 23,
                             name: 'asdsa',
                             amount: 200,
                             unit: 'df',
@@ -145,6 +145,9 @@ export const runDevSeeds = async (prisma: PrismaClient) => {
             name: 'OOO smth',
             phone: '123123124',
         },
+        include: {
+            items: true
+        }
     })
 
     const providerRequest = await prisma.providerRequest.upsert({
@@ -166,7 +169,7 @@ export const runDevSeeds = async (prisma: PrismaClient) => {
                     data: [{
                         manufacturer: 'sadas',
                         cost: 4000,
-                        horecaRequestItemId: 23
+                        horecaRequestItemId: horecaRequest.items[0].id
                     }]
                 }
             }
