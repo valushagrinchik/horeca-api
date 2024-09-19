@@ -21,5 +21,5 @@ export class UploadDto implements Upload {
 }
 
 export class SourceWithUploads {
-    images: UploadDto[]
+    images?: UploadDto[]
 }

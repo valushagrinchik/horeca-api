@@ -15,6 +15,7 @@ import {
 import { HorecaRequestsService } from './services/horecaRequests.service'
 import { SuccessDto } from '../system/utils/dto/success.dto'
 import { HorecaRequestApproveProviderRequestDto } from './dto/horecaRequest.approveProviderRequest.dto'
+import { HorecaRequestWithProviderRequestDto } from './dto/horecaRequest.withProviderRequests.dto'
 
 @AuthUser(UserRole.Horeca)
 @Controller('requests/horeca')
@@ -30,7 +31,7 @@ export class HorecaRequestsController {
     }
 
     @Get(':id')
-    @RequestDecorator(HorecaRequestDto)
+    @RequestDecorator(HorecaRequestWithProviderRequestDto)
     @ApiOperation({ summary: 'Get Horeca request' })
     async get(@AuthParamDecorator() auth: AuthInfoDto, @Param('id') id: number) {
         return this.service.get(auth, +id)

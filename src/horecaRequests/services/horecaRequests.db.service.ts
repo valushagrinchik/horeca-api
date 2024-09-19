@@ -1,14 +1,11 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { DatabaseService } from '../../system/database/database.service'
 import { Prisma } from '@prisma/client'
 import { HorecaRequestApproveProviderRequestDto } from '../dto/horecaRequest.approveProviderRequest.dto'
 
 @Injectable()
 export class HorecaRequestsDbService {
-    constructor(
-        //@Inject(forwardRef(() => DatabaseService))
-        private db: DatabaseService
-    ) {}
+    constructor(private db: DatabaseService) {}
 
     create = async (data: Prisma.HorecaRequestCreateInput) => {
         return this.db.horecaRequest.create({
@@ -16,10 +13,10 @@ export class HorecaRequestsDbService {
         })
     }
 
-    get = async (id: number) => {
+    get = async (userId: number, id: number) => {
         return this.db.horecaRequest.findUnique({
-            where: { id },
-            include: { items: true },
+            where: { id, userId },
+            include: { items: true, providerRequests: { include: { items: true } } },
         })
     }
 
@@ -34,7 +31,7 @@ export class HorecaRequestsDbService {
                 userId,
             },
             data: {
-                providerRequest: {
+                providerRequests: {
                     update: {
                         where: {
                             id: dto.providerRequestId,

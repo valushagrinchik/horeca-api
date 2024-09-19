@@ -3,7 +3,6 @@ import { SourceWithUploads } from '../../uploads/dto/upload.dto'
 
 export class ProviderRequestItemDto extends SourceWithUploads implements ProviderRequestItem {
     id: number
-    userId: number
 
     providerRequestId: number
     horecaRequestItemId: number

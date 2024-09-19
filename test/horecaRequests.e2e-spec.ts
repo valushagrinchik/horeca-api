@@ -1,5 +1,5 @@
 import { INestApplication } from '@nestjs/common'
-import { authUser, createHorecaRequest, findAllHorecaRequest, getHorecaRequest, initApp } from './helpers'
+import { authUser, createHorecaRequest, createProviderRequest, findAllHorecaRequest, getHorecaRequest, initApp } from './helpers'
 import { ENDPOINTS } from './constants'
 import { AuthResultDto } from './../src/users/dto/auth.result.dto'
 import { horecaRequestInput, horecaUserInput, providerUserInput } from './mock/seedData'
@@ -35,10 +35,27 @@ describe('HorecaRequestsController (e2e)', () => {
 
     describe('GET ' + ENDPOINTS.HOREKA_REQUEST, () => {
         it('should return request data', async () => {
-            const res = await getHorecaRequest(app, horecaAuth.accessToken, createdRequestId)
+            const createdHorecaRequest = await createHorecaRequest(app, horecaAuth.accessToken, horecaRequestInput)
+            const createdProviderRequest = await createProviderRequest(app, providerAuth.accessToken, {
+                horecaRequestId: createdHorecaRequest.id,
+                comment: 'super',
+                items: createdHorecaRequest.items.map(item => ({
+                    available: true,
+                    manufacturer: 'smb',
+                    cost: 3000,
+                    horecaRequestItemId: item.horecaRequestId
+                }))
+            })
 
-            expect(res.id).toBe(createdRequestId)
+            const res = await getHorecaRequest(app, horecaAuth.accessToken, createdHorecaRequest.id)
+
+            expect(res.id).toBe(createdHorecaRequest.id)
             expect(res).toHaveProperty('items')
+            expect(res).toHaveProperty('providerRequests')
+            expect(res.providerRequests.length).toBe(1)
+            expect(res.providerRequests[0]).toHaveProperty('cover')
+            expect(res.providerRequests[0].cover).toBe(1)
+
             expect(res.items.length).toBe(horecaRequestInput.items.length)
             return
         })

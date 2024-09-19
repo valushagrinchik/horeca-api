@@ -269,7 +269,7 @@ model HorecaRequest {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
-  providerRequest ProviderRequest?
+  providerRequests ProviderRequest[]
 
   // shouldn't be used
   horecaRequestProviderStatus HorecaRequestProviderStatus?
@@ -330,7 +330,7 @@ model ProviderRequest {
   items ProviderRequestItem[]
 
   horecaRequest   HorecaRequest @relation(fields: [horecaRequestId], references: [id])
-  horecaRequestId Int           @unique @map("horeca_request_id")
+  horecaRequestId Int           @map("horeca_request_id")
 
   // images - could be loaded on runtime from UploadsLink     
   comment String?
@@ -342,6 +342,7 @@ model ProviderRequest {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
+  @@unique([userId, horecaRequestId])
   @@map("provider_requests")
 }
 

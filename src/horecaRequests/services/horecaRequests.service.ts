@@ -8,6 +8,7 @@ import { UploadsLinkService } from '../../uploads/uploads.link.service'
 import { HorecaRequestItemDto } from '../dto/horecaRequest.item.dto'
 import { HorecaRequestsDbService } from './horecaRequests.db.service'
 import { HorecaRequestApproveProviderRequestDto } from '../dto/horecaRequest.approveProviderRequest.dto'
+import { HorecaRequestWithProviderRequestDto } from '../dto/horecaRequest.withProviderRequests.dto'
 
 @Injectable()
 export class HorecaRequestsService {
@@ -37,12 +38,16 @@ export class HorecaRequestsService {
     }
 
     async get(auth: AuthInfoDto, id: number) {
-        const horecaRequest = await this.horecaRequestsRep.get(id)
+        const horecaRequest = await this.horecaRequestsRep.get(auth.id, id)
         const images = await this.uploadsLinkService.getImages(UploadsLinkType.HorecaRequest, [horecaRequest.id])
 
-        return new HorecaRequestDto({
+        return new HorecaRequestWithProviderRequestDto({
             ...horecaRequest,
             items: horecaRequest.items.map(item => new HorecaRequestItemDto(item)),
+            providerRequests: horecaRequest.providerRequests.map(pR => ({
+                ...pR,
+                cover: pR.items.length / horecaRequest.items.length,
+            })),
             images: (images[id] || []).map(image => image.image),
         })
     }
