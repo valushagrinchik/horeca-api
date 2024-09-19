@@ -26,7 +26,7 @@ export class ProviderRequestsController {
 
     @Get('income')
     //  TODO: dto chould be changed
-    @RequestPaginatedDecorator(HorecaRequestDto) 
+    @RequestPaginatedDecorator(HorecaRequestDto)
     @ApiOperation({ summary: "List of HoReCa proposals that matches with provider's offers" })
     async findForProvider(
         @AuthParamDecorator() auth: AuthInfoDto,

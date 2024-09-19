@@ -94,9 +94,7 @@ export class HorecaRequestsService {
     }
 
     async findByCondition(args: Prisma.HorecaRequestFindManyArgs) {
-        const horecaRequests = await this.horecaRequestsRep.findManyWithItems(
-            args
-        )
+        const horecaRequests = await this.horecaRequestsRep.findManyWithItems(args)
 
         const images = await this.uploadsLinkService.getImages(
             UploadsLinkType.HorecaRequest,

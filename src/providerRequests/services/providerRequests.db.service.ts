@@ -29,7 +29,7 @@ export class ProviderRequestsDbService {
             include: {
                 items: true,
             },
-            ...args
+            ...args,
         })
     }
 
@@ -49,7 +49,7 @@ export class ProviderRequestsDbService {
 
     async approveOnlyOne(id: number) {
         const currentProviderRequest = await this.get(id)
-        await this.updateMany({horecaRequestId: currentProviderRequest.horecaRequestId}, { approvedByHoreca: false })
+        await this.updateMany({ horecaRequestId: currentProviderRequest.horecaRequestId }, { approvedByHoreca: false })
         await this.update(id, { approvedByHoreca: true })
     }
 }

@@ -127,6 +127,7 @@ export const runDevSeeds = async (prisma: PrismaClient) => {
                 createMany: {
                     data: [
                         {
+                            id: 23,
                             name: 'asdsa',
                             amount: 200,
                             unit: 'df',
@@ -160,9 +161,15 @@ export const runDevSeeds = async (prisma: PrismaClient) => {
                     id: horecaRequest.id,
                 },
             },
-            manufacturer: 'OOO sdadfsd',
-            paymentType: PaymentType.Prepayment,
-            cost: 10000,
+            items: {
+                createMany: {
+                    data: [{
+                        manufacturer: 'sadas',
+                        cost: 4000,
+                        horecaRequestItemId: 23
+                    }]
+                }
+            }
         },
     })
 
