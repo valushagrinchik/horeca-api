@@ -1,7 +1,7 @@
 import { ProviderRequestDto } from '../../providerRequests/dto/providerRequest.dto'
 import { HorecaRequestDto } from './horecaRequest.dto'
 
-type HRProviderRequestDto = ProviderRequestDto & {
+class HRProviderRequestDto extends ProviderRequestDto {
     cover: number
 }
 
