@@ -62,19 +62,5 @@ describe('HorecaRequestsController (e2e)', () => {
         })
     })
 
-    describe('GET ' + ENDPOINTS.HOREKA_REQUESTS_FOR_PROVIDER, () => {
-        it('should return array of horeca requests that matche with providers categories', async () => {
-            const res = await findAllHorecaRequestForProvider(app, providerAuth.accessToken)
-            const user = await getProfile(app, providerAuth.accessToken)
 
-            const crossedCategoryItemsLength = horecaRequestInput.items.filter(item =>
-                user.profile.categories.includes(item.category)
-            ).length
-            expect(res.length).toBeGreaterThan(0)
-            expect(res[0]).toHaveProperty('items')
-            expect(res[0].items.length).toBe(crossedCategoryItemsLength)
-
-            return
-        })
-    })
 })

@@ -12,6 +12,8 @@ import { Test, TestingModule, TestingModuleBuilder } from '@nestjs/testing'
 import { AppModule } from './../src/app.module'
 import { AuthResultDto } from './../src/users/dto/auth.result.dto'
 import { ProviderRequestCreateDto } from './../src/providerRequests/dto/providerRequest.create.dto'
+import { HorecaRequestProviderStatusDto } from 'src/providerRequests/dto/horecaRequest.providerStatus.dto'
+import { HorecaRequestSearchDto } from 'src/providerRequests/dto/horecaRequest.search.dto'
 
 export const initApp = async (overwriteCb?: (mb: TestingModuleBuilder) => void, tmCb?: (tm: TestingModule) => void) => {
     const tmBuilder = Test.createTestingModule({
@@ -89,12 +91,25 @@ export const findAllHorecaRequest = async (
 export const findAllHorecaRequestForProvider = async (
     app: INestApplication,
     accessToken: string,
-    paginate: Partial<PaginateValidateType> = {}
+    paginate: Partial<PaginateValidateType<HorecaRequestSearchDto>> = {}
 ) => {
     return request(app.getHttpServer())
         .get(ENDPOINTS.HOREKA_REQUESTS_FOR_PROVIDER)
         .set('Authorization', 'Bearer ' + accessToken)
         .query(paginate)
+        .then(res => {
+            return res.body
+        })
+}
+export const setHorecaRequestStatus = async (
+    app: INestApplication,
+    accessToken: string,
+    payload: HorecaRequestProviderStatusDto
+) => {
+    return request(app.getHttpServer())
+        .post(ENDPOINTS.HOREKA_REQUESTS_FOR_PROVIDER_STATUS)
+        .set('Authorization', 'Bearer ' + accessToken)
+        .send(payload)
         .then(res => {
             return res.body
         })
@@ -109,6 +124,20 @@ export const createProviderRequest = async (
         .post(ENDPOINTS.PROVIDER_REQUEST)
         .set('Authorization', 'Bearer ' + accessToken)
         .send(payload)
+        .then(res => {
+            return res.body
+        })
+}
+
+export const findAllProviderRequests = async (
+    app: INestApplication,
+    accessToken: string,
+    paginate: Partial<PaginateValidateType> = {}
+) => {
+    return request(app.getHttpServer())
+        .get(ENDPOINTS.PROVIDER_REQUEST)
+        .set('Authorization', 'Bearer ' + accessToken)
+        .query(paginate)
         .then(res => {
             return res.body
         })
@@ -138,13 +167,14 @@ export const prepareForChat = async (app: INestApplication, horecaAccessToken: s
     const providerCreateRequestRes = await createProviderRequest(app, providerAccessToken, {
         horecaRequestId: horecaCreateRequestRes.id,
         comment: 'string',
-        items: [{
-            available: true,
-            manufacturer: 'string',
-            cost: 2000,
-            horecaRequestItemId: horecaCreateRequestRes.items[0].id
-        }]
-
+        items: [
+            {
+                available: true,
+                manufacturer: 'string',
+                cost: 2000,
+                horecaRequestItemId: horecaCreateRequestRes.items[0].id,
+            },
+        ],
     })
 
     await request(app.getHttpServer())

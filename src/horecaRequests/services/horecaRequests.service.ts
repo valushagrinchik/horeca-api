@@ -3,7 +3,7 @@ import { HorecaRequestCreateDto } from '../dto/horecaRequest.create.dto'
 import { HorecaRequestDto } from '../dto/horecaRequest.dto'
 import { HorecaRequestTemplateCreateDto } from '../dto/horecaRequest.template.create.dto'
 import { AuthInfoDto } from '../../users/dto/auth.info.dto'
-import { UploadsLinkType } from '@prisma/client'
+import { Prisma, UploadsLinkType } from '@prisma/client'
 import { PaginateValidateType } from '../../system/utils/swagger/decorators'
 import { HorecaRequestTemplateDto } from '../dto/horecaRequest.template.dto'
 import { UploadsLinkService } from '../../uploads/uploads.link.service'
@@ -93,35 +93,10 @@ export class HorecaRequestsService {
         )
     }
 
-    async findForProvider(auth: AuthInfoDto, paginate: Partial<PaginateValidateType> = {}) {
-        const now = new Date()
-        const provider = await this.usersService.get(auth)
-        const categories = provider.profile.categories
-        const horecaRequests = await this.horecaRequestsRep.findManyWithItems({
-            where: {
-                items: {
-                    some: {
-                        category: { in: categories },
-                    },
-                },
-                //TODO: check only day not time
-                acceptUntill: {
-                    gte: now,
-                },
-            },
-            include: {
-                items: {
-                    where: {
-                        category: { in: categories },
-                    },
-                },
-            },
-            orderBy: {
-                [paginate.sort.field]: paginate.sort.order,
-            },
-            take: paginate.limit,
-            skip: paginate.offset,
-        })
+    async findByCondition(args: Prisma.HorecaRequestFindManyArgs) {
+        const horecaRequests = await this.horecaRequestsRep.findManyWithItems(
+            args
+        )
 
         const images = await this.uploadsLinkService.getImages(
             UploadsLinkType.HorecaRequest,

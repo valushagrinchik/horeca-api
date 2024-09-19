@@ -6,14 +6,6 @@ import { ErrorDto } from '../../dto/error.dto'
 export const RequestPaginatedValidateParamsDecorator = createParamDecorator((data: unknown, ctx: ExecutionContext) => {
     const request: ExpressRequest = ctx.switchToHttp().getRequest()
     const query = request.query
-    let search = {}
-    if (query.search) {
-        try {
-            search = JSON.parse(query.search.toString())
-        } catch (e) {
-            throw new BadRequestException(new ErrorDto(ErrorCodes.INVALID_QUERY_STRING))
-        }
-    }
 
     let sort: PaginateValidateSortType | undefined = new PaginateValidateSortType({ field: 'createdAt', order: 'desc' })
     if (query.sort) {
@@ -28,7 +20,7 @@ export const RequestPaginatedValidateParamsDecorator = createParamDecorator((dat
     return new PaginateValidateType({
         offset: query.offset ? parseInt(query.offset.toString(), 10) : 0,
         limit: query.limit ? parseInt(query.limit.toString(), 10) : 60,
-        search: search,
+        search: query.search || {},
         sort: sort,
     })
 })

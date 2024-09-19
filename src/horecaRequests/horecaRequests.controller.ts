@@ -22,17 +22,6 @@ import { HorecaRequestTemplateCreateDto } from './dto/horecaRequest.template.cre
 export class HorecaRequestsController {
     constructor(private readonly service: HorecaRequestsService) {}
 
-    @Get('provider')
-    @AuthUser(UserRole.Provider)
-    @RequestPaginatedDecorator(HorecaRequestDto)
-    @ApiOperation({ summary: "List of HoReCa proposals that matches with provider's offers" })
-    async findForProvider(
-        @AuthParamDecorator() auth: AuthInfoDto,
-        @RequestPaginatedValidateParamsDecorator() paginate: PaginateValidateType
-    ) {
-        return this.service.findForProvider(auth, paginate)
-    }
-
     @Post()
     @ApiOperation({ summary: 'Create products(categories) set proposal required for HoReCa' })
     @RequestDecorator(HorecaRequestDto, HorecaRequestCreateDto)

@@ -82,8 +82,9 @@ model User {
   providerRequests ProviderRequest[]
   horecaRequests   HorecaRequest[]
 
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+  createdAt                     DateTime                      @default(now()) @map("created_at")
+  updatedAt                     DateTime                      @default(now()) @updatedAt @map("updated_at")
+  horecaRequestProviderStatuses HorecaRequestProviderStatus[]
 
   @@map("users")
 }
@@ -270,6 +271,9 @@ model HorecaRequest {
 
   providerRequest ProviderRequest?
 
+  // shouldn't be used
+  horecaRequestProviderStatus HorecaRequestProviderStatus?
+
   @@map("horeca_requests")
 }
 
@@ -299,6 +303,21 @@ model HorecaRequestTemplate {
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
   @@map("horeca_request_templates")
+}
+
+model HorecaRequestProviderStatus {
+  horecaRequest   HorecaRequest @relation(fields: [horecaRequestId], references: [id])
+  horecaRequestId Int           @unique @map("horeca_request_id")
+  viewed          Boolean       @default(false)
+  hidden          Boolean       @default(false)
+
+  provider   User @relation(fields: [providerId], references: [id])
+  providerId Int  @map("provider_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@map("horeca_request_provider_status")
 }
 
 // Provider Application

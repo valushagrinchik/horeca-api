@@ -24,10 +24,32 @@ export class ProviderRequestsDbService {
         })
     }
 
+    async findAll(args: Prisma.ProviderRequestFindManyArgs) {
+        return this.prisma.providerRequest.findMany({
+            include: {
+                items: true,
+            },
+            ...args
+        })
+    }
+
     async update(id: number, data: Prisma.ProviderRequestUpdateInput) {
         await this.prisma.providerRequest.update({
             where: { id },
             data,
         })
+    }
+
+    async updateMany(where: Prisma.ProviderRequestWhereInput, data: Prisma.ProviderRequestUpdateInput) {
+        await this.prisma.providerRequest.updateMany({
+            where,
+            data,
+        })
+    }
+
+    async approveOnlyOne(id: number) {
+        const currentProviderRequest = await this.get(id)
+        await this.updateMany({horecaRequestId: currentProviderRequest.horecaRequestId}, { approvedByHoreca: false })
+        await this.update(id, { approvedByHoreca: true })
     }
 }
