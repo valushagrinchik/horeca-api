@@ -52,7 +52,7 @@ export class ProviderRequestsController {
 
     @Get()
     @RequestPaginatedDecorator(HorecaRequestDto)
-    @ApiOperation({ summary: "Get all provider requests" })
+    @ApiOperation({ summary: 'Get all provider requests' })
     async findAll(
         @AuthParamDecorator() auth: AuthInfoDto,
         @RequestPaginatedValidateParamsDecorator() paginate: PaginateValidateType<HorecaRequestSearchDto>

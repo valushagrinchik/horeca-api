@@ -12,8 +12,9 @@ import { Test, TestingModule, TestingModuleBuilder } from '@nestjs/testing'
 import { AppModule } from './../src/app.module'
 import { AuthResultDto } from './../src/users/dto/auth.result.dto'
 import { ProviderRequestCreateDto } from './../src/providerRequests/dto/providerRequest.create.dto'
-import { HorecaRequestProviderStatusDto } from 'src/providerRequests/dto/horecaRequest.providerStatus.dto'
-import { HorecaRequestSearchDto } from 'src/providerRequests/dto/horecaRequest.search.dto'
+import { HorecaRequestProviderStatusDto } from './../src/providerRequests/dto/horecaRequest.providerStatus.dto'
+import { HorecaRequestSearchDto } from './../src/providerRequests/dto/horecaRequest.search.dto'
+import { HorecaRequestTemplateCreateDto } from './../src/horecaRequests/dto/horecaRequest.template.create.dto'
 
 export const initApp = async (overwriteCb?: (mb: TestingModuleBuilder) => void, tmCb?: (tm: TestingModule) => void) => {
     const tmBuilder = Test.createTestingModule({
@@ -74,6 +75,28 @@ export const getHorecaRequest = async (app: INestApplication, accessToken: strin
         })
 }
 
+export const createHorecaRequestTemplate = async (
+    app: INestApplication,
+    accessToken: string,
+    payload: HorecaRequestTemplateCreateDto
+) => {
+    return request(app.getHttpServer())
+        .post(ENDPOINTS.HOREKA_REQUESTS_TEMPLATE)
+        .set('Authorization', 'Bearer ' + accessToken)
+        .send(payload)
+        .then(res => {
+            return res.body
+        })
+}
+
+export const getHorecaRequestTemplate = async (app: INestApplication, accessToken: string, id: number) => {
+    return request(app.getHttpServer())
+        .get(ENDPOINTS.HOREKA_REQUESTS_TEMPLATE + '/' + id)
+        .set('Authorization', 'Bearer ' + accessToken)
+        .then(res => {
+            return res.body
+        })
+}
 export const findAllHorecaRequest = async (
     app: INestApplication,
     accessToken: string,

@@ -1,13 +1,5 @@
 import { INestApplication } from '@nestjs/common'
-import {
-    authUser,
-    createHorecaRequest,
-    findAllHorecaRequest,
-    findAllHorecaRequestForProvider,
-    getHorecaRequest,
-    getProfile,
-    initApp,
-} from './helpers'
+import { authUser, createHorecaRequest, findAllHorecaRequest, getHorecaRequest, initApp } from './helpers'
 import { ENDPOINTS } from './constants'
 import { AuthResultDto } from './../src/users/dto/auth.result.dto'
 import { horecaRequestInput, horecaUserInput, providerUserInput } from './mock/seedData'
@@ -61,6 +53,4 @@ describe('HorecaRequestsController (e2e)', () => {
             return
         })
     })
-
-
 })

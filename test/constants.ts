@@ -4,6 +4,7 @@ export const ENDPOINTS = {
     SIGNIN: '/auth/login',
     PROFILE: '/users/me',
     HOREKA_REQUESTS: '/requests/horeca',
+    HOREKA_REQUESTS_TEMPLATE: '/requests/horeca/template',
     HOREKA_REQUEST: '/requests/horeca/:id',
     HOREKA_REQUESTS_FOR_PROVIDER: '/requests/provider/income',
     HOREKA_REQUESTS_FOR_PROVIDER_STATUS: '/requests/provider/income/status',

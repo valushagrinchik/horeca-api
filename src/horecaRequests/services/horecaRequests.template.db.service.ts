@@ -4,10 +4,7 @@ import { Prisma } from '@prisma/client'
 
 @Injectable()
 export class HorecaRequestsTemplateDbService {
-    constructor(
-        //@Inject(forwardRef(() => DatabaseService))
-        private db: DatabaseService
-    ) {}
+    constructor(private db: DatabaseService) {}
 
     create = async (data: Prisma.HorecaRequestTemplateCreateInput) => {
         return this.db.horecaRequestTemplate.create({

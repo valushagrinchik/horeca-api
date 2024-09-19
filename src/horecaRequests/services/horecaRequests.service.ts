@@ -1,24 +1,18 @@
 import { Injectable } from '@nestjs/common'
 import { HorecaRequestCreateDto } from '../dto/horecaRequest.create.dto'
 import { HorecaRequestDto } from '../dto/horecaRequest.dto'
-import { HorecaRequestTemplateCreateDto } from '../dto/horecaRequest.template.create.dto'
 import { AuthInfoDto } from '../../users/dto/auth.info.dto'
 import { Prisma, UploadsLinkType } from '@prisma/client'
 import { PaginateValidateType } from '../../system/utils/swagger/decorators'
-import { HorecaRequestTemplateDto } from '../dto/horecaRequest.template.dto'
 import { UploadsLinkService } from '../../uploads/uploads.link.service'
 import { HorecaRequestItemDto } from '../dto/horecaRequest.item.dto'
 import { HorecaRequestsDbService } from './horecaRequests.db.service'
-import { HorecaRequestsTemplateDbService } from './horecaRequestsTemplate.db.service'
-import { UsersService } from '../../users/services/users.service'
 
 @Injectable()
 export class HorecaRequestsService {
     constructor(
         private horecaRequestsRep: HorecaRequestsDbService,
-        private horecaRequestsTemplateRep: HorecaRequestsTemplateDbService,
-        private uploadsLinkService: UploadsLinkService,
-        private usersService: UsersService
+        private uploadsLinkService: UploadsLinkService
     ) {}
 
     async create(auth: AuthInfoDto, { imageIds, ...dto }: HorecaRequestCreateDto) {
@@ -50,19 +44,6 @@ export class HorecaRequestsService {
             items: horecaRequest.items.map(item => new HorecaRequestItemDto(item)),
             images: (images[id] || []).map(image => image.image),
         })
-    }
-
-    async createTemplate({ content, ...dto }: HorecaRequestTemplateCreateDto) {
-        const proposalTemplate = await this.horecaRequestsTemplateRep.create({
-            ...dto,
-            content: JSON.stringify(content),
-        })
-        return new HorecaRequestTemplateDto(proposalTemplate)
-    }
-
-    async getTemplate(id: number) {
-        const proposalTemplate = await this.horecaRequestsTemplateRep.get(id)
-        return new HorecaRequestTemplateDto(proposalTemplate)
     }
 
     async findAll(auth: AuthInfoDto, paginate: Partial<PaginateValidateType> = {}) {
