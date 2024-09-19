@@ -7,6 +7,7 @@ import { PaginateValidateType } from '../../system/utils/swagger/decorators'
 import { UploadsLinkService } from '../../uploads/uploads.link.service'
 import { HorecaRequestItemDto } from '../dto/horecaRequest.item.dto'
 import { HorecaRequestsDbService } from './horecaRequests.db.service'
+import { HorecaRequestApproveProviderRequestDto } from '../dto/horecaRequest.approveProviderRequest.dto'
 
 @Injectable()
 export class HorecaRequestsService {
@@ -90,5 +91,9 @@ export class HorecaRequestsService {
                     images: (images[p.id] || []).map(image => image.image),
                 })
         )
+    }
+
+    async approveProviderRequest(auth: AuthInfoDto, dto: HorecaRequestApproveProviderRequestDto) {
+        return this.horecaRequestsRep.approveProviderRequest(auth.id, dto)
     }
 }

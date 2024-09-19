@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common'
+import { Body, Controller, Get, Post } from '@nestjs/common'
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { AuthUser } from '../system/utils/auth/decorators/auth.decorator'
 import { UserRole } from '@prisma/client'
@@ -58,14 +58,5 @@ export class ProviderRequestsController {
         @RequestPaginatedValidateParamsDecorator() paginate: PaginateValidateType<HorecaRequestSearchDto>
     ) {
         return this.service.findAll(auth, paginate)
-    }
-
-    @AuthUser(UserRole.Horeca)
-    @Post(':id')
-    @RequestDecorator(SuccessDto)
-    @ApiOperation({ summary: 'Approve by HoReCa to be able to start chat with' })
-    async approveByHoreca(@AuthParamDecorator() auth: AuthInfoDto, @Param('id') id: number) {
-        await this.service.approveByHoreca(auth, +id)
-        return new SuccessDto('ok')
     }
 }

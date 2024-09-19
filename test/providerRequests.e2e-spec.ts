@@ -1,5 +1,6 @@
 import { INestApplication } from '@nestjs/common'
 import {
+    approveProviderRequest,
     authUser,
     createHorecaRequest,
     createProviderRequest,
@@ -18,7 +19,9 @@ import { Categories } from '../src/system/utils/enums'
 let app: INestApplication
 let horecaAuth: AuthResultDto
 let providerAuth: AuthResultDto
-let createdRequestId: number
+
+let createdhorecaRequestId: number
+let createdProviderRequestId: number
 
 beforeAll(async () => {
     app = await initApp()
@@ -104,7 +107,7 @@ describe('ProviderRequestsController (e2e)', () => {
                 comment: 'string',
             })
 
-            const res = await createProviderRequest(app, providerAuth.accessToken, {
+            const providerCreateRequestRes = await createProviderRequest(app, providerAuth.accessToken, {
                 horecaRequestId: horecaCreateRequestRes.id,
                 comment: 'string',
                 items: horecaCreateRequestRes.items.map(item => ({
@@ -115,18 +118,30 @@ describe('ProviderRequestsController (e2e)', () => {
                 })),
             })
 
-            createdRequestId = res.id
+            createdhorecaRequestId = horecaCreateRequestRes.id
+            createdProviderRequestId = providerCreateRequestRes.id
 
-            expect(res).toHaveProperty('id')
+            expect(providerCreateRequestRes).toHaveProperty('id')
             return
         })
     })
 
     describe('GET ' + ENDPOINTS.PROVIDER_REQUEST, () => {
         it('should return just created request data', async () => {
-           const res = await findAllProviderRequests(app, providerAuth.accessToken)
+            const res = await findAllProviderRequests(app, providerAuth.accessToken)
 
-           expect(res.length).toBeGreaterThan(0)
+            expect(res.length).toBeGreaterThan(0)
+        })
+    })
+
+    describe('POST ' + ENDPOINTS.HOREKA_APPROVE_PROVIDER_REQUEST, () => {
+        it('should return just created request data', async () => {
+            const res = await approveProviderRequest(app, horecaAuth.accessToken, {
+                horecaRequestId: createdhorecaRequestId,
+                providerRequestId: createdProviderRequestId,
+            })
+
+            expect(res.status).toBe('ok')
         })
     })
 })

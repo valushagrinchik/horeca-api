@@ -15,6 +15,7 @@ import { ProviderRequestCreateDto } from './../src/providerRequests/dto/provider
 import { HorecaRequestProviderStatusDto } from './../src/providerRequests/dto/horecaRequest.providerStatus.dto'
 import { HorecaRequestSearchDto } from './../src/providerRequests/dto/horecaRequest.search.dto'
 import { HorecaRequestTemplateCreateDto } from './../src/horecaRequests/dto/horecaRequest.template.create.dto'
+import { HorecaRequestApproveProviderRequestDto } from 'src/horecaRequests/dto/horecaRequest.approveProviderRequest.dto'
 
 export const initApp = async (overwriteCb?: (mb: TestingModuleBuilder) => void, tmCb?: (tm: TestingModule) => void) => {
     const tmBuilder = Test.createTestingModule({
@@ -166,6 +167,20 @@ export const findAllProviderRequests = async (
         })
 }
 
+export const approveProviderRequest = async (
+    app: INestApplication,
+    accessToken: string,
+    payload: HorecaRequestApproveProviderRequestDto
+) => {
+    return request(app.getHttpServer())
+        .post(ENDPOINTS.HOREKA_APPROVE_PROVIDER_REQUEST)
+        .set('Authorization', 'Bearer ' + accessToken)
+        .send(payload)
+        .then(res => {
+            return res.body
+        })
+}
+
 export const prepareForChat = async (app: INestApplication, horecaAccessToken: string, providerAccessToken: string) => {
     const validAcceptUntill = generateAcceptUntil()
 
@@ -200,12 +215,10 @@ export const prepareForChat = async (app: INestApplication, horecaAccessToken: s
         ],
     })
 
-    await request(app.getHttpServer())
-        .post(ENDPOINTS.APPROVE_PROVIDER_REQUEST.replace(':id', providerCreateRequestRes.id))
-        .set('Authorization', 'Bearer ' + horecaAccessToken)
-        .then(res => {
-            return res.body
-        })
+    await approveProviderRequest(app, horecaAccessToken, {
+       horecaRequestId: horecaCreateRequestRes.id,
+       providerRequestId: providerCreateRequestRes.id
+    })
 
     return {
         providerRequestId: providerCreateRequestRes.id,

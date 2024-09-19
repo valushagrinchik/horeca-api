@@ -1,6 +1,7 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common'
 import { DatabaseService } from '../../system/database/database.service'
 import { Prisma } from '@prisma/client'
+import { HorecaRequestApproveProviderRequestDto } from '../dto/horecaRequest.approveProviderRequest.dto'
 
 @Injectable()
 export class HorecaRequestsDbService {
@@ -24,5 +25,26 @@ export class HorecaRequestsDbService {
 
     findManyWithItems = async (args: Prisma.HorecaRequestFindManyArgs) => {
         return this.db.horecaRequest.findMany({ include: { items: true }, ...args })
+    }
+
+    approveProviderRequest = async (userId: number, dto: HorecaRequestApproveProviderRequestDto) => {
+        return this.db.horecaRequest.update({
+            where: {
+                id: dto.horecaRequestId,
+                userId,
+            },
+            data: {
+                providerRequest: {
+                    update: {
+                        where: {
+                            id: dto.providerRequestId,
+                        },
+                        data: {
+                            approvedByHoreca: true,
+                        },
+                    },
+                },
+            },
+        })
     }
 }

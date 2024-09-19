@@ -1,0 +1,8 @@
+import { TypeValidate, Validate } from '../../system/utils/validation/validate.decotators'
+
+export class HorecaRequestApproveProviderRequestDto {
+    @Validate(TypeValidate.NUMBER)
+    horecaRequestId: number
+    @Validate(TypeValidate.NUMBER)
+    providerRequestId: number
+}

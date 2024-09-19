@@ -133,8 +133,4 @@ export class ProviderRequestsService {
             }),
         })
     }
-
-    async approveByHoreca(auth: AuthInfoDto, id: number) {
-        await this.providerRequestsRep.approveOnlyOne(id)
-    }
 }
