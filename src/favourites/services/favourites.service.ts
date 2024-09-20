@@ -10,7 +10,13 @@ export class FavouritesService {
     async create(auth: AuthInfoDto, dto: FavouritesCreateDto) {
         return this.favsRep.create(auth.id, dto)
     }
+
     async delete(auth: AuthInfoDto, providerId: number) {
         return this.favsRep.delete(auth.id, providerId)
+    }
+
+    async isReadyForChat(auth: AuthInfoDto, providerId: number) {
+        const request = await this.favsRep.find({ userId: auth.id, providerId })
+        return !!request
     }
 }

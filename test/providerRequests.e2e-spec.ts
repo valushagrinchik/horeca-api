@@ -80,7 +80,7 @@ describe('ProviderRequestsController (e2e)', () => {
             expect(res.status).toBe('ok')
 
             const horecaRequestsRes2 = await findAllHorecaRequestForProvider(app, providerAuth.accessToken)
-            expect(horecaRequestsRes2.length).toBe(0)
+            expect(horecaRequestsRes2.length).toBe(horecaRequestsRes.length-1)
 
             return
         })

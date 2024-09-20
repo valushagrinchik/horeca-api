@@ -203,51 +203,8 @@ export const approveProviderRequest = async (
         })
 }
 
-export const prepareForChat = async (app: INestApplication, horecaAccessToken: string, providerAccessToken: string) => {
-    const validAcceptUntill = generateAcceptUntil()
-    const horecaCreateRequestRes = await createHorecaRequest(app, horecaAccessToken, {
-        items: [
-            {
-                name: 'string',
-                amount: 10,
-                unit: 'string',
-                category: Categories.alcoholicDrinks,
-            },
-        ],
-        address: 'string',
-        deliveryTime: validAcceptUntill,
-        acceptUntill: validAcceptUntill,
-        paymentType: 'Prepayment',
-        name: 'string',
-        phone: 'string',
-        comment: 'string',
-    })
-    const providerCreateRequestRes = await createProviderRequest(app, providerAccessToken, {
-        horecaRequestId: horecaCreateRequestRes.id,
-        comment: 'string',
-        items: [
-            {
-                available: true,
-                manufacturer: 'string',
-                cost: 2000,
-                horecaRequestItemId: horecaCreateRequestRes.items[0].id,
-            },
-        ],
-    })
 
-    await approveProviderRequest(app, horecaAccessToken, {
-        horecaRequestId: horecaCreateRequestRes.id,
-        providerRequestId: providerCreateRequestRes.id,
-    })
-
-    return {
-        horecaRequestId: horecaCreateRequestRes.id,
-        providerRequestId: providerCreateRequestRes.id,
-    }
-
-}
-
-export const createChat = async (app: INestApplication, accessToken: string, payload: ChatCreateDto): Promise<ChatDto> => {
+export const createChat = async (app: INestApplication, accessToken: string, payload: ChatCreateDto): Promise<ChatDto | any> => {
     return request(app.getHttpServer())
         .post(ENDPOINTS.CHAT)
         .set('Authorization', 'Bearer ' + accessToken)

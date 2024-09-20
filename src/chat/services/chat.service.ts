@@ -6,32 +6,56 @@ import { ChatMessageCreateDto } from '../dto/chat.message.create.dto'
 import { ChatDto } from '../dto/chat.dto'
 import { ChatMessageDto } from '../dto/chat.message.dto'
 import { ChatDbService } from './chat.db.service'
-import { Inject, forwardRef } from '@nestjs/common'
+import { BadRequestException, Inject, forwardRef } from '@nestjs/common'
+import { ChatSearchDto } from '../dto/chat.search.dto'
+import { ErrorDto } from '../../system/utils/dto/error.dto'
+import { ErrorCodes } from '../../system/utils/enums/errorCodes.enum'
+import { HorecaRequestsService } from '../../horecaRequests/services/horecaRequests.service'
+import { FavouritesService } from '../../favourites/services/favourites.service'
 
 export class ChatService {
     constructor(
         @Inject(forwardRef(() => ChatDbService))
-        private chatRep: ChatDbService
+        private chatRep: ChatDbService,
+        private favouritesService: FavouritesService,
+        private horecaRequestsService: HorecaRequestsService
     ) {}
 
-    async getChats(auth: AuthInfoDto, paginate: PaginateValidateType) {
+    async getChats(auth: AuthInfoDto, paginate: PaginateValidateType<ChatSearchDto>) {
         return this.chatRep.getChats(auth.id, paginate)
     }
 
-    async getChat(auth: AuthInfoDto, id: number) {
-        const chat = await this.chatRep.getChat(id)
+    async getChat(auth: AuthInfoDto, id: number, paginate: PaginateValidateType) {
+        const chat = await this.chatRep.getChatWithPaginatedMessages(auth.id, id, paginate)
         return new ChatDto({ ...chat, messages: chat.messages.map(m => new ChatMessageDto(m)) })
     }
 
+    async validateChatCreation(auth: AuthInfoDto, dto: ChatCreateDto) {
+        switch (dto.type) {
+            case ChatType.Order: {
+                const valid = await this.horecaRequestsService.isReadyForChat(auth, dto.horecaRequestId)
+                if (!valid) {
+                    throw new BadRequestException(new ErrorDto(ErrorCodes.FORBIDDEN_ACTION))
+                }
+                return
+            }
+            case ChatType.Private: {
+                const valid = await this.favouritesService.isReadyForChat(auth, dto.opponentId)
+                if (!valid) {
+                    throw new BadRequestException(new ErrorDto(ErrorCodes.FORBIDDEN_ACTION))
+                }
+                return
+            }
+            default: {
+                throw new BadRequestException(new ErrorDto(ErrorCodes.FORBIDDEN_ACTION))
+            }
+        }
+    }
+
     /** Returns chat object and latest just created message */
-    async createChat(auth: AuthInfoDto, { opponentId, providerRequestId }: ChatCreateDto) {
-        const chat = await this.chatRep.createChat({
-            providerRequest: {
-                connect: { id: providerRequestId },
-            },
-            opponents: [auth.id, opponentId],
-            type: ChatType.Order,
-        })
+    async createChat(auth: AuthInfoDto, dto: ChatCreateDto) {
+        await this.validateChatCreation(auth, dto)
+        const chat = await this.chatRep.createChat(auth.id, dto)
         const message = await this.chatRep.createMessage({
             message: 'Chat is created',
             isServer: true,
@@ -43,7 +67,7 @@ export class ChatService {
 
     /** Returns chat object and latest just created message */
     async createMessage(auth: AuthInfoDto, dto: ChatMessageCreateDto) {
-        const chat = await this.chatRep.getChat(dto.chatId)
+        const chat = await this.chatRep.getChat(auth.id, dto.chatId)
         const message = await this.chatRep.createMessage(dto)
         return new ChatDto({ ...chat, messages: [message] })
     }

@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { DatabaseService } from '../../system/database/database.service'
 import { FavouritesCreateDto } from '../dto/favourites.create.dto'
+import { Prisma } from '@prisma/client'
 
 @Injectable()
 export class FavouritesDbService {
@@ -12,6 +13,12 @@ export class FavouritesDbService {
                 ...dto,
                 userId,
             },
+        })
+    }
+
+    async find(where: Prisma.HorecaFavouritesWhereInput) {
+        return this.db.horecaFavourites.findFirst({
+            where,
         })
     }
 

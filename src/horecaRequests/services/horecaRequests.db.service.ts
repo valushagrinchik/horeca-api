@@ -16,7 +16,7 @@ export class HorecaRequestsDbService {
     get = async (userId: number, id: number) => {
         return this.db.horecaRequest.findUnique({
             where: { id, userId },
-            include: { items: true, providerRequests: { include: { items: true } } },
+            include: { items: true, providerRequests: { include: { items: true } }, activeProviderRequest: true },
         })
     }
 
@@ -31,15 +31,8 @@ export class HorecaRequestsDbService {
                 userId,
             },
             data: {
-                providerRequests: {
-                    update: {
-                        where: {
-                            id: dto.providerRequestId,
-                        },
-                        data: {
-                            approvedByHoreca: true,
-                        },
-                    },
+                activeProviderRequest: {
+                    connect: { id: dto.providerRequestId },
                 },
             },
         })

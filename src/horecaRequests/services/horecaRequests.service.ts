@@ -101,4 +101,9 @@ export class HorecaRequestsService {
     async approveProviderRequest(auth: AuthInfoDto, dto: HorecaRequestApproveProviderRequestDto) {
         await this.horecaRequestsRep.approveProviderRequest(auth.id, dto)
     }
+
+    async isReadyForChat(auth: AuthInfoDto, id: number) {
+        const request = await this.horecaRequestsRep.get(auth.id, id)
+        return !!request.activeProviderRequest
+    }
 }

@@ -290,7 +290,14 @@ model HorecaRequest {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
-  providerRequests ProviderRequest[]
+  // indicates whitch provider request was approved by horeca to start chating
+  activeProviderRequest   ProviderRequest? @relation(fields: [activeProviderRequestId], references: [id])
+  activeProviderRequestId Int?             @unique @map("active_provider_request_id")
+
+  chat   Chat? @relation(fields: [chatId], references: [id])
+  chatId Int?  @unique @map("chat_id")
+
+  providerRequests ProviderRequest[] @relation("allProviderRequests")
 
   // shouldn't be used
   horecaRequestProviderStatus HorecaRequestProviderStatus?
@@ -350,18 +357,22 @@ model ProviderRequest {
 
   items ProviderRequestItem[]
 
-  horecaRequest   HorecaRequest @relation(fields: [horecaRequestId], references: [id])
+  horecaRequest   HorecaRequest @relation("allProviderRequests", fields: [horecaRequestId], references: [id])
   horecaRequestId Int           @map("horeca_request_id")
 
   // images - could be loaded on runtime from UploadsLink     
   comment String?
 
-  // indicates whitch provider requests was approved by horeca to start chating
-  approvedByHoreca Boolean @default(false) @map("approved_by_horeca")
-  chat             Chat?
+  // chat   Chat? @relation(fields: [chatId], references: [id])
+  // chatId Int?  @map("chat_id")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  //just relation for  HorecaRequest.activeProviderRequest
+  for HorecaRequest?
+  // Chat   Chat?          @relation(fields: [chatId], references: [id])
+  // chatId Int?
 
   @@unique([userId, horecaRequestId])
   @@map("provider_requests")
@@ -392,11 +403,10 @@ model Chat {
   opponents Int[]
   type      ChatType
 
-  providerRequest   ProviderRequest? @relation(fields: [providerRequestId], references: [id])
-  providerRequestId Int?             @unique @map("provider_request_id")
-
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  horecaRequest HorecaRequest?
 
   @@map("chats")
 }
