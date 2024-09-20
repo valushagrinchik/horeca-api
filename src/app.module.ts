@@ -9,6 +9,7 @@ import { ChatModule } from './chat/chat.module'
 import { ProviderRequestsModule } from './providerRequests/providerRequests.module'
 import { HorecaRequestsModule } from './horecaRequests/horecaRequests.module'
 import { DatabaseModule } from './system/database/database.module'
+import { FavouritesModule } from './favourites/favourites.module'
 
 @Module({
     imports: [
@@ -27,6 +28,7 @@ import { DatabaseModule } from './system/database/database.module'
         ProviderRequestsModule,
         ProductsModule,
         ChatModule,
+        FavouritesModule,
     ],
     controllers: [],
     providers: [],
