@@ -212,6 +212,14 @@ export const createChat = async (app: INestApplication, accessToken: string, pay
         .then(res => res.body)
 }
 
+export const getChats = async (app: INestApplication, accessToken: string) => {
+    return request(app.getHttpServer())
+        .get(ENDPOINTS.CHAT)
+        .set('Authorization', 'Bearer ' + accessToken)
+        .then(res => res.body)
+}
+
+
 export const getProfile = async (app: INestApplication, accessToken: string) => {
     return request(app.getHttpServer())
         .get(ENDPOINTS.PROFILE)

@@ -271,24 +271,17 @@ model HorecaFavourites {
 }
 
 model HorecaRequest {
-  id     Int                 @id @default(autoincrement())
-  user   User                @relation(fields: [userId], references: [id])
-  userId Int                 @map("user_id")
-  items  HorecaRequestItem[]
-  // images - could be loaded on runtime from UploadsLink
-
+  id           Int                 @id @default(autoincrement())
+  user         User                @relation(fields: [userId], references: [id])
+  userId       Int                 @map("user_id")
+  items        HorecaRequestItem[]
   address      String
-  deliveryTime DateTime    @map("delivery_time")
-  acceptUntill DateTime    @map("accept_untill")
-  paymentType  PaymentType @map("payment_type")
-
-  comment String?
-
-  name  String
-  phone String
-
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+  deliveryTime DateTime            @map("delivery_time")
+  acceptUntill DateTime            @map("accept_untill")
+  paymentType  PaymentType         @map("payment_type")
+  comment      String?
+  name         String
+  phone        String
 
   // indicates whitch provider request was approved by horeca to start chating
   activeProviderRequest   ProviderRequest? @relation(fields: [activeProviderRequestId], references: [id])
@@ -297,10 +290,13 @@ model HorecaRequest {
   chat   Chat? @relation(fields: [chatId], references: [id])
   chatId Int?  @unique @map("chat_id")
 
-  providerRequests ProviderRequest[] @relation("allProviderRequests")
-
+  providerRequests            ProviderRequest[]            @relation("allProviderRequests")
   // shouldn't be used
   horecaRequestProviderStatus HorecaRequestProviderStatus?
+
+  // images - could be loaded on runtime from UploadsLink
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
   @@map("horeca_requests")
 }
@@ -350,29 +346,21 @@ model HorecaRequestProviderStatus {
 
 // Provider Application
 model ProviderRequest {
-  id Int @id @default(autoincrement())
-
-  user   User @relation(fields: [userId], references: [id])
-  userId Int  @map("user_id")
-
-  items ProviderRequestItem[]
+  id      Int                   @id @default(autoincrement())
+  comment String?
+  user    User                  @relation(fields: [userId], references: [id])
+  userId  Int                   @map("user_id")
+  items   ProviderRequestItem[]
 
   horecaRequest   HorecaRequest @relation("allProviderRequests", fields: [horecaRequestId], references: [id])
   horecaRequestId Int           @map("horeca_request_id")
 
-  // images - could be loaded on runtime from UploadsLink     
-  comment String?
-
-  // chat   Chat? @relation(fields: [chatId], references: [id])
-  // chatId Int?  @map("chat_id")
-
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
-
   //just relation for  HorecaRequest.activeProviderRequest
   for HorecaRequest?
-  // Chat   Chat?          @relation(fields: [chatId], references: [id])
-  // chatId Int?
+
+  // images - could be loaded on runtime from UploadsLink     
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
   @@unique([userId, horecaRequestId])
   @@map("provider_requests")

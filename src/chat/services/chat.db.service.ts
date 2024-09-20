@@ -7,7 +7,7 @@ import { ChatCreateDto } from '../dto/chat.create.dto'
 
 export class ChatDbService {
     constructor(
-        @Inject(forwardRef(() => DatabaseService)) // TODO: try to delete after migration of using db repository approach
+        @Inject(forwardRef(() => DatabaseService))
         private db: DatabaseService
     ) {}
 
@@ -15,9 +15,13 @@ export class ChatDbService {
         return this.db.chat.create({
             data: {
                 ...dto,
-                horecaRequest: {
-                    connect: { id: horecaRequestId },
-                },
+                ...(horecaRequestId
+                    ? {
+                          horecaRequest: {
+                              connect: { id: horecaRequestId },
+                          },
+                      }
+                    : {}),
                 opponents: [userId, opponentId],
             },
         })
@@ -73,11 +77,6 @@ export class ChatDbService {
                 AND: {
                     opponents: {
                         has: opponentId,
-                    },
-                    NOT: {
-                        opponents: {
-                            has: -1, // support chats
-                        },
                     },
                 },
                 type: search.type,
