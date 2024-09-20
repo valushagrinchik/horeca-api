@@ -14,6 +14,9 @@ export class HorecaRequestDto extends SourceWithUploads implements HorecaRequest
     items: HorecaRequestItemDto[]
     comment: string
 
+    activeProviderRequestId: number | null
+    chatId: number | null
+
     createdAt: Date
     updatedAt: Date
 
