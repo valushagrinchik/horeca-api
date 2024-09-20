@@ -17,6 +17,8 @@ import { HorecaRequestSearchDto } from '../src/providerRequests/dto/horecaReques
 import { HorecaRequestTemplateCreateDto } from '../src/horecaRequests/dto/horecaRequest.template.create.dto'
 import { HorecaRequestApproveProviderRequestDto } from '../src/horecaRequests/dto/horecaRequest.approveProviderRequest.dto'
 import { FavouritesCreateDto } from '../src/favourites/dto/favourites.create.dto'
+import { ChatCreateDto } from '../src/chat/dto/chat.create.dto'
+import { ChatDto } from '../src/chat/dto/chat.dto'
 
 export const initApp = async (overwriteCb?: (mb: TestingModuleBuilder) => void, tmCb?: (tm: TestingModule) => void) => {
     const tmBuilder = Test.createTestingModule({
@@ -68,11 +70,7 @@ export const createHorecaRequest = async (
         })
 }
 
-export const addFavourites = async (
-    app: INestApplication,
-    accessToken: string,
-    payload: FavouritesCreateDto
-) => {
+export const addFavourites = async (app: INestApplication, accessToken: string, payload: FavouritesCreateDto) => {
     return request(app.getHttpServer())
         .post(ENDPOINTS.HOREKA_FAVOURITES)
         .set('Authorization', 'Bearer ' + accessToken)
@@ -82,11 +80,7 @@ export const addFavourites = async (
         })
 }
 
-export const deleteFavourites = async (
-    app: INestApplication,
-    accessToken: string,
-    providerId: number
-) => {
+export const deleteFavourites = async (app: INestApplication, accessToken: string, providerId: number) => {
     return request(app.getHttpServer())
         .delete(ENDPOINTS.HOREKA_FAVOURITES + '/' + providerId)
         .set('Authorization', 'Bearer ' + accessToken)
@@ -211,7 +205,6 @@ export const approveProviderRequest = async (
 
 export const prepareForChat = async (app: INestApplication, horecaAccessToken: string, providerAccessToken: string) => {
     const validAcceptUntill = generateAcceptUntil()
-
     const horecaCreateRequestRes = await createHorecaRequest(app, horecaAccessToken, {
         items: [
             {
@@ -229,7 +222,6 @@ export const prepareForChat = async (app: INestApplication, horecaAccessToken: s
         phone: 'string',
         comment: 'string',
     })
-
     const providerCreateRequestRes = await createProviderRequest(app, providerAccessToken, {
         horecaRequestId: horecaCreateRequestRes.id,
         comment: 'string',
@@ -244,14 +236,23 @@ export const prepareForChat = async (app: INestApplication, horecaAccessToken: s
     })
 
     await approveProviderRequest(app, horecaAccessToken, {
-       horecaRequestId: horecaCreateRequestRes.id,
-       providerRequestId: providerCreateRequestRes.id
+        horecaRequestId: horecaCreateRequestRes.id,
+        providerRequestId: providerCreateRequestRes.id,
     })
 
     return {
+        horecaRequestId: horecaCreateRequestRes.id,
         providerRequestId: providerCreateRequestRes.id,
-        opponentId: providerCreateRequestRes.userId,
     }
+
+}
+
+export const createChat = async (app: INestApplication, accessToken: string, payload: ChatCreateDto): Promise<ChatDto> => {
+    return request(app.getHttpServer())
+        .post(ENDPOINTS.CHAT)
+        .set('Authorization', 'Bearer ' + accessToken)
+        .send(payload)
+        .then(res => res.body)
 }
 
 export const getProfile = async (app: INestApplication, accessToken: string) => {

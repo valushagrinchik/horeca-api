@@ -19,7 +19,7 @@ import { HorecaRequestProviderStatusDto } from './dto/horecaRequest.providerStat
 import { HorecaRequestSearchDto } from './dto/horecaRequest.search.dto'
 
 @AuthUser(UserRole.Provider)
-@Controller('requests/provider')
+@Controller('provider/requests')
 @ApiTags('ProviderRequests')
 export class ProviderRequestsController {
     constructor(private readonly service: ProviderRequestsService) {}

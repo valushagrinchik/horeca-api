@@ -5,13 +5,13 @@ import { ChatType } from '@prisma/client'
 import { ChatMessageCreateDto } from '../dto/chat.message.create.dto'
 import { ChatDto } from '../dto/chat.dto'
 import { ChatMessageDto } from '../dto/chat.message.dto'
-import { ChatDBService } from './chat.db.service'
+import { ChatDbService } from './chat.db.service'
 import { Inject, forwardRef } from '@nestjs/common'
 
 export class ChatService {
     constructor(
-        @Inject(forwardRef(() => ChatDBService))
-        private chatRep: ChatDBService
+        @Inject(forwardRef(() => ChatDbService))
+        private chatRep: ChatDbService
     ) {}
 
     async getChats(auth: AuthInfoDto, paginate: PaginateValidateType) {

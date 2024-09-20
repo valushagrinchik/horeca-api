@@ -68,7 +68,7 @@ describe('ProviderRequestsController (e2e)', () => {
         })
     })
     describe('POST ' + ENDPOINTS.HOREKA_REQUESTS_FOR_PROVIDER_STATUS, () => {
-        it('should change reqponse of GET ' + ENDPOINTS.HOREKA_REQUESTS_FOR_PROVIDER, async () => {
+        it('should apply "viewed" status to one of horeca request and delete it from active requests list', async () => {
             expect.assertions(3)
             const horecaRequestsRes = await findAllHorecaRequestForProvider(app, providerAuth.accessToken)
             expect(horecaRequestsRes.length).toBeGreaterThan(0)
@@ -134,6 +134,7 @@ describe('ProviderRequestsController (e2e)', () => {
         })
     })
 
+    // TODO: move to horeca requests tests
     describe('POST ' + ENDPOINTS.HOREKA_APPROVE_PROVIDER_REQUEST, () => {
         it('should return just created request data', async () => {
             const res = await approveProviderRequest(app, horecaAuth.accessToken, {

@@ -4,7 +4,7 @@ import { ChatMessageCreateDto } from '../dto/chat.message.create.dto'
 import { DatabaseService } from '../../system/database/database.service'
 import { forwardRef, Inject } from '@nestjs/common'
 
-export class ChatDBService {
+export class ChatDbService {
     constructor(
         @Inject(forwardRef(() => DatabaseService)) // TODO: try to delete after migration of using db repository approach
         private db: DatabaseService
@@ -23,8 +23,15 @@ export class ChatDBService {
         })
     }
 
-    async createMessage({ chatId, ...dto }: ChatMessageCreateDto) {
-        return this.db.chatMessage.create({ data: { ...dto, chatId } })
+    async createMessage({ chatId, ...data }: Omit<Prisma.ChatMessageCreateInput, 'chat'> & { chatId: number }) {
+        return this.db.chatMessage.create({
+            data: {
+                ...data,
+                chat: {
+                    connect: { id: chatId },
+                },
+            },
+        })
     }
 
     async getChats(opponentId: number, paginate: PaginateValidateType) {

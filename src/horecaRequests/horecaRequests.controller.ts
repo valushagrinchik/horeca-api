@@ -18,7 +18,7 @@ import { HorecaRequestApproveProviderRequestDto } from './dto/horecaRequest.appr
 import { HorecaRequestWithProviderRequestDto } from './dto/horecaRequest.withProviderRequests.dto'
 
 @AuthUser(UserRole.Horeca)
-@Controller('requests/horeca')
+@Controller('horeca/requests')
 @ApiTags('HorecaRequests')
 export class HorecaRequestsController {
     constructor(private readonly service: HorecaRequestsService) {}
@@ -32,7 +32,7 @@ export class HorecaRequestsController {
 
     @Get(':id')
     @RequestDecorator(HorecaRequestWithProviderRequestDto)
-    @ApiOperation({ summary: 'Get Horeca request' })
+    @ApiOperation({ summary: "Get Horeca request with Provider's requests to compare" })
     async get(@AuthParamDecorator() auth: AuthInfoDto, @Param('id') id: number) {
         return this.service.get(auth, +id)
     }
@@ -54,7 +54,7 @@ export class HorecaRequestsController {
         @AuthParamDecorator() auth: AuthInfoDto,
         @Body() dto: HorecaRequestApproveProviderRequestDto
     ) {
-        await this.service.approveProviderRequest(auth, dto)
+        const res = await this.service.approveProviderRequest(auth, dto)
         return new SuccessDto('ok')
     }
 }

@@ -27,6 +27,7 @@ afterAll(async () => {
 describe('FavouritesController (e2e)', () => {
     describe('POST ' + ENDPOINTS.HOREKA_FAVOURITES, () => {
         it('should return just created request data', async () => {
+            await addFavourites(app, horecaAuth.accessToken, { providerId: provider.id })
             const res = await addFavourites(app, horecaAuth.accessToken, { providerId: provider.id })
 
             expect(res.status).toBe('ok')

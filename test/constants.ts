@@ -3,14 +3,13 @@ export const ENDPOINTS = {
     ACTIVATE_PROFILE: '/auth/activate/:uuid',
     SIGNIN: '/auth/login',
     PROFILE: '/users/me',
-    HOREKA_REQUESTS: '/requests/horeca',
+    HOREKA_REQUESTS: '/horeca/requests',
     HOREKA_FAVOURITES: '/horeca/favourites',
-    HOREKA_REQUESTS_TEMPLATE: '/requests/horeca/template',
-    HOREKA_REQUEST: '/requests/horeca/:id',
-    HOREKA_REQUESTS_FOR_PROVIDER: '/requests/provider/income',
-    HOREKA_REQUESTS_FOR_PROVIDER_STATUS: '/requests/provider/income/status',
-    PROVIDER_REQUEST: '/requests/provider',
-    // APPROVE_PROVIDER_REQUEST: '/requests/provider/:id',
-    CREATE_CHAT: '/chats',
-    HOREKA_APPROVE_PROVIDER_REQUEST: '/requests/horeca/approve'
+    HOREKA_REQUESTS_TEMPLATE: '/horeca/requests/template',
+    HOREKA_REQUEST: '/horeca/requests/:id',
+    HOREKA_REQUESTS_FOR_PROVIDER: '/provider/requests/income',
+    HOREKA_REQUESTS_FOR_PROVIDER_STATUS: '/provider/requests/income/status',
+    PROVIDER_REQUEST: '/provider/requests',
+    CHAT: '/chats',
+    HOREKA_APPROVE_PROVIDER_REQUEST: '/horeca/requests/approve'
 }

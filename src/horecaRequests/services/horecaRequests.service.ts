@@ -99,6 +99,6 @@ export class HorecaRequestsService {
     }
 
     async approveProviderRequest(auth: AuthInfoDto, dto: HorecaRequestApproveProviderRequestDto) {
-        return this.horecaRequestsRep.approveProviderRequest(auth.id, dto)
+        await this.horecaRequestsRep.approveProviderRequest(auth.id, dto)
     }
 }

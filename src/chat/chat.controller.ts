@@ -20,6 +20,12 @@ import { ChatCreateDto } from './dto/chat.create.dto'
 export class ChatsController {
     constructor(private readonly service: ChatService) {}
 
+    @Post()
+    @RequestDecorator(ChatDto, ChatCreateDto)
+    async createChat(@AuthParamDecorator() auth: AuthInfoDto, @Body() dto: ChatCreateDto) {
+        return this.service.createChat(auth, dto)
+    }
+
     @RequestPaginatedDecorator(ChatDto)
     async findAll(
         @AuthParamDecorator() auth: AuthInfoDto,
@@ -33,11 +39,4 @@ export class ChatsController {
     async getChat(@AuthParamDecorator() auth: AuthInfoDto, @Param('id') id: number) {
         return this.service.getChat(auth, id)
     }
-
-    // Moved to WS
-    // @Post()
-    // @RequestDecorator(ChatDto, ChatCreateDto)
-    // async createChat(@AuthParamDecorator() auth: AuthInfoDto, @Body() dto: ChatCreateDto) {
-    //     return this.service.createChat(auth, dto)
-    // }
 }

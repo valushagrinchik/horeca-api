@@ -8,7 +8,7 @@ import { HorecaRequestTemplateCreateDto } from './dto/horecaRequest.template.cre
 import { HorecaRequestsTemplateService } from './services/horecaRequests.template.service'
 
 @AuthUser(UserRole.Horeca)
-@Controller('requests/horeca/template')
+@Controller('horeca/requests/template')
 @ApiTags('HorecaRequests Template')
 export class HorecaRequestsTemplateController {
     constructor(private readonly service: HorecaRequestsTemplateService) {}

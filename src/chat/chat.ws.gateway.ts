@@ -15,7 +15,7 @@ import { ConfigService } from '@nestjs/config'
 import { ChatService } from './services/chat.service'
 import { OnModuleInit } from '@nestjs/common'
 import { ChatMessageCreateDto } from '../chat/dto/chat.message.create.dto'
-import { ChatCreateDto } from './dto/chat.create.dto'
+import { ChatMessageDto } from './dto/chat.message.dto'
 
 const WS_PORT = Number(process.env.WS_PORT ?? 4000)
 
@@ -59,27 +59,24 @@ export class ChatWsGateway implements OnModuleInit, OnGatewayConnection, OnGatew
         this.clients = this.clients.filter(data => data.client !== client)
     }
 
-    @SubscribeMessage(WebsocketEvents.CHAT)
-    async newChat(@ConnectedSocket() client: Socket, @MessageBody() dto: ChatCreateDto): Promise<void> {
-        const chat = await this.chatService.createChat((client as any).auth, dto)
-        this.emitToOpponents(chat.opponents, WebsocketEvents.MESSAGE, chat.messages[0])
-    }
-
     @SubscribeMessage(WebsocketEvents.MESSAGE)
     async handleSendMessage(
         @ConnectedSocket() client: Socket,
         @MessageBody() dto: ChatMessageCreateDto
     ): Promise<void> {
-        const chat = await this.chatService.createMessage((client as any).auth, dto)
-        this.emitToOpponents(chat.opponents, WebsocketEvents.MESSAGE, chat.messages[0])
+        const auth = (client as any).auth
+        const chat = await this.chatService.createMessage(auth, dto)
+        this.emitToOpponent(
+            chat.opponents.find(o => o != dto.authorId),
+            WebsocketEvents.MESSAGE,
+            chat.messages[0]
+        )
     }
 
-    public emitToOpponents<T>(userIds: number[], event: WebsocketEvents, payload: T) {
-        userIds.map(userId => {
-            const connected = this.clients.find(client => client.userId == userId)
-            if (connected) {
-                connected.client.emit(event, payload)
-            }
-        })
+    public emitToOpponent(userId: number, event: WebsocketEvents, payload: ChatMessageDto) {
+        const connected = this.clients.find(client => client.userId == userId)
+        if (connected) {
+            connected.client.emit(event, payload)
+        }
     }
 }
