@@ -49,6 +49,9 @@ export class UsersDbService {
                     },
                 },
             },
+            include: {
+                profile: true
+            }
         })
     }
 

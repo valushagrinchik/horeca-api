@@ -38,15 +38,14 @@ describe('AuthorizationController (e2e)', () => {
         describe('POST ' + ENDPOINTS.SIGNUP, () => {
             it('should throw an GDPR_IS_NOT_APPROVED in case of GDPRApproved is not set', async () => {
                 const res = await registrateUser(app, { ...payload, GDPRApproved: false })
-
                 expect(res.statusCode).toEqual(400)
                 expect(res.errorMessage).toEqual(ErrorCodes.GDPR_IS_NOT_APPROVED)
                 return
             })
             it('should return just created user', async () => {
                 const res = await registrateUser(app, payload)
-
                 expect(res).toHaveProperty('id')
+                expect(res).toHaveProperty('profile')
                 expect(res.email).toEqual(payload.email)
                 return
             })
