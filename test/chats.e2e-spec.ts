@@ -139,7 +139,7 @@ describe('ChatWsGateway (e2e)', () => {
                     horecaRequestId: horecaRequest.id,
                     providerRequestId: providerRequest.id,
                 })
-                
+
                 chat = res.chat
 
                 return Promise.all(promises)

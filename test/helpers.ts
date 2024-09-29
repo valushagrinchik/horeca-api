@@ -202,7 +202,11 @@ export const approveProviderRequest = async (
         })
 }
 
-export const createChat = async (app: INestApplication, accessToken: string, payload: ChatCreateDto): Promise<ChatDto | any> => {
+export const createChat = async (
+    app: INestApplication,
+    accessToken: string,
+    payload: ChatCreateDto
+): Promise<ChatDto | any> => {
     return request(app.getHttpServer())
         .post(ENDPOINTS.CHAT)
         .set('Authorization', 'Bearer ' + accessToken)
@@ -216,7 +220,6 @@ export const getChats = async (app: INestApplication, accessToken: string) => {
         .set('Authorization', 'Bearer ' + accessToken)
         .then(res => res.body)
 }
-
 
 export const getProfile = async (app: INestApplication, accessToken: string) => {
     return request(app.getHttpServer())
@@ -233,7 +236,11 @@ export const updateProfile = async (app: INestApplication, accessToken: string, 
         .then(res => res.body)
 }
 
-export const createSupportRequest = async (app: INestApplication, accessToken: string, payload: SupportRequestCreateDto): Promise<ChatDto | any> => {
+export const createSupportRequest = async (
+    app: INestApplication,
+    accessToken: string,
+    payload: SupportRequestCreateDto
+): Promise<ChatDto | any> => {
     return request(app.getHttpServer())
         .post(ENDPOINTS.SUPPORT)
         .set('Authorization', 'Bearer ' + accessToken)
@@ -247,4 +254,3 @@ export const assignAdminToSupportRequest = async (app: INestApplication, accessT
         .set('Authorization', 'Bearer ' + accessToken)
         .then(res => res.body)
 }
-

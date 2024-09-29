@@ -36,7 +36,7 @@ export const horecaUsers = [
                 },
             ],
         },
-    }
+    },
 ]
 
 export const providerUsers = [
@@ -54,5 +54,5 @@ export const providerUsers = [
             deliveryMethods: [DeliveryMethods.deliveryBySupplier, DeliveryMethods.sameDayDelivery],
             categories: [Categories.alcoholicDrinks, Categories.bakeryProducts, Categories.cannedFoods],
         },
-    }
+    },
 ]

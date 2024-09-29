@@ -1,8 +1,18 @@
 import { INestApplication } from '@nestjs/common'
-import { authUser, createHorecaRequest, createProviderRequest, findAllHorecaRequest, getHorecaRequest, initApp } from './helpers'
+import {
+    approveProviderRequest,
+    authUser,
+    createHorecaRequest,
+    createProviderRequest,
+    findAllHorecaRequest,
+    getHorecaRequest,
+    initApp,
+} from './helpers'
 import { ENDPOINTS } from './constants'
 import { AuthResultDto } from './../src/users/dto/auth.result.dto'
 import { horecaRequestInput, horecaUserInput, providerUserInput } from './mock/seedData'
+import { HorecaRequestDto } from 'src/horecaRequests/dto/horecaRequest.dto'
+import { ProviderRequestDto } from 'src/providerRequests/dto/providerRequest.dto'
 
 let app: INestApplication
 let horecaAuth: AuthResultDto
@@ -21,6 +31,9 @@ afterAll(async () => {
 })
 
 describe('HorecaRequestsController (e2e)', () => {
+    let createdHorecaRequest: HorecaRequestDto
+    let createdProviderRequest: ProviderRequestDto
+
     describe('POST ' + ENDPOINTS.HOREKA_REQUESTS, () => {
         it('should return just created request data', async () => {
             const res = await createHorecaRequest(app, horecaAuth.accessToken, horecaRequestInput)
@@ -35,16 +48,16 @@ describe('HorecaRequestsController (e2e)', () => {
 
     describe('GET ' + ENDPOINTS.HOREKA_REQUEST, () => {
         it('should return request data', async () => {
-            const createdHorecaRequest = await createHorecaRequest(app, horecaAuth.accessToken, horecaRequestInput)
-            const createdProviderRequest = await createProviderRequest(app, providerAuth.accessToken, {
+            createdHorecaRequest = await createHorecaRequest(app, horecaAuth.accessToken, horecaRequestInput)
+            createdProviderRequest = await createProviderRequest(app, providerAuth.accessToken, {
                 horecaRequestId: createdHorecaRequest.id,
                 comment: 'super',
                 items: createdHorecaRequest.items.map(item => ({
                     available: true,
                     manufacturer: 'smb',
                     cost: 3000,
-                    horecaRequestItemId: item.horecaRequestId
-                }))
+                    horecaRequestItemId: item.horecaRequestId,
+                })),
             })
 
             const res = await getHorecaRequest(app, horecaAuth.accessToken, createdHorecaRequest.id)
@@ -67,6 +80,18 @@ describe('HorecaRequestsController (e2e)', () => {
 
             expect(res.length).toBeGreaterThan(0)
             expect(res[0]).toHaveProperty('items')
+            return
+        })
+    })
+
+    describe('POST ' + ENDPOINTS.HOREKA_APPROVE_PROVIDER_REQUEST, () => {
+        it('should return just created request data', async () => {
+            const { providerRequest } = await approveProviderRequest(app, horecaAuth.accessToken, {
+                horecaRequestId: createdHorecaRequest.id,
+                providerRequestId: createdProviderRequest.id,
+            })
+
+            expect(providerRequest).toHaveProperty('id')
             return
         })
     })

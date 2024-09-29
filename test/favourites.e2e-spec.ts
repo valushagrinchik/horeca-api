@@ -27,11 +27,10 @@ afterAll(async () => {
 describe('FavouritesController (e2e)', () => {
     describe('POST ' + ENDPOINTS.HOREKA_FAVOURITES, () => {
         it('should return just created request data', async () => {
-            await addFavourites(app, horecaAuth.accessToken, { providerId: provider.id })
-            const res = await addFavourites(app, horecaAuth.accessToken, { providerId: provider.id })
+            const { favourite } = await addFavourites(app, horecaAuth.accessToken, { providerId: provider.id })
 
-            expect(res).toHaveProperty('id')
-            expect(res.providerId).toBe(provider.id)
+            expect(favourite).toHaveProperty('id')
+            expect(favourite.providerId).toBe(provider.id)
             return
         })
     })

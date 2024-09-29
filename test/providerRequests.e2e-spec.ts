@@ -80,7 +80,7 @@ describe('ProviderRequestsController (e2e)', () => {
             expect(res.status).toBe('ok')
 
             const horecaRequestsRes2 = await findAllHorecaRequestForProvider(app, providerAuth.accessToken)
-            expect(horecaRequestsRes2.length).toBe(horecaRequestsRes.length-1)
+            expect(horecaRequestsRes2.length).toBe(horecaRequestsRes.length - 1)
 
             return
         })
@@ -131,18 +131,6 @@ describe('ProviderRequestsController (e2e)', () => {
             const res = await findAllProviderRequests(app, providerAuth.accessToken)
 
             expect(res.length).toBeGreaterThan(0)
-        })
-    })
-
-    // TODO: move to horeca requests tests
-    describe('POST ' + ENDPOINTS.HOREKA_APPROVE_PROVIDER_REQUEST, () => {
-        it('should return just created request data', async () => {
-            const res = await approveProviderRequest(app, horecaAuth.accessToken, {
-                horecaRequestId: createdhorecaRequestId,
-                providerRequestId: createdProviderRequestId,
-            })
-
-            expect(res.status).toBe('ok')
         })
     })
 })
