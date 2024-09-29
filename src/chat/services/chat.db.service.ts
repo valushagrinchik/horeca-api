@@ -7,22 +7,15 @@ import { ChatCreateDto } from '../dto/chat.create.dto'
 
 export class ChatDbService {
     constructor(
-        @Inject(forwardRef(() => DatabaseService))
-        private db: DatabaseService
+        // @Inject(forwardRef(() => DatabaseService))
+        protected db: DatabaseService
     ) {}
 
-    async createChat(userId: number, { opponentId, horecaRequestId, ...dto }: ChatCreateDto) {
+    async createChat(userId: number, { opponentId, ...dto }: ChatCreateDto) {
         return this.db.chat.create({
             data: {
                 ...dto,
-                ...(horecaRequestId
-                    ? {
-                          horecaRequest: {
-                              connect: { id: horecaRequestId },
-                          },
-                      }
-                    : {}),
-                opponents: [userId, opponentId],
+                opponents: [userId, opponentId].filter(o => !!o),
             },
         })
     }
@@ -38,13 +31,23 @@ export class ChatDbService {
         })
     }
 
+    async findChat(where: Prisma.ChatWhereInput) {
+        return this.db.chat.findFirst({
+            where,
+        })
+    }
+
+    async updateChat(where: Prisma.ChatWhereUniqueInput, data: Prisma.ChatUpdateInput) {
+        return this.db.chat.update({
+            where,
+            data,
+        })
+    }
+
     async getChatWithPaginatedMessages(userId: number, id: number, paginate: PaginateValidateType) {
         return this.db.chat.findUnique({
             where: {
                 id,
-                opponents: {
-                    has: userId,
-                },
             },
             include: {
                 messages: {
@@ -70,13 +73,13 @@ export class ChatDbService {
         })
     }
 
-    async getChats(opponentId: number, paginate: PaginateValidateType<ChatSearchDto>) {
+    async getChats(userId: number, paginate: PaginateValidateType<ChatSearchDto>) {
         const search = paginate.search || { type: ChatType.Order }
         return this.db.chat.findMany({
             where: {
                 AND: {
                     opponents: {
-                        has: opponentId,
+                        has: userId,
                     },
                 },
                 type: search.type,
@@ -88,4 +91,31 @@ export class ChatDbService {
             skip: paginate.offset,
         })
     }
+
+    async getSupportChatsForAdmin(userId: number, paginate: PaginateValidateType<ChatSearchDto>) {
+        return this.db.chat.findMany({
+            where: {
+                type: ChatType.Support,
+            },
+            orderBy: {
+                createdAt: 'desc',
+                [paginate.sort.field]: paginate.sort.order,
+            },
+            take: paginate.limit,
+            skip: paginate.offset,
+        })
+    }
+
+    // async assignOpponent(userId: number, id: number) {
+    //     return this.db.chat.update({
+    //         where: {
+    //             id,
+    //         },
+    //         data: {
+    //             opponents: {
+    //                 push: userId,
+    //             },
+    //         },
+    //     })
+    // }
 }

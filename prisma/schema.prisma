@@ -55,9 +55,15 @@ enum PaymentType {
 }
 
 enum ChatType {
-  Support
-  Order // Aggrement between horeca and provider requests
-  Private
+  Support // Between horeca or provider and Admin
+  Order // Between horeca and provider based on request
+  Private // Between horeca and one of favourite providers
+}
+
+enum SupportRequestStatus {
+  Default
+  Active
+  Resolved
 }
 
 model User {
@@ -91,6 +97,8 @@ model User {
 
   // provider property
   favouritesOf HorecaFavourites[] @relation("provider")
+
+  supportRequest SupportRequest[]
 
   @@map("users")
 }
@@ -287,9 +295,6 @@ model HorecaRequest {
   activeProviderRequest   ProviderRequest? @relation(fields: [activeProviderRequestId], references: [id])
   activeProviderRequestId Int?             @unique @map("active_provider_request_id")
 
-  chat   Chat? @relation(fields: [chatId], references: [id])
-  chatId Int?  @unique @map("chat_id")
-
   providerRequests            ProviderRequest[]            @relation("allProviderRequests")
   // shouldn't be used
   horecaRequestProviderStatus HorecaRequestProviderStatus?
@@ -344,7 +349,6 @@ model HorecaRequestProviderStatus {
   @@map("horeca_request_provider_status")
 }
 
-// Provider Application
 model ProviderRequest {
   id      Int                   @id @default(autoincrement())
   comment String?
@@ -384,6 +388,24 @@ model ProviderRequestItem {
   @@map("provider_requests_items")
 }
 
+model SupportRequest {
+  id Int @id @default(autoincrement())
+
+  user   User @relation(fields: [userId], references: [id])
+  userId Int  @map("user_id")
+
+  content String?
+
+  status SupportRequestStatus @default(Default)
+
+  adminId Int? @map("admin_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@map("support_requests")
+}
+
 model Chat {
   id Int @id @default(autoincrement())
 
@@ -391,11 +413,15 @@ model Chat {
   opponents Int[]
   type      ChatType
 
+  active Boolean @default(true)
+
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
-  horecaRequest HorecaRequest?
+  // HorecaRequest or SupportRequest or HorecaFavourites depends on type(Order,Support,Private)
+  sourceId Int @map("source_id")
 
+  @@unique([type, sourceId])
   @@map("chats")
 }
 
@@ -407,7 +433,6 @@ model ChatMessage {
 
   message String
 
-  // as it can be server message
   authorId Int?    @map("author_id")
   // indicates that this is server message
   isServer Boolean @default(false) @map("is_server")

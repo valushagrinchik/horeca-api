@@ -5,8 +5,7 @@ import { UsersModule } from '../users/users.module'
 import { ChatWsGateway } from './chat.ws.gateway'
 import { ChatDbService } from './services/chat.db.service'
 import { ConfigModule } from '@nestjs/config'
-import { HorecaRequestsModule } from '../horecaRequests/horecaRequests.module'
-import { FavouritesModule } from '../favourites/favourites.module'
+import { ChatSupportService } from './services/chat.support.service'
 
 @Module({
     imports: [
@@ -14,11 +13,9 @@ import { FavouritesModule } from '../favourites/favourites.module'
             isGlobal: true,
         }),
         UsersModule,
-        HorecaRequestsModule,
-        FavouritesModule,
     ],
-    providers: [ChatWsGateway, ChatDbService, ChatService],
+    providers: [ChatDbService, ChatService, ChatSupportService, ChatWsGateway],
     controllers: [ChatsController],
-    exports: [ChatService],
+    exports: [ChatService, ChatSupportService],
 })
 export class ChatModule {}

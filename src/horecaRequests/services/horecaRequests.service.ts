@@ -2,19 +2,21 @@ import { Injectable } from '@nestjs/common'
 import { HorecaRequestCreateDto } from '../dto/horecaRequest.create.dto'
 import { HorecaRequestDto } from '../dto/horecaRequest.dto'
 import { AuthInfoDto } from '../../users/dto/auth.info.dto'
-import { Prisma, UploadsLinkType } from '@prisma/client'
+import { ChatType, Prisma, UploadsLinkType } from '@prisma/client'
 import { PaginateValidateType } from '../../system/utils/swagger/decorators'
 import { UploadsLinkService } from '../../uploads/uploads.link.service'
 import { HorecaRequestItemDto } from '../dto/horecaRequest.item.dto'
 import { HorecaRequestsDbService } from './horecaRequests.db.service'
 import { HorecaRequestApproveProviderRequestDto } from '../dto/horecaRequest.approveProviderRequest.dto'
 import { HorecaRequestWithProviderRequestDto } from '../dto/horecaRequest.withProviderRequests.dto'
+import { ChatService } from 'src/chat/services/chat.service'
 
 @Injectable()
 export class HorecaRequestsService {
     constructor(
         private horecaRequestsRep: HorecaRequestsDbService,
-        private uploadsLinkService: UploadsLinkService
+        private uploadsLinkService: UploadsLinkService,
+        private chatService: ChatService
     ) {}
 
     async create(auth: AuthInfoDto, { imageIds, ...dto }: HorecaRequestCreateDto) {
@@ -100,10 +102,10 @@ export class HorecaRequestsService {
 
     async approveProviderRequest(auth: AuthInfoDto, dto: HorecaRequestApproveProviderRequestDto) {
         await this.horecaRequestsRep.approveProviderRequest(auth.id, dto)
-    }
-
-    async isReadyForChat(auth: AuthInfoDto, id: number) {
-        const request = await this.horecaRequestsRep.get(auth.id, id)
-        return !!request.activeProviderRequest
+        await this.chatService.createChat(auth, {
+            sourceId: dto.horecaRequestId,
+            type: ChatType.Order,
+            opponentId: dto.providerRequestId,
+        })
     }
 }

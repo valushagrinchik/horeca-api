@@ -7,9 +7,10 @@ import { HorecaRequestsDbService } from './services/horecaRequests.db.service'
 import { HorecaRequestsTemplateDbService } from './services/horecaRequests.template.db.service'
 import { HorecaRequestsTemplateController } from './horecaRequests.template.controller'
 import { HorecaRequestsTemplateService } from './services/horecaRequests.template.service'
+import { ChatModule } from '../chat/chat.module'
 
 @Module({
-    imports: [UsersModule, UploadsModule],
+    imports: [UsersModule, UploadsModule, ChatModule],
     controllers: [HorecaRequestsController, HorecaRequestsTemplateController],
     providers: [
         HorecaRequestsTemplateDbService,

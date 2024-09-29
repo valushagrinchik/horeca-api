@@ -5,8 +5,11 @@ export class ChatDto implements Chat {
     id: number
     opponents: number[]
     type: ChatType
-    providerRequestId: number | null
     messages?: ChatMessageDto[]
+
+    sourceId: number | null
+
+    active: boolean
 
     createdAt: Date
     updatedAt: Date

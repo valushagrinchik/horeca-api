@@ -29,10 +29,12 @@ export class FavouritesDbService {
                 providerId,
             },
         })
-        return this.db.horecaFavourites.delete({
+        await this.db.horecaFavourites.delete({
             where: {
                 id: fav.id,
             },
         })
+
+        return fav
     }
 }

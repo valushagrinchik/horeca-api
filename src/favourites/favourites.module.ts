@@ -3,9 +3,10 @@ import { UsersModule } from '../users/users.module'
 import { FavouritesController } from './favourites.controller'
 import { FavouritesService } from './services/favourites.service'
 import { FavouritesDbService } from './services/favourites.db.service'
+import { ChatModule } from '../chat/chat.module'
 
 @Module({
-    imports: [UsersModule],
+    imports: [UsersModule, ChatModule],
     controllers: [FavouritesController],
     providers: [FavouritesDbService, FavouritesService],
     exports: [FavouritesService],

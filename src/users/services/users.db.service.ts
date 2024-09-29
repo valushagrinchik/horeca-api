@@ -50,8 +50,8 @@ export class UsersDbService {
                 },
             },
             include: {
-                profile: true
-            }
+                profile: true,
+            },
         })
     }
 

@@ -5,8 +5,6 @@ import { LoginUserDto } from '../src/users/dto/login-user.dto'
 import { RegistrateUserDto } from '../src/users/dto/registrate-user.dto'
 import { UpdateUserDto } from '../src/users/dto/update-user.dto'
 import { HorecaRequestCreateDto } from '../src/horecaRequests/dto/horecaRequest.create.dto'
-import { Categories } from '../src/system/utils/enums'
-import { generateAcceptUntil } from '../src/system/utils/date'
 import { PaginateValidateType } from '../src/system/utils/swagger/decorators'
 import { Test, TestingModule, TestingModuleBuilder } from '@nestjs/testing'
 import { AppModule } from '../src/app.module'
@@ -19,6 +17,7 @@ import { HorecaRequestApproveProviderRequestDto } from '../src/horecaRequests/dt
 import { FavouritesCreateDto } from '../src/favourites/dto/favourites.create.dto'
 import { ChatCreateDto } from '../src/chat/dto/chat.create.dto'
 import { ChatDto } from '../src/chat/dto/chat.dto'
+import { SupportRequestCreateDto } from '../src/supportRequests/dto/supportRequest.create.dto'
 
 export const initApp = async (overwriteCb?: (mb: TestingModuleBuilder) => void, tmCb?: (tm: TestingModule) => void) => {
     const tmBuilder = Test.createTestingModule({
@@ -234,3 +233,12 @@ export const updateProfile = async (app: INestApplication, accessToken: string, 
         .send(payload)
         .then(res => res.body)
 }
+
+export const createSupportRequest = async (app: INestApplication, accessToken: string, payload: SupportRequestCreateDto): Promise<ChatDto | any> => {
+    return request(app.getHttpServer())
+        .post(ENDPOINTS.SUPPORT)
+        .set('Authorization', 'Bearer ' + accessToken)
+        .send(payload)
+        .then(res => res.body)
+}
+

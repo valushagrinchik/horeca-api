@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { JwtService } from '@nestjs/jwt'
 
@@ -16,7 +16,7 @@ export class AuthorizationService {
     ) {}
 
     async login(user: User) {
-        const payload = { id: user.id } as AuthInfoDto
+        const payload = { id: user.id, role: user.role } as AuthInfoDto
         const token = {
             accessToken: this.jwtService.sign(payload, {
                 secret: this.configService.get('JWT_ACCESS_TOKEN_SECRET'),

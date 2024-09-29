@@ -9,12 +9,13 @@ import {
     createChat,
     createHorecaRequest,
     createProviderRequest,
+    createSupportRequest,
     getChats,
     getProfile,
     initApp,
 } from './helpers'
 import { AuthResultDto } from '../src/users/dto/auth.result.dto'
-import { horecaUserInput, providerUserInput } from './mock/seedData'
+import { adminUserInput, horecaUserInput, providerUserInput } from './mock/seedData'
 import { ChatType } from '@prisma/client'
 import { ENDPOINTS } from './constants'
 import { generateAcceptUntil } from '../src/system/utils/date'
@@ -27,6 +28,7 @@ import { ErrorCodes } from '../src/system/utils/enums/errorCodes.enum'
 
 let app: INestApplication
 let gateway: ChatWsGateway
+let adminAuth: AuthResultDto
 let horecaAuth: AuthResultDto
 let providerAuth: AuthResultDto
 let provider: UserDto
@@ -37,6 +39,7 @@ beforeAll(async () => {
         gateway = tm.get<ChatWsGateway>(ChatWsGateway)
     })
 
+    adminAuth = await authUser(app, adminUserInput)
     horecaAuth = await authUser(app, horecaUserInput)
     providerAuth = await authUser(app, providerUserInput)
     provider = await getProfile(app, providerAuth.accessToken)
@@ -94,7 +97,7 @@ describe('ChatWsGateway (e2e)', () => {
             it('should thow an error in case chat is not allowed', async () => {
                 const res = await createChat(app, horecaAuth.accessToken, {
                     opponentId: provider.id,
-                    horecaRequestId: horecaRequest.id,
+                    sourceId: horecaRequest.id,
                     type: ChatType.Order,
                 })
 
@@ -110,7 +113,7 @@ describe('ChatWsGateway (e2e)', () => {
                 })
                 chat = await createChat(app, horecaAuth.accessToken, {
                     opponentId: provider.id,
-                    horecaRequestId: horecaRequest.id,
+                    sourceId: horecaRequest.id,
                     type: ChatType.Order,
                 })
                 expect(chat).toHaveProperty('id')
@@ -169,6 +172,7 @@ describe('ChatWsGateway (e2e)', () => {
                 const res = await createChat(app, horecaAuth.accessToken, {
                     opponentId: provider.id,
                     type: ChatType.Private,
+                    sourceId: -1 
                 })
 
                 expect(res.statusCode).toEqual(400)
@@ -177,12 +181,14 @@ describe('ChatWsGateway (e2e)', () => {
             })
 
             it('should return chat', async () => {
-                await addFavourites(app, horecaAuth.accessToken, {
+                const fav = await addFavourites(app, horecaAuth.accessToken, {
                     providerId: provider.id,
                 })
+
                 chat = await createChat(app, horecaAuth.accessToken, {
                     opponentId: provider.id,
                     type: ChatType.Private,
+                    sourceId: fav.id
                 })
                 expect(chat).toHaveProperty('id')
                 expect(chat.opponents).toEqual([horeca.id, provider.id])
@@ -233,7 +239,76 @@ describe('ChatWsGateway (e2e)', () => {
                 })
             })
         })
-        describe(`with type=${ChatType.Support}`, () => {})
+        describe.only(`with type=${ChatType.Support}`, () => {
+            let chat: ChatDto
+            it('should thow an error in case chat is not allowed', async () => {
+                const res = await createChat(app, providerAuth.accessToken, {
+                    type: ChatType.Support,
+                    sourceId: -1 
+                })
+
+                expect(res.statusCode).toEqual(400)
+                expect(res.errorMessage).toEqual(ErrorCodes.FORBIDDEN_ACTION)
+                return
+            })
+
+            it('should return chat', async () => {
+                const supportRequest = await createSupportRequest(app, providerAuth.accessToken, {})
+
+                chat = await createChat(app, providerAuth.accessToken, {
+                    type: ChatType.Support,
+                    sourceId: supportRequest.id
+                })
+
+                expect(chat).toHaveProperty('id')
+                expect(chat.opponents).toEqual([provider.id])
+                return
+            })
+
+            it('should be possible for opponents to communicate with each other', async () => {
+                const adminWsClient = io(process.env.WS_URL, {
+                    autoConnect: false,
+                    transports: ['websocket'],
+                    extraHeaders: { authorization: 'Bearer ' + adminAuth.accessToken },
+                })
+
+                const providerWsClient = io(process.env.WS_URL, {
+                    autoConnect: false,
+                    transports: ['websocket'],
+                    extraHeaders: { authorization: 'Bearer ' + providerAuth.accessToken },
+                })
+
+                adminWsClient.connect()
+                providerWsClient.connect()
+
+                expect.assertions(2)
+
+                return new Promise<void>(resolve => {
+                    providerWsClient.on(WebsocketEvents.MESSAGE, data => {
+                        const res = expect(data.message).toBe('Hello!')
+                        adminWsClient.disconnect()
+                        providerWsClient.disconnect()
+                        return resolve(res)
+                    })
+
+                    providerWsClient.emit(WebsocketEvents.MESSAGE, {
+                        chatId: chat.id,
+                        message: 'Hi!',
+                        authorId: provider.id,
+                    })
+
+                    adminWsClient.on(WebsocketEvents.MESSAGE, data => {
+                        expect(data.message).toBe('Hi!')
+
+                        adminWsClient.emit(WebsocketEvents.MESSAGE, {
+                            chatId: chat.id,
+                            message: 'Hello!',
+                            authorId: horeca.id,
+                        })
+                    })
+                })
+            })
+        })
     })
 
     describe('GET ' + ENDPOINTS.CHAT, () => {

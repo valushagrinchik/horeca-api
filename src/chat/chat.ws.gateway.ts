@@ -13,7 +13,7 @@ import { Server, Socket } from 'socket.io'
 import { WebsocketEvents } from '../system/utils/enums/websocketEvents.enum'
 import { ConfigService } from '@nestjs/config'
 import { ChatService } from './services/chat.service'
-import { OnModuleInit } from '@nestjs/common'
+import { forwardRef, Inject, OnModuleInit } from '@nestjs/common'
 import { ChatMessageCreateDto } from '../chat/dto/chat.message.create.dto'
 import { ChatMessageDto } from './dto/chat.message.dto'
 
@@ -27,6 +27,7 @@ export class ChatWsGateway implements OnModuleInit, OnGatewayConnection, OnGatew
     constructor(
         private jwtService: JwtService,
         private configService: ConfigService,
+        @Inject(forwardRef(() => ChatService))
         private chatService: ChatService
     ) {}
 
@@ -42,6 +43,8 @@ export class ChatWsGateway implements OnModuleInit, OnGatewayConnection, OnGatew
                 const payload = this.jwtService.verify(client.handshake.headers.authorization.replace('Bearer ', ''), {
                     secret: this.configService.get('JWT_ACCESS_TOKEN_SECRET'),
                 })
+
+                console.log({ payload })
 
                 client = Object.assign(client, {
                     auth: payload,
@@ -66,11 +69,6 @@ export class ChatWsGateway implements OnModuleInit, OnGatewayConnection, OnGatew
     ): Promise<void> {
         const auth = (client as any).auth
         const chat = await this.chatService.createMessage(auth, dto)
-        this.emitToOpponent(
-            chat.opponents.find(o => o != dto.authorId),
-            WebsocketEvents.MESSAGE,
-            chat.messages[0]
-        )
     }
 
     public emitToOpponent(userId: number, event: WebsocketEvents, payload: ChatMessageDto) {
@@ -78,5 +76,13 @@ export class ChatWsGateway implements OnModuleInit, OnGatewayConnection, OnGatew
         if (connected) {
             connected.client.emit(event, payload)
         }
+    }
+
+    public emitToOpponents(userIds: number[], event: WebsocketEvents, payload: ChatMessageDto) {
+        this.clients
+            .filter(client => userIds.includes(client.userId))
+            .map(connected => {
+                connected.client.emit(event, payload)
+            })
     }
 }
