@@ -9,7 +9,10 @@ import { HorecaRequestItemDto } from '../dto/horecaRequest.item.dto'
 import { HorecaRequestsDbService } from './horecaRequests.db.service'
 import { HorecaRequestApproveProviderRequestDto } from '../dto/horecaRequest.approveProviderRequest.dto'
 import { HorecaRequestWithProviderRequestDto } from '../dto/horecaRequest.withProviderRequests.dto'
-import { ChatService } from 'src/chat/services/chat.service'
+import { ChatService } from '../../chat/services/chat.service'
+import { HorecaRequestApproveProviderRequestResponseDto } from '../dto/horecaRequest.approveProviderRequest.response.dto'
+import { ChatDto } from '../../chat/dto/chat.dto'
+import { ProviderRequestDto } from '../../providerRequests/dto/providerRequest.dto'
 
 @Injectable()
 export class HorecaRequestsService {
@@ -101,11 +104,16 @@ export class HorecaRequestsService {
     }
 
     async approveProviderRequest(auth: AuthInfoDto, dto: HorecaRequestApproveProviderRequestDto) {
-        await this.horecaRequestsRep.approveProviderRequest(auth.id, dto)
-        await this.chatService.createChat(auth, {
+        const providerRequest = await this.horecaRequestsRep.approveProviderRequest(auth.id, dto)
+        const chat = await this.chatService.createChat(auth, {
             sourceId: dto.horecaRequestId,
             type: ChatType.Order,
-            opponentId: dto.providerRequestId,
+            opponentId: providerRequest.activeProviderRequest.userId,
+        })
+
+        return new HorecaRequestApproveProviderRequestResponseDto({
+            providerRequest: new ProviderRequestDto(providerRequest),
+            chat: new ChatDto(chat),
         })
     }
 }

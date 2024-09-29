@@ -13,9 +13,9 @@ import {
     RequestPaginatedValidateParamsDecorator,
 } from '../system/utils/swagger/decorators'
 import { HorecaRequestsService } from './services/horecaRequests.service'
-import { SuccessDto } from '../system/utils/dto/success.dto'
 import { HorecaRequestApproveProviderRequestDto } from './dto/horecaRequest.approveProviderRequest.dto'
 import { HorecaRequestWithProviderRequestDto } from './dto/horecaRequest.withProviderRequests.dto'
+import { HorecaRequestApproveProviderRequestResponseDto } from './dto/horecaRequest.approveProviderRequest.response.dto'
 
 @AuthUser(UserRole.Horeca)
 @Controller('horeca/requests')
@@ -48,13 +48,13 @@ export class HorecaRequestsController {
     }
 
     @Post('approve')
-    @RequestDecorator(SuccessDto, HorecaRequestApproveProviderRequestDto)
+    @RequestDecorator(HorecaRequestApproveProviderRequestResponseDto, HorecaRequestApproveProviderRequestDto)
     @ApiOperation({ summary: 'Approve one of providers request to be able to start chat with' })
     async approveProviderRequest(
         @AuthParamDecorator() auth: AuthInfoDto,
         @Body() dto: HorecaRequestApproveProviderRequestDto
     ) {
         const res = await this.service.approveProviderRequest(auth, dto)
-        return new SuccessDto('ok')
+        return new HorecaRequestApproveProviderRequestResponseDto(res)
     }
 }

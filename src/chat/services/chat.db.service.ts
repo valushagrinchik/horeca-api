@@ -7,7 +7,7 @@ import { ChatCreateDto } from '../dto/chat.create.dto'
 
 export class ChatDbService {
     constructor(
-        // @Inject(forwardRef(() => DatabaseService))
+        @Inject(forwardRef(() => DatabaseService))
         protected db: DatabaseService
     ) {}
 

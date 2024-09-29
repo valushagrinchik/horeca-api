@@ -1,10 +1,11 @@
 import { INestApplication } from '@nestjs/common'
-import { io } from 'socket.io-client'
+import { io, Socket } from 'socket.io-client'
 import { ChatWsGateway } from '../src/chat/chat.ws.gateway'
 import { WebsocketEvents } from '../src/system/utils/enums/websocketEvents.enum'
 import {
     addFavourites,
     approveProviderRequest,
+    assignAdminToSupportRequest,
     authUser,
     createChat,
     createHorecaRequest,
@@ -24,7 +25,9 @@ import { HorecaRequestDto } from '../src/horecaRequests/dto/horecaRequest.dto'
 import { ProviderRequestDto } from '../src/providerRequests/dto/providerRequest.dto'
 import { UserDto } from '../src/users/dto/user.dto'
 import { ChatDto } from '../src/chat/dto/chat.dto'
-import { ErrorCodes } from '../src/system/utils/enums/errorCodes.enum'
+import { SupportRequestDto } from '../src/supportRequests/dto/supportRequest.dto'
+import { MESSAGES } from '../src/chat/messages'
+import { FavouriteDto } from '../src/favourites/dto/favourite.dto'
 
 let app: INestApplication
 let gateway: ChatWsGateway
@@ -59,8 +62,9 @@ describe('ChatWsGateway (e2e)', () => {
         describe(`with type=${ChatType.Order}`, () => {
             let horecaRequest: HorecaRequestDto
             let providerRequest: ProviderRequestDto
-
             let chat: ChatDto
+            let horecaWsClient: Socket
+            let providerWsClient: Socket
 
             beforeAll(async () => {
                 const validAcceptUntill = generateAcceptUntil()
@@ -94,56 +98,57 @@ describe('ChatWsGateway (e2e)', () => {
                     ],
                 })
             })
-            it('should thow an error in case chat is not allowed', async () => {
-                const res = await createChat(app, horecaAuth.accessToken, {
-                    opponentId: provider.id,
-                    sourceId: horecaRequest.id,
-                    type: ChatType.Order,
-                })
 
-                expect(res.statusCode).toEqual(400)
-                expect(res.errorMessage).toEqual(ErrorCodes.FORBIDDEN_ACTION)
-                return
-            })
-
-            it('should return chat', async () => {
-                await approveProviderRequest(app, horecaAuth.accessToken, {
-                    horecaRequestId: horecaRequest.id,
-                    providerRequestId: providerRequest.id,
-                })
-                chat = await createChat(app, horecaAuth.accessToken, {
-                    opponentId: provider.id,
-                    sourceId: horecaRequest.id,
-                    type: ChatType.Order,
-                })
-                expect(chat).toHaveProperty('id')
-                expect(chat.opponents).toEqual([horeca.id, provider.id])
-                return
-            })
-
-            it('should be possible for opponents to communicate with each other', async () => {
-                const horecaWsClient = io(process.env.WS_URL, {
+            beforeEach(async () => {
+                horecaWsClient = io(process.env.WS_URL, {
                     autoConnect: false,
                     transports: ['websocket'],
                     extraHeaders: { authorization: 'Bearer ' + horecaAuth.accessToken },
                 })
 
-                const providerWsClient = io(process.env.WS_URL, {
+                providerWsClient = io(process.env.WS_URL, {
                     autoConnect: false,
                     transports: ['websocket'],
                     extraHeaders: { authorization: 'Bearer ' + providerAuth.accessToken },
                 })
-
                 horecaWsClient.connect()
                 providerWsClient.connect()
+            })
+            afterEach(() => {
+                horecaWsClient.disconnect()
+                providerWsClient.disconnect()
+            })
 
-                expect.assertions(2)
+            it('should send server message to horeca and provider when horeca approve provider request', async () => {
+                const promises = [
+                    new Promise<void>(resolve => {
+                        providerWsClient.on(WebsocketEvents.MESSAGE, data => {
+                            const res = expect(data.message).toBe(MESSAGES.CHAT_CREATED)
+                            return resolve(res)
+                        })
+                    }),
+                    new Promise<void>(resolve => {
+                        horecaWsClient.on(WebsocketEvents.MESSAGE, data => {
+                            const res = expect(data.message).toBe(MESSAGES.CHAT_CREATED)
+                            return resolve(res)
+                        })
+                    }),
+                ]
 
+                const res = await approveProviderRequest(app, horecaAuth.accessToken, {
+                    horecaRequestId: horecaRequest.id,
+                    providerRequestId: providerRequest.id,
+                })
+                
+                chat = res.chat
+
+                return Promise.all(promises)
+            })
+
+            it('should be possible for opponents to communicate with each other', async () => {
                 return new Promise<void>(resolve => {
                     providerWsClient.on(WebsocketEvents.MESSAGE, data => {
                         const res = expect(data.message).toBe('Hello!')
-                        horecaWsClient.disconnect()
-                        providerWsClient.disconnect()
                         return resolve(res)
                     })
 
@@ -166,58 +171,60 @@ describe('ChatWsGateway (e2e)', () => {
             })
         })
         describe(`with type=${ChatType.Private}`, () => {
+            let favourite: FavouriteDto
             let chat: ChatDto
-
-            it('should thow an error in case chat is not allowed', async () => {
-                const res = await createChat(app, horecaAuth.accessToken, {
-                    opponentId: provider.id,
-                    type: ChatType.Private,
-                    sourceId: -1 
-                })
-
-                expect(res.statusCode).toEqual(400)
-                expect(res.errorMessage).toEqual(ErrorCodes.FORBIDDEN_ACTION)
-                return
-            })
-
-            it('should return chat', async () => {
-                const fav = await addFavourites(app, horecaAuth.accessToken, {
-                    providerId: provider.id,
-                })
-
-                chat = await createChat(app, horecaAuth.accessToken, {
-                    opponentId: provider.id,
-                    type: ChatType.Private,
-                    sourceId: fav.id
-                })
-                expect(chat).toHaveProperty('id')
-                expect(chat.opponents).toEqual([horeca.id, provider.id])
-                return
-            })
-
-            it('should be possible for opponents to communicate with each other', async () => {
-                const horecaWsClient = io(process.env.WS_URL, {
+            let horecaWsClient: Socket
+            let providerWsClient: Socket
+            beforeEach(async () => {
+                horecaWsClient = io(process.env.WS_URL, {
                     autoConnect: false,
                     transports: ['websocket'],
                     extraHeaders: { authorization: 'Bearer ' + horecaAuth.accessToken },
                 })
 
-                const providerWsClient = io(process.env.WS_URL, {
+                providerWsClient = io(process.env.WS_URL, {
                     autoConnect: false,
                     transports: ['websocket'],
                     extraHeaders: { authorization: 'Bearer ' + providerAuth.accessToken },
                 })
-
                 horecaWsClient.connect()
                 providerWsClient.connect()
+            })
+            afterEach(() => {
+                horecaWsClient.disconnect()
+                providerWsClient.disconnect()
+            })
 
-                expect.assertions(2)
+            it('should send server message to horeca and provider when horeca adds provider to the favourites list', async () => {
+                const promises = [
+                    new Promise<void>(resolve => {
+                        providerWsClient.on(WebsocketEvents.MESSAGE, data => {
+                            const res = expect(data.message).toBe(MESSAGES.CHAT_CREATED)
+                            return resolve(res)
+                        })
+                    }),
+                    new Promise<void>(resolve => {
+                        horecaWsClient.on(WebsocketEvents.MESSAGE, data => {
+                            const res = expect(data.message).toBe(MESSAGES.CHAT_CREATED)
+                            return resolve(res)
+                        })
+                    }),
+                ]
 
+                const res = await addFavourites(app, horecaAuth.accessToken, {
+                    providerId: provider.id,
+                })
+
+                favourite = res.favourite
+                chat = res.chat
+
+                return Promise.all(promises)
+            })
+
+            it('should be possible for opponents to communicate with each other', async () => {
                 return new Promise<void>(resolve => {
                     providerWsClient.on(WebsocketEvents.MESSAGE, data => {
                         const res = expect(data.message).toBe('Hello!')
-                        horecaWsClient.disconnect()
-                        providerWsClient.disconnect()
                         return resolve(res)
                     })
 
@@ -239,55 +246,70 @@ describe('ChatWsGateway (e2e)', () => {
                 })
             })
         })
-        describe.only(`with type=${ChatType.Support}`, () => {
+        describe(`with type=${ChatType.Support}`, () => {
+            let supportRequest: SupportRequestDto
             let chat: ChatDto
-            it('should thow an error in case chat is not allowed', async () => {
-                const res = await createChat(app, providerAuth.accessToken, {
-                    type: ChatType.Support,
-                    sourceId: -1 
-                })
-
-                expect(res.statusCode).toEqual(400)
-                expect(res.errorMessage).toEqual(ErrorCodes.FORBIDDEN_ACTION)
-                return
-            })
-
-            it('should return chat', async () => {
-                const supportRequest = await createSupportRequest(app, providerAuth.accessToken, {})
-
-                chat = await createChat(app, providerAuth.accessToken, {
-                    type: ChatType.Support,
-                    sourceId: supportRequest.id
-                })
-
-                expect(chat).toHaveProperty('id')
-                expect(chat.opponents).toEqual([provider.id])
-                return
-            })
-
-            it('should be possible for opponents to communicate with each other', async () => {
-                const adminWsClient = io(process.env.WS_URL, {
+            let adminWsClient: Socket
+            let providerWsClient: Socket
+            beforeEach(async () => {
+                adminWsClient = io(process.env.WS_URL, {
                     autoConnect: false,
                     transports: ['websocket'],
                     extraHeaders: { authorization: 'Bearer ' + adminAuth.accessToken },
                 })
 
-                const providerWsClient = io(process.env.WS_URL, {
+                providerWsClient = io(process.env.WS_URL, {
                     autoConnect: false,
                     transports: ['websocket'],
                     extraHeaders: { authorization: 'Bearer ' + providerAuth.accessToken },
                 })
-
                 adminWsClient.connect()
                 providerWsClient.connect()
+            })
+            afterEach(() => {
+                adminWsClient.disconnect()
+                providerWsClient.disconnect()
+            })
 
-                expect.assertions(2)
+            it('should send server message to user on creating support request', async () => {
+                const promise = new Promise<void>(resolve => {
+                    providerWsClient.on(WebsocketEvents.MESSAGE, data => {
+                        const res = expect(data.message).toBe(MESSAGES.SUPPORT_CHAT_CREATED)
+                        return resolve(res)
+                    })
+                })
+                const res = await createSupportRequest(app, providerAuth.accessToken, {})
 
+                supportRequest = res.supportRequest
+                chat = res.chat
+
+                return promise
+            })
+
+            it('user and admin should receive message from admin when admin will be assigned', async () => {
+                const promises = [
+                    new Promise<void>(resolve => {
+                        providerWsClient.on(WebsocketEvents.MESSAGE, data => {
+                            const res = expect(data.message).toBe(MESSAGES.SUPPORT_CHAT_ADMIN_ASSIGNED)
+                            return resolve(res)
+                        })
+                    }),
+                    new Promise<void>(resolve => {
+                        adminWsClient.on(WebsocketEvents.MESSAGE, data => {
+                            const res = expect(data.message).toBe(MESSAGES.SUPPORT_CHAT_ADMIN_ASSIGNED)
+                            return resolve(res)
+                        })
+                    }),
+                ]
+                await assignAdminToSupportRequest(app, adminAuth.accessToken, supportRequest.id)
+
+                return Promise.all(promises)
+            })
+
+            it('should be possible for opponents to communicate with each other', async () => {
                 return new Promise<void>(resolve => {
                     providerWsClient.on(WebsocketEvents.MESSAGE, data => {
                         const res = expect(data.message).toBe('Hello!')
-                        adminWsClient.disconnect()
-                        providerWsClient.disconnect()
                         return resolve(res)
                     })
 
@@ -321,7 +343,13 @@ describe('ChatWsGateway (e2e)', () => {
         describe('for Provider', () => {
             it(`should return all user\'s chats`, async () => {
                 const chats = await getChats(app, providerAuth.accessToken)
-                expect(chats.length).toEqual(2)
+                expect(chats.length).toEqual(3)
+            })
+        })
+        describe('for Admin', () => {
+            it(`should return all admin\'s chats`, async () => {
+                const chats = await getChats(app, adminAuth.accessToken)
+                expect(chats.length).toEqual(1)
             })
         })
     })

@@ -17,7 +17,7 @@ export class SupportRequestsAdminController {
     @Post(':id/assign')
     @RequestDecorator(SuccessDto)
     @ApiOperation({ summary: 'Admin assigns himself to customer support request' })
-    async assign(@AuthParamDecorator() auth: AuthInfoDto, @Param('id') id: number) {
-        return this.supportRequestService.assign(auth, id)
+    async assignAdmin(@AuthParamDecorator() auth: AuthInfoDto, @Param('id') id: number) {
+        return this.supportRequestService.assignAdmin(auth, +id)
     }
 }

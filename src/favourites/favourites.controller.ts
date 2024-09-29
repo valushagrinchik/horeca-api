@@ -5,10 +5,10 @@ import { UserRole } from '@prisma/client'
 import { AuthParamDecorator } from '../system/utils/auth/decorators/auth.param.decorator'
 import { AuthInfoDto } from '../users/dto/auth.info.dto'
 import { RequestDecorator } from '../system/utils/swagger/decorators'
-import { FavouritesCreateDto } from './dto/favourites.create.dto'
+import { FavouriteCreateDto } from './dto/favourite.create.dto'
 import { SuccessDto } from '../system/utils/dto/success.dto'
 import { FavouritesService } from './services/favourites.service'
-import { FavouritesDto } from './dto/favourites.dto'
+import { FavouriteCreateResponseDto } from './dto/favourite.create.response.dto'
 
 @AuthUser(UserRole.Horeca)
 @Controller('horeca/favourites')
@@ -18,10 +18,10 @@ export class FavouritesController {
 
     @Post()
     @ApiOperation({ summary: 'Adds provider into favourites and creates chat' })
-    @RequestDecorator(FavouritesDto, FavouritesCreateDto)
-    async create(@AuthParamDecorator() auth: AuthInfoDto, @Body() dto: FavouritesCreateDto) {
-        const fav = await this.service.create(auth, dto)
-        return new FavouritesDto(fav)
+    @RequestDecorator(FavouriteCreateResponseDto, FavouriteCreateDto)
+    async create(@AuthParamDecorator() auth: AuthInfoDto, @Body() dto: FavouriteCreateDto) {
+        const res = await this.service.create(auth, dto)
+        return new FavouriteCreateResponseDto(res)
     }
 
     @Delete(':providerId')

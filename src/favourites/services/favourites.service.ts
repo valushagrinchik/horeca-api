@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common'
 import { FavouritesDbService } from './favourites.db.service'
 import { AuthInfoDto } from '../../users/dto/auth.info.dto'
-import { FavouritesCreateDto } from '../dto/favourites.create.dto'
+import { FavouriteCreateDto } from '../dto/favourite.create.dto'
 import { ChatType } from '@prisma/client'
-import { ChatService } from 'src/chat/services/chat.service'
+import { ChatService } from '../../chat/services/chat.service'
+import { FavouriteDto } from '../dto/favourite.dto'
+import { ChatDto } from '../../chat/dto/chat.dto'
 
 @Injectable()
 export class FavouritesService {
@@ -12,14 +14,14 @@ export class FavouritesService {
         private chatService: ChatService
     ) {}
 
-    async create(auth: AuthInfoDto, dto: FavouritesCreateDto) {
-        const fav = await this.favsRep.create(auth.id, dto)
-        await this.chatService.createChat(auth, {
-            sourceId: fav.id,
+    async create(auth: AuthInfoDto, dto: FavouriteCreateDto) {
+        const favourite = await this.favsRep.create(auth.id, dto)
+        const chat = await this.chatService.createChat(auth, {
+            sourceId: favourite.id,
             type: ChatType.Private,
             opponentId: dto.providerId,
         })
-        return fav
+        return { favourite: new FavouriteDto(favourite), chat: new ChatDto(chat) }
     }
 
     async delete(auth: AuthInfoDto, providerId: number) {

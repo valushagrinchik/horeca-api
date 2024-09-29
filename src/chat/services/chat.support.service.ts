@@ -7,6 +7,7 @@ import { ChatWsGateway } from '../chat.ws.gateway'
 import { WebsocketEvents } from '../../system/utils/enums/websocketEvents.enum'
 import { ChatType } from '@prisma/client'
 import { ChatSupportDbService } from './chat.support.db.service'
+import { MESSAGES } from '../messages'
 
 export class ChatSupportService {
     constructor(
@@ -21,7 +22,7 @@ export class ChatSupportService {
             sourceId,
         })
         const message = await this.chatRep.createMessage({
-            message: 'Чат создан. Ожидайте пока поддежка присоеденится',
+            message: MESSAGES.SUPPORT_CHAT_CREATED,
             isServer: true,
             chatId: chat.id,
         })
@@ -37,7 +38,7 @@ export class ChatSupportService {
             sourceId: supportRequestId,
         })
 
-        await this.chatRep.updateChat(
+        const updated = await this.chatRep.updateChat(
             { id: chat.id },
             {
                 opponents: {
@@ -47,13 +48,13 @@ export class ChatSupportService {
         )
 
         const message = await this.chatRep.createMessage({
-            message: 'Здраствуйте, чем могу вам помочь?',
+            message: MESSAGES.SUPPORT_CHAT_ADMIN_ASSIGNED,
             authorId: auth.id,
             chatId: chat.id,
         })
 
-        this.ws.emitToOpponents(chat.opponents, WebsocketEvents.MESSAGE, message)
+        this.ws.emitToOpponents(updated.opponents, WebsocketEvents.MESSAGE, message)
 
-        return new ChatDto({ ...chat, messages: [message] })
+        return new ChatDto({ ...updated, messages: [message] })
     }
 }

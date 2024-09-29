@@ -1,6 +1,6 @@
 import { HorecaFavourites } from '@prisma/client'
 
-export class FavouritesDto implements HorecaFavourites {
+export class FavouriteDto implements HorecaFavourites {
     id: number
     userId: number
 

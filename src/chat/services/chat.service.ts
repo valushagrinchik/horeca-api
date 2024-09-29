@@ -13,6 +13,7 @@ import { ErrorCodes } from '../../system/utils/enums/errorCodes.enum'
 import { ChatWsGateway } from '../chat.ws.gateway'
 import { WebsocketEvents } from '../../system/utils/enums/websocketEvents.enum'
 import { ChatDeactivateDto } from '../dto/chat.deactivate.dto'
+import { MESSAGES } from '../messages'
 
 export class ChatService {
     constructor(
@@ -38,7 +39,7 @@ export class ChatService {
     async createChat(auth: AuthInfoDto, dto: ChatCreateDto) {
         const chat = await this.chatRep.createChat(auth.id, dto)
         const message = await this.chatRep.createMessage({
-            message: 'Chat is created',
+            message: MESSAGES.CHAT_CREATED,
             isServer: true,
             chatId: chat.id,
         })

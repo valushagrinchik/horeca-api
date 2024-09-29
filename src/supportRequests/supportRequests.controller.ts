@@ -9,8 +9,8 @@ import { RequestDecorator } from '../system/utils/swagger/decorators'
 import { AuthParamDecorator } from '../system/utils/auth/decorators/auth.param.decorator'
 import { AuthInfoDto } from '../users/dto/auth.info.dto'
 import { SupportRequestCreateDto } from './dto/supportRequest.create.dto'
-import { SupportRequestDto } from './dto/supportRequest.dto'
-import { SuccessDto } from 'src/system/utils/dto/success.dto'
+import { SuccessDto } from '../system/utils/dto/success.dto'
+import { SupportRequestCreateResponseDto } from './dto/supportRequest.create.response.dto'
 
 @AuthUser(UserRole.Provider, UserRole.Horeca)
 @Controller('support/requests')
@@ -19,17 +19,17 @@ export class SupportRequestsController {
     constructor(private supportRequestService: SupportRequestsService) {}
 
     @Post()
-    @RequestDecorator(SupportRequestDto, SupportRequestCreateDto)
+    @RequestDecorator(SupportRequestCreateResponseDto, SupportRequestCreateDto)
     @ApiOperation({ summary: 'Creates request to support' })
     async create(@AuthParamDecorator() auth: AuthInfoDto, @Body() dto: SupportRequestCreateDto) {
-        const request = await this.supportRequestService.create(auth, dto)
-        return new SupportRequestDto(request)
+        const response = await this.supportRequestService.create(auth, dto)
+        return new SupportRequestCreateResponseDto(response)
     }
 
     @Post(':id/resolve')
     @RequestDecorator(SuccessDto)
     @ApiOperation({ summary: 'Marks request to support as resolved' })
-    async assign(@AuthParamDecorator() auth: AuthInfoDto, @Param('id') id: number) {
-        return this.supportRequestService.resolve(auth, id)
+    async resolve(@AuthParamDecorator() auth: AuthInfoDto, @Param('id') id: number) {
+        return this.supportRequestService.resolve(auth, +id)
     }
 }

@@ -14,10 +14,10 @@ import { HorecaRequestProviderStatusDto } from '../src/providerRequests/dto/hore
 import { HorecaRequestSearchDto } from '../src/providerRequests/dto/horecaRequest.search.dto'
 import { HorecaRequestTemplateCreateDto } from '../src/horecaRequests/dto/horecaRequest.template.create.dto'
 import { HorecaRequestApproveProviderRequestDto } from '../src/horecaRequests/dto/horecaRequest.approveProviderRequest.dto'
-import { FavouritesCreateDto } from '../src/favourites/dto/favourites.create.dto'
 import { ChatCreateDto } from '../src/chat/dto/chat.create.dto'
 import { ChatDto } from '../src/chat/dto/chat.dto'
 import { SupportRequestCreateDto } from '../src/supportRequests/dto/supportRequest.create.dto'
+import { FavouriteCreateDto } from '../src/favourites/dto/favourite.create.dto'
 
 export const initApp = async (overwriteCb?: (mb: TestingModuleBuilder) => void, tmCb?: (tm: TestingModule) => void) => {
     const tmBuilder = Test.createTestingModule({
@@ -69,7 +69,7 @@ export const createHorecaRequest = async (
         })
 }
 
-export const addFavourites = async (app: INestApplication, accessToken: string, payload: FavouritesCreateDto) => {
+export const addFavourites = async (app: INestApplication, accessToken: string, payload: FavouriteCreateDto) => {
     return request(app.getHttpServer())
         .post(ENDPOINTS.HOREKA_FAVOURITES)
         .set('Authorization', 'Bearer ' + accessToken)
@@ -202,7 +202,6 @@ export const approveProviderRequest = async (
         })
 }
 
-
 export const createChat = async (app: INestApplication, accessToken: string, payload: ChatCreateDto): Promise<ChatDto | any> => {
     return request(app.getHttpServer())
         .post(ENDPOINTS.CHAT)
@@ -239,6 +238,13 @@ export const createSupportRequest = async (app: INestApplication, accessToken: s
         .post(ENDPOINTS.SUPPORT)
         .set('Authorization', 'Bearer ' + accessToken)
         .send(payload)
+        .then(res => res.body)
+}
+
+export const assignAdminToSupportRequest = async (app: INestApplication, accessToken: string, id: number) => {
+    return request(app.getHttpServer())
+        .post(ENDPOINTS.SUPPORT_ADMIN.replace(':id', id.toString()))
+        .set('Authorization', 'Bearer ' + accessToken)
         .then(res => res.body)
 }
 
