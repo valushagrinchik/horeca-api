@@ -6,6 +6,7 @@ import { SupportRequestsDbService } from './supportRequests.db.service'
 import { ChatSupportService } from '../../chat/services/chat.support.service'
 import { SupportRequestDto } from '../dto/supportRequest.dto'
 import { ChatDto } from '../../chat/dto/chat.dto'
+import { ChatType } from '@prisma/client'
 
 @Injectable()
 export class SupportRequestsService {
@@ -21,7 +22,11 @@ export class SupportRequestsService {
     }
 
     async resolve(auth: AuthInfoDto, id: number) {
-        return this.supportRequestsRep.resolve(auth, id)
+        await this.supportRequestsRep.resolve(auth, id)
+        await this.chatService.deactivate(auth, {
+            sourceId: id,
+            type: ChatType.Support,
+        })
     }
 
     async assignAdmin(auth: AuthInfoDto, supportRequestsId: number) {

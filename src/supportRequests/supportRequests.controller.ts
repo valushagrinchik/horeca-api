@@ -30,6 +30,7 @@ export class SupportRequestsController {
     @RequestDecorator(SuccessDto)
     @ApiOperation({ summary: 'Marks request to support as resolved' })
     async resolve(@AuthParamDecorator() auth: AuthInfoDto, @Param('id') id: number) {
-        return this.supportRequestService.resolve(auth, +id)
+        await this.supportRequestService.resolve(auth, +id)
+        return new SuccessDto('ok')
     }
 }

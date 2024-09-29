@@ -7,7 +7,6 @@ import {
     approveProviderRequest,
     assignAdminToSupportRequest,
     authUser,
-    createChat,
     createHorecaRequest,
     createProviderRequest,
     createSupportRequest,

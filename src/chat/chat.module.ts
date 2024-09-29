@@ -6,6 +6,7 @@ import { ChatWsGateway } from './chat.ws.gateway'
 import { ChatDbService } from './services/chat.db.service'
 import { ConfigModule } from '@nestjs/config'
 import { ChatSupportService } from './services/chat.support.service'
+import { ChatSupportDbService } from './services/chat.support.db.service'
 
 @Module({
     imports: [
@@ -14,7 +15,7 @@ import { ChatSupportService } from './services/chat.support.service'
         }),
         UsersModule,
     ],
-    providers: [ChatDbService, ChatService, ChatSupportService, ChatWsGateway],
+    providers: [ChatDbService, ChatService, ChatSupportDbService, ChatSupportService, ChatWsGateway],
     controllers: [ChatsController],
     exports: [ChatService, ChatSupportService],
 })

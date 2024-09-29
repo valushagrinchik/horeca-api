@@ -1,17 +1,16 @@
 import { AuthInfoDto } from '../../users/dto/auth.info.dto'
 import { ChatDto } from '../dto/chat.dto'
-import { ChatDbService } from './chat.db.service'
-import { Inject, forwardRef } from '@nestjs/common'
-
 import { ChatWsGateway } from '../chat.ws.gateway'
 import { WebsocketEvents } from '../../system/utils/enums/websocketEvents.enum'
 import { ChatType } from '@prisma/client'
 import { ChatSupportDbService } from './chat.support.db.service'
 import { MESSAGES } from '../messages'
+import { ChatDeactivateDto } from '../dto/chat.deactivate.dto'
+import { forwardRef, Inject } from '@nestjs/common'
 
 export class ChatSupportService {
     constructor(
-        @Inject(forwardRef(() => ChatDbService))
+        @Inject(forwardRef(() => ChatSupportDbService))
         private chatRep: ChatSupportDbService,
         private ws: ChatWsGateway
     ) {}
@@ -56,5 +55,19 @@ export class ChatSupportService {
         this.ws.emitToOpponents(updated.opponents, WebsocketEvents.MESSAGE, message)
 
         return new ChatDto({ ...updated, messages: [message] })
+    }
+
+    async deactivate(auth: AuthInfoDto, dto: ChatDeactivateDto) {
+        await this.chatRep.updateChat(
+            {
+                type_sourceId: {
+                    type: dto.type,
+                    sourceId: dto.sourceId,
+                },
+            },
+            {
+                active: false,
+            }
+        )
     }
 }
