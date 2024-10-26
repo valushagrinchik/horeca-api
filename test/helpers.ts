@@ -167,7 +167,7 @@ export const createProviderRequest = async (
     payload: ProviderRequestCreateDto
 ) => {
     return request(app.getHttpServer())
-        .post(ENDPOINTS.PROVIDER_REQUEST)
+        .post(ENDPOINTS.PROVIDER_REQUESTS)
         .set('Authorization', 'Bearer ' + accessToken)
         .send(payload)
         .then(res => {
@@ -181,7 +181,7 @@ export const findAllProviderRequests = async (
     paginate: Partial<PaginateValidateType> = {}
 ) => {
     return request(app.getHttpServer())
-        .get(ENDPOINTS.PROVIDER_REQUEST)
+        .get(ENDPOINTS.PROVIDER_REQUESTS)
         .set('Authorization', 'Bearer ' + accessToken)
         .query(paginate)
         .then(res => {
@@ -206,7 +206,7 @@ export const approveProviderRequest = async (
 
 export const createChat = async (app: INestApplication, accessToken: string, payload: ChatCreateDto): Promise<ChatDto | any> => {
     return request(app.getHttpServer())
-        .post(ENDPOINTS.CHAT)
+        .post(ENDPOINTS.CHATS)
         .set('Authorization', 'Bearer ' + accessToken)
         .send(payload)
         .then(res => res.body)
@@ -214,7 +214,21 @@ export const createChat = async (app: INestApplication, accessToken: string, pay
 
 export const getChats = async (app: INestApplication, accessToken: string) => {
     return request(app.getHttpServer())
-        .get(ENDPOINTS.CHAT)
+        .get(ENDPOINTS.CHATS)
+        .set('Authorization', 'Bearer ' + accessToken)
+        .then(res => res.body)
+}
+
+export const getChat = async (app: INestApplication, accessToken: string, id: number) => {
+    return request(app.getHttpServer())
+        .get(ENDPOINTS.CHAT.replace(':id', id.toString()))
+        .set('Authorization', 'Bearer ' + accessToken)
+        .then(res => res.body)
+}
+
+export const getChatMessages = async (app: INestApplication, accessToken: string, id: number) => {
+    return request(app.getHttpServer())
+        .get(ENDPOINTS.CHAT_MESSAGES.replace(':id', id.toString()))
         .set('Authorization', 'Bearer ' + accessToken)
         .then(res => res.body)
 }

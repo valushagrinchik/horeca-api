@@ -44,7 +44,10 @@ export class ProductsService {
         return this.get(auth, product.id)
     }
 
-    async findAll(auth: AuthInfoDto, paginate: PaginateValidateType<ProductSearchDto>) {
+    async findAllAndCount(
+        auth: AuthInfoDto,
+        paginate: PaginateValidateType<ProductSearchDto>
+    ): Promise<[ProductDto[], number]> {
         const search = paginate.search
 
         const products = await this.prisma.product.findMany({
@@ -59,18 +62,26 @@ export class ProductsService {
             skip: paginate.offset,
         })
 
+        const total = await this.prisma.product.count({
+            where: {
+                userId: auth.id,
+                ...search,
+            },
+        })
+
         const images = await this.uploadsLinkService.getImages(
             UploadsLinkType.Product,
             products.map(p => p.id)
         )
 
-        return products.map(
+        const data = products.map(
             p =>
                 new ProductDto({
                     ...p,
                     images: (images[p.id] || []).map(image => image.image),
                 })
         )
+        return [data, total]
     }
 
     async get(auth: AuthInfoDto, id: number) {

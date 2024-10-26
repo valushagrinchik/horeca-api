@@ -33,6 +33,10 @@ export class ProviderRequestsDbService {
         })
     }
 
+    async count(args: Prisma.ProviderRequestCountArgs) {
+        return this.prisma.providerRequest.count(args)
+    }
+
     async update(id: number, data: Prisma.ProviderRequestUpdateInput) {
         await this.prisma.providerRequest.update({
             where: { id },

@@ -14,6 +14,8 @@ import { ChatService } from './services/chat.service'
 import { ChatDto } from './dto/chat.dto'
 import { ChatCreateDto } from './dto/chat.create.dto'
 import { ChatSearchDto } from './dto/chat.search.dto'
+import { PaginatedDto } from '../system/utils/dto/paginated.dto'
+import { ChatMessageDto } from './dto/chat.message.dto'
 
 @AuthUser(UserRole.Provider, UserRole.Horeca)
 @Controller('chats')
@@ -35,17 +37,26 @@ export class ChatsController {
         @AuthParamDecorator() auth: AuthInfoDto,
         @RequestPaginatedValidateParamsDecorator() paginate: PaginateValidateType<ChatSearchDto>
     ) {
-        return this.service.getChats(auth, paginate)
+        const [data, total] = await this.service.findAllAndCount(auth, paginate)
+        return new PaginatedDto<ChatDto>(data, total)
     }
 
     @Get(':id')
-    @RequestPaginatedDecorator(ChatDto)
+    @RequestDecorator(ChatDto)
     @ApiOperation({ summary: 'Get chat' })
-    async getChat(
+    async getChat(@AuthParamDecorator() auth: AuthInfoDto, @Param('id') id: number) {
+        return this.service.getChat(auth, +id)
+    }
+
+    @Get(':id/messages')
+    @RequestPaginatedDecorator(ChatMessageDto)
+    @ApiOperation({ summary: 'Get chat messages' })
+    async getChatMessages(
         @AuthParamDecorator() auth: AuthInfoDto,
         @Param('id') id: number,
         @RequestPaginatedValidateParamsDecorator() paginate: PaginateValidateType
     ) {
-        return this.service.getChat(auth, id, paginate)
+        const [data, total] = await this.service.getChatMessages(auth, +id, paginate)
+        return new PaginatedDto<ChatMessageDto>(data, total)
     }
 }

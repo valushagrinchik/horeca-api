@@ -65,8 +65,11 @@ describe('HorecaRequestsController (e2e)', () => {
         it('should return array of requests', async () => {
             const res = await findAllHorecaRequest(app, horecaAuth.accessToken)
 
-            expect(res.length).toBeGreaterThan(0)
-            expect(res[0]).toHaveProperty('items')
+            expect(res).toHaveProperty('data')
+            expect(res).toHaveProperty('total')
+
+            expect(res.data.length).toBeGreaterThan(0)
+            expect(res.data[0]).toHaveProperty('items')
             return
         })
     })

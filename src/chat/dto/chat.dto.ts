@@ -7,6 +7,8 @@ export class ChatDto implements Chat {
     type: ChatType
     providerRequestId: number | null
     messages?: ChatMessageDto[]
+    active: boolean
+    sourceId: number
 
     createdAt: Date
     updatedAt: Date

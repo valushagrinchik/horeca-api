@@ -16,6 +16,7 @@ import { HorecaRequestsService } from './services/horecaRequests.service'
 import { SuccessDto } from '../system/utils/dto/success.dto'
 import { HorecaRequestApproveProviderRequestDto } from './dto/horecaRequest.approveProviderRequest.dto'
 import { HorecaRequestWithProviderRequestDto } from './dto/horecaRequest.withProviderRequests.dto'
+import { PaginatedDto } from '../system/utils/dto/paginated.dto'
 
 @AuthUser(UserRole.Horeca)
 @Controller('horeca/requests')
@@ -44,7 +45,8 @@ export class HorecaRequestsController {
         @AuthParamDecorator() auth: AuthInfoDto,
         @RequestPaginatedValidateParamsDecorator() paginate: PaginateValidateType
     ) {
-        return this.service.findAll(auth, paginate)
+        const [data, total] = await this.service.findAllAndCount(auth, paginate)
+        return new PaginatedDto<HorecaRequestDto>(data, total)
     }
 
     @Post('approve')

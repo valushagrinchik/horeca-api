@@ -9,6 +9,7 @@ import { HorecaRequestItemDto } from '../dto/horecaRequest.item.dto'
 import { HorecaRequestsDbService } from './horecaRequests.db.service'
 import { HorecaRequestApproveProviderRequestDto } from '../dto/horecaRequest.approveProviderRequest.dto'
 import { HorecaRequestWithProviderRequestDto } from '../dto/horecaRequest.withProviderRequests.dto'
+import { HorecaRequestSearchDto } from '../../providerRequests/dto/horecaRequest.search.dto'
 
 @Injectable()
 export class HorecaRequestsService {
@@ -52,7 +53,10 @@ export class HorecaRequestsService {
         })
     }
 
-    async findAll(auth: AuthInfoDto, paginate: Partial<PaginateValidateType> = {}) {
+    async findAllAndCount(
+        auth: AuthInfoDto,
+        paginate: Partial<PaginateValidateType> = {}
+    ): Promise<[HorecaRequestDto[], number]> {
         const horecaRequests = await this.horecaRequestsRep.findManyWithItems({
             where: {
                 userId: auth.id,
@@ -65,12 +69,18 @@ export class HorecaRequestsService {
             skip: paginate.offset,
         })
 
+        const total = await this.horecaRequestsRep.count({
+            where: {
+                userId: auth.id,
+            },
+        })
+
         const images = await this.uploadsLinkService.getImages(
             UploadsLinkType.HorecaRequest,
             horecaRequests.map(p => p.id)
         )
 
-        return horecaRequests.map(
+        const data = horecaRequests.map(
             p =>
                 new HorecaRequestDto({
                     ...p,
@@ -78,6 +88,8 @@ export class HorecaRequestsService {
                     images: (images[p.id] || []).map(image => image.image),
                 })
         )
+
+        return [data, total]
     }
 
     async findByCondition(args: Prisma.HorecaRequestFindManyArgs) {
@@ -96,6 +108,9 @@ export class HorecaRequestsService {
                     images: (images[p.id] || []).map(image => image.image),
                 })
         )
+    }
+    async countByCondition(args: Prisma.HorecaRequestCountArgs) {
+        return this.horecaRequestsRep.count(args)
     }
 
     async approveProviderRequest(auth: AuthInfoDto, dto: HorecaRequestApproveProviderRequestDto) {

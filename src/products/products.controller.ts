@@ -15,6 +15,7 @@ import {
 import { ProductSearchDto } from './dto/product.search.dto'
 import { ProductUpdateDto } from './dto/product.update.dto'
 import { ProductCreateDto } from './dto/product.create.dto'
+import { PaginatedDto } from '../system/utils/dto/paginated.dto'
 
 @AuthUser(UserRole.Provider)
 @Controller('products/provider')
@@ -36,7 +37,8 @@ export class ProductsController {
         @AuthParamDecorator() auth: AuthInfoDto,
         @RequestPaginatedValidateParamsDecorator() paginate: PaginateValidateType<ProductSearchDto>
     ) {
-        return this.service.findAll(auth, paginate)
+        const [data, total] = await this.service.findAllAndCount(auth, paginate)
+        return new PaginatedDto<ProductDto>(data, total)
     }
 
     @Get(':id')

@@ -13,6 +13,7 @@ import { HorecaRequestsService } from '../../horecaRequests/services/horecaReque
 import { HorecaRequestProviderStatusDto } from '../dto/horecaRequest.providerStatus.dto'
 import { HorecaRequestProviderStatusDbService } from './horecaRequest.providerStatus.db.service'
 import { HorecaRequestSearchDto } from '../dto/horecaRequest.search.dto'
+import { HorecaRequestDto } from '../../horecaRequests/dto/horecaRequest.dto'
 
 @Injectable()
 export class ProviderRequestsService {
@@ -24,29 +25,34 @@ export class ProviderRequestsService {
         private horecaRequestProviderStatusRep: HorecaRequestProviderStatusDbService
     ) {}
 
-    async findHorecaRequests(auth: AuthInfoDto, paginate: Partial<PaginateValidateType<HorecaRequestSearchDto>> = {}) {
+    async findHorecaRequests(
+        auth: AuthInfoDto,
+        paginate: Partial<PaginateValidateType<HorecaRequestSearchDto>> = {}
+    ): Promise<[HorecaRequestDto[], number]> {
         const now = new Date()
         const provider = await this.usersService.get(auth)
         const categories = provider.profile.categories
         const filter = paginate.search
 
-        const data = await this.horecaRequestService.findByCondition({
-            where: {
-                items: {
-                    some: {
-                        category: { in: categories },
-                    },
-                },
-                horecaRequestProviderStatus: !filter.inactive
-                    ? {
-                          is: null,
-                      }
-                    : { isNot: null },
-                //TODO: check only day not time
-                acceptUntill: {
-                    gte: now,
+        const where = {
+            items: {
+                some: {
+                    category: { in: categories },
                 },
             },
+            horecaRequestProviderStatus: !filter.inactive
+                ? {
+                      is: null,
+                  }
+                : { isNot: null },
+            //TODO: check only day not time
+            acceptUntill: {
+                gte: now,
+            },
+        }
+
+        const data = await this.horecaRequestService.findByCondition({
+            where,
             include: {
                 items: {
                     where: {
@@ -65,8 +71,9 @@ export class ProviderRequestsService {
             take: paginate.limit,
             skip: paginate.offset,
         })
+        const total = await this.horecaRequestService.countByCondition({ where })
 
-        return data
+        return [data, total]
     }
 
     async setStatus(auth: AuthInfoDto, dto: HorecaRequestProviderStatusDto) {
@@ -105,8 +112,11 @@ export class ProviderRequestsService {
         return this.get(auth, providerRequest.id)
     }
 
-    async findAll(auth: AuthInfoDto, paginate: Partial<PaginateValidateType> = {}) {
-        return this.providerRequestsRep.findAll({
+    async findAllAndCount(
+        auth: AuthInfoDto,
+        paginate: Partial<PaginateValidateType> = {}
+    ): Promise<[ProviderRequestDto[], number]> {
+        const data = await this.providerRequestsRep.findAll({
             where: {
                 userId: auth.id,
             },
@@ -116,6 +126,12 @@ export class ProviderRequestsService {
             take: paginate.limit,
             skip: paginate.offset,
         })
+        const total = await this.providerRequestsRep.count({
+            where: {
+                userId: auth.id,
+            },
+        })
+        return [data, total]
     }
 
     async get(auth: AuthInfoDto, id: number) {

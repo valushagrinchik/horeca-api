@@ -21,13 +21,42 @@ export class ChatService {
         private horecaRequestsService: HorecaRequestsService
     ) {}
 
-    async getChats(auth: AuthInfoDto, paginate: PaginateValidateType<ChatSearchDto>) {
-        return this.chatRep.getChats(auth.id, paginate)
+    async findAllAndCount(
+        auth: AuthInfoDto,
+        paginate: PaginateValidateType<ChatSearchDto>
+    ): Promise<[ChatDto[], number]> {
+        return this.chatRep.findAllAndCount(auth.id, paginate)
     }
 
-    async getChat(auth: AuthInfoDto, id: number, paginate: PaginateValidateType) {
-        const chat = await this.chatRep.getChatWithPaginatedMessages(auth.id, id, paginate)
-        return new ChatDto({ ...chat, messages: chat.messages.map(m => new ChatMessageDto(m)) })
+    async getChat(auth: AuthInfoDto, id: number) {
+        return this.chatRep.getChat(auth.id, id)
+        // return new ChatDto({ ...chat, messages: chat.messages.map(m => new ChatMessageDto(m)) })
+    }
+
+    async getChatMessages(
+        auth: AuthInfoDto,
+        id: number,
+        paginate: PaginateValidateType
+    ): Promise<[ChatMessageDto[], number]> {
+        const where = {
+            chatId: id,
+            chat: {
+                opponents: {
+                    has: auth.id,
+                },
+            },
+        }
+        const data = await this.chatRep.getChatMessages({
+            where,
+            orderBy: {
+                createdAt: 'desc',
+                [paginate.sort.field]: paginate.sort.order,
+            },
+            take: paginate.limit,
+            skip: paginate.offset,
+        })
+        const total = await this.chatRep.countChatMessages({ where })
+        return [data, total]
     }
 
     async validateChatCreation(auth: AuthInfoDto, dto: ChatCreateDto) {

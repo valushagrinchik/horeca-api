@@ -9,6 +9,8 @@ import {
     createChat,
     createHorecaRequest,
     createProviderRequest,
+    getChat,
+    getChatMessages,
     getChats,
     getProfile,
     initApp,
@@ -52,7 +54,7 @@ describe('ChatWsGateway (e2e)', () => {
         expect(gateway).toBeDefined()
     })
 
-    describe('POST ' + ENDPOINTS.CHAT, () => {
+    describe('POST ' + ENDPOINTS.CHATS, () => {
         describe(`with type=${ChatType.Order}`, () => {
             let horecaRequest: HorecaRequestDto
             let providerRequest: ProviderRequestDto
@@ -236,18 +238,52 @@ describe('ChatWsGateway (e2e)', () => {
         describe(`with type=${ChatType.Support}`, () => {})
     })
 
-    describe('GET ' + ENDPOINTS.CHAT, () => {
+    describe('GET ' + ENDPOINTS.CHATS, () => {
+        it(`should return paginated data and total`, async () => {
+            const res = await getChats(app, horecaAuth.accessToken)
+
+            expect(res).toHaveProperty('data')
+            expect(res).toHaveProperty('total')
+
+            expect(res.data.length).toEqual(2)
+        })
         describe('for Horeca', () => {
             it(`should return all user\'s chats`, async () => {
-                const chats = await getChats(app, horecaAuth.accessToken)
-                expect(chats.length).toEqual(2)
+                const res = await getChats(app, horecaAuth.accessToken)
+                expect(res.data.length).toEqual(2)
             })
         })
         describe('for Provider', () => {
             it(`should return all user\'s chats`, async () => {
-                const chats = await getChats(app, providerAuth.accessToken)
-                expect(chats.length).toEqual(2)
+                const res = await getChats(app, providerAuth.accessToken)
+                expect(res.data.length).toEqual(2)
             })
         })
     })
+
+    describe('GET ' + ENDPOINTS.CHAT, () => {
+        it(`should return chat`, async () => {
+            const chatRes = await getChats(app, providerAuth.accessToken)
+
+            const res = await getChat(app, horecaAuth.accessToken, chatRes.data[0].id)
+
+            expect(res).toHaveProperty('messages')
+            expect(res).toHaveProperty('opponents')
+            expect(res).toHaveProperty('id')
+        })
+    })
+
+    describe('GET ' + ENDPOINTS.CHAT_MESSAGES, () => {
+        it(`should return paginated data and total`, async () => {
+            const chatRes = await getChats(app, providerAuth.accessToken)
+
+            const res = await getChatMessages(app, horecaAuth.accessToken, chatRes.data[0].id)
+
+            expect(res).toHaveProperty('data')
+            expect(res).toHaveProperty('total')
+
+            expect(res.data.length).toBeGreaterThan(0)
+        })
+    })
+
 })

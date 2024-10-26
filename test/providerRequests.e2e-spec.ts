@@ -39,6 +39,18 @@ describe('ProviderRequestsController (e2e)', () => {
         beforeAll(async () => {
             await createHorecaRequest(app, horecaAuth.accessToken, horecaRequestInput)
         })
+        it('should return paginated data and total', async () => {
+            const res = await findAllHorecaRequestForProvider(app, providerAuth.accessToken)
+
+            expect(res).toHaveProperty('data')
+            expect(res).toHaveProperty('total')
+
+            expect(res.data.length).toBeGreaterThan(0)
+            expect(res.data[0]).toHaveProperty('items')
+
+            return
+        })
+
         describe('without search filter (that means "active") ', () => {
             it('should return array of active horeca requests that matche with providers categories', async () => {
                 const res = await findAllHorecaRequestForProvider(app, providerAuth.accessToken)
@@ -48,9 +60,9 @@ describe('ProviderRequestsController (e2e)', () => {
                 const crossedCategoryItemsLength = horecaRequestInput.items.filter(item =>
                     user.profile.categories.includes(item.category)
                 ).length
-                expect(res.length).toBeGreaterThan(0)
-                expect(res[0]).toHaveProperty('items')
-                expect(res[0].items.length).toBe(crossedCategoryItemsLength)
+                expect(res.data.length).toBeGreaterThan(0)
+                expect(res.data[0]).toHaveProperty('items')
+                expect(res.data[0].items.length).toBe(crossedCategoryItemsLength)
 
                 return
             })
@@ -61,7 +73,7 @@ describe('ProviderRequestsController (e2e)', () => {
                     search: { inactive: true },
                 })
 
-                expect(res.length).toBe(0)
+                expect(res.data.length).toBe(0)
 
                 return
             })
@@ -71,21 +83,21 @@ describe('ProviderRequestsController (e2e)', () => {
         it('should apply "viewed" status to one of horeca request and delete it from active requests list', async () => {
             expect.assertions(3)
             const horecaRequestsRes = await findAllHorecaRequestForProvider(app, providerAuth.accessToken)
-            expect(horecaRequestsRes.length).toBeGreaterThan(0)
+            expect(horecaRequestsRes.data.length).toBeGreaterThan(0)
 
             const res = await setHorecaRequestStatus(app, providerAuth.accessToken, {
-                horecaRequestId: horecaRequestsRes[0].id,
+                horecaRequestId: horecaRequestsRes.data[0].id,
                 viewed: true,
             })
             expect(res.status).toBe('ok')
 
             const horecaRequestsRes2 = await findAllHorecaRequestForProvider(app, providerAuth.accessToken)
-            expect(horecaRequestsRes2.length).toBe(horecaRequestsRes.length-1)
+            expect(horecaRequestsRes2.data.length).toBe(horecaRequestsRes.data.length-1)
 
             return
         })
     })
-    describe('POST ' + ENDPOINTS.PROVIDER_REQUEST, () => {
+    describe('POST ' + ENDPOINTS.PROVIDER_REQUESTS, () => {
         it('should return just created request data', async () => {
             const validAcceptUntill = generateAcceptUntil()
 
@@ -126,11 +138,16 @@ describe('ProviderRequestsController (e2e)', () => {
         })
     })
 
-    describe('GET ' + ENDPOINTS.PROVIDER_REQUEST, () => {
-        it('should return just created request data', async () => {
+    describe('GET ' + ENDPOINTS.PROVIDER_REQUESTS, () => {
+        it('should return paginated data and total', async () => {
             const res = await findAllProviderRequests(app, providerAuth.accessToken)
 
-            expect(res.length).toBeGreaterThan(0)
+            expect(res).toHaveProperty('data')
+            expect(res).toHaveProperty('total')
+
+            expect(res.data.length).toBeGreaterThan(0)
+            expect(res.data[0]).toHaveProperty('items')
+            return 
         })
     })
 

@@ -9,7 +9,9 @@ export const ENDPOINTS = {
     HOREKA_REQUEST: '/horeca/requests/:id',
     HOREKA_REQUESTS_FOR_PROVIDER: '/provider/requests/income',
     HOREKA_REQUESTS_FOR_PROVIDER_STATUS: '/provider/requests/income/status',
-    PROVIDER_REQUEST: '/provider/requests',
-    CHAT: '/chats',
+    PROVIDER_REQUESTS: '/provider/requests',
+    CHATS: '/chats',
+    CHAT: '/chats/:id',
+    CHAT_MESSAGES: '/chats/:id/messages',
     HOREKA_APPROVE_PROVIDER_REQUEST: '/horeca/requests/approve'
 }

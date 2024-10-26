@@ -24,6 +24,10 @@ export class HorecaRequestsDbService {
         return this.db.horecaRequest.findMany({ include: { items: true }, ...args })
     }
 
+    count = async (args: Prisma.HorecaRequestCountArgs) => {
+        return this.db.horecaRequest.count(args)
+    }
+
     approveProviderRequest = async (userId: number, dto: HorecaRequestApproveProviderRequestDto) => {
         return this.db.horecaRequest.update({
             where: {

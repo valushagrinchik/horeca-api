@@ -17,6 +17,8 @@ import { SuccessDto } from '../system/utils/dto/success.dto'
 import { HorecaRequestDto } from '../horecaRequests/dto/horecaRequest.dto'
 import { HorecaRequestProviderStatusDto } from './dto/horecaRequest.providerStatus.dto'
 import { HorecaRequestSearchDto } from './dto/horecaRequest.search.dto'
+import { PaginatedDto } from '../system/utils/dto/paginated.dto'
+import { ProviderRequestSearchDto } from './dto/providerRequest.search.dto'
 
 @AuthUser(UserRole.Provider)
 @Controller('provider/requests')
@@ -32,7 +34,8 @@ export class ProviderRequestsController {
         @AuthParamDecorator() auth: AuthInfoDto,
         @RequestPaginatedValidateParamsDecorator() paginate: PaginateValidateType<HorecaRequestSearchDto>
     ) {
-        return this.service.findHorecaRequests(auth, paginate)
+        const [data, total] = await this.service.findHorecaRequests(auth, paginate)
+        return new PaginatedDto<HorecaRequestDto>(data, total)
     }
 
     @Post('income/status')
@@ -51,12 +54,13 @@ export class ProviderRequestsController {
     }
 
     @Get()
-    @RequestPaginatedDecorator(HorecaRequestDto)
+    @RequestPaginatedDecorator(ProviderRequestDto)
     @ApiOperation({ summary: 'Get all provider requests' })
     async findAll(
         @AuthParamDecorator() auth: AuthInfoDto,
-        @RequestPaginatedValidateParamsDecorator() paginate: PaginateValidateType<HorecaRequestSearchDto>
+        @RequestPaginatedValidateParamsDecorator() paginate: PaginateValidateType<ProviderRequestSearchDto>
     ) {
-        return this.service.findAll(auth, paginate)
+        const [data, total] = await this.service.findAllAndCount(auth, paginate)
+        return new PaginatedDto<ProviderRequestDto>(data, total)
     }
 }

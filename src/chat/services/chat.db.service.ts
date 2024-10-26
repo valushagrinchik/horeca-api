@@ -4,6 +4,7 @@ import { DatabaseService } from '../../system/database/database.service'
 import { forwardRef, Inject } from '@nestjs/common'
 import { ChatSearchDto } from '../dto/chat.search.dto'
 import { ChatCreateDto } from '../dto/chat.create.dto'
+import { ChatDto } from '../dto/chat.dto'
 
 export class ChatDbService {
     constructor(
@@ -35,6 +36,14 @@ export class ChatDbService {
                     has: userId,
                 },
             },
+            include: {
+                messages: {
+                    orderBy: {
+                        createdAt: 'desc',
+                    },
+                    take: 10,
+                },
+            },
         })
     }
 
@@ -59,6 +68,13 @@ export class ChatDbService {
         })
     }
 
+    async getChatMessages(args: Prisma.ChatMessageFindManyArgs) {
+        return this.db.chatMessage.findMany(args)
+    }
+    async countChatMessages(args: Prisma.ChatMessageCountArgs) {
+        return this.db.chatMessage.count(args)
+    }
+
     async createMessage({ chatId, ...data }: Omit<Prisma.ChatMessageCreateInput, 'chat'> & { chatId: number }) {
         return this.db.chatMessage.create({
             data: {
@@ -70,22 +86,30 @@ export class ChatDbService {
         })
     }
 
-    async getChats(opponentId: number, paginate: PaginateValidateType<ChatSearchDto>) {
+    async findAllAndCount(
+        opponentId: number,
+        paginate: PaginateValidateType<ChatSearchDto>
+    ): Promise<[ChatDto[], number]> {
         const search = paginate.search || { type: ChatType.Order }
-        return this.db.chat.findMany({
-            where: {
-                AND: {
-                    opponents: {
-                        has: opponentId,
-                    },
+        const where = {
+            AND: {
+                opponents: {
+                    has: opponentId,
                 },
-                type: search.type,
             },
+            type: search.type,
+        }
+        const data = await this.db.chat.findMany({
+            where,
             orderBy: {
                 [paginate.sort.field]: paginate.sort.order,
             },
             take: paginate.limit,
             skip: paginate.offset,
         })
+        const total = await this.db.chat.count({
+            where,
+        })
+        return [data.map(chat => new ChatDto(chat)), total]
     }
 }
