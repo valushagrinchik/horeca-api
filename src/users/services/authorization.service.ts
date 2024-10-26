@@ -16,7 +16,7 @@ export class AuthorizationService {
     ) {}
 
     async login(user: User) {
-        const payload = { id: user.id } as AuthInfoDto
+        const payload = { id: user.id, role: user.role } as AuthInfoDto
         const token = {
             accessToken: this.jwtService.sign(payload, {
                 secret: this.configService.get('JWT_ACCESS_TOKEN_SECRET'),
@@ -68,7 +68,7 @@ export class AuthorizationService {
      * @returns
      */
     getRecoveryToken(user: AuthInfoDto) {
-        const payload = { id: user.id }
+        const payload = { id: user.id, role: user.role } as AuthInfoDto
         const token = this.jwtService.sign(payload, {
             secret: this.configService.get('JWT_ACCESS_TOKEN_SECRET'),
             expiresIn: '15m',

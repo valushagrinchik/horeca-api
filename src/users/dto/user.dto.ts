@@ -8,7 +8,7 @@ export class UserDto implements User {
     @ApiProperty()
     id: number
 
-    @Exclude()
+    @ApiProperty({ enum: UserRole })
     role: UserRole
 
     @ApiProperty()
@@ -23,12 +23,13 @@ export class UserDto implements User {
     @ApiProperty()
     phone: string
 
-    @ApiProperty()
+    @Exclude()
     password: string
 
     createdAt: Date
     updatedAt: Date
 
+    @Exclude()
     activationLink: string
 
     @Exclude()
