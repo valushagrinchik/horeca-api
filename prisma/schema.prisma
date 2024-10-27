@@ -90,7 +90,8 @@ model User {
   favourites HorecaFavourites[] @relation("user")
 
   // provider property
-  favouritesOf HorecaFavourites[] @relation("provider")
+  favouritesOf          HorecaFavourites[]      @relation("provider")
+  templates HorecaRequestTemplate[]
 
   @@map("users")
 }
@@ -319,6 +320,9 @@ model HorecaRequestItem {
 
 model HorecaRequestTemplate {
   id Int @id @default(autoincrement())
+
+  user   User @relation(fields: [userId], references: [id])
+  userId Int  @map("user_id")
 
   content Json
   name    String

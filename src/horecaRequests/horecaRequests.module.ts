@@ -10,7 +10,7 @@ import { HorecaRequestsTemplateService } from './services/horecaRequests.templat
 
 @Module({
     imports: [UsersModule, UploadsModule],
-    controllers: [HorecaRequestsController, HorecaRequestsTemplateController],
+    controllers: [HorecaRequestsTemplateController, HorecaRequestsController],
     providers: [
         HorecaRequestsTemplateDbService,
         HorecaRequestsDbService,

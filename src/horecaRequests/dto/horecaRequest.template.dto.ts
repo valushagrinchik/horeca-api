@@ -9,6 +9,9 @@ export class HorecaRequestTemplateDto implements HorecaRequestTemplate {
     name: string
 
     @ApiProperty()
+    userId: number
+
+    @ApiProperty()
     content: Prisma.JsonObject
 
     @ApiProperty()

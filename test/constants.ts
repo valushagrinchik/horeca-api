@@ -5,7 +5,7 @@ export const ENDPOINTS = {
     PROFILE: '/users/me',
     HOREKA_REQUESTS: '/horeca/requests',
     HOREKA_FAVOURITES: '/horeca/favourites',
-    HOREKA_REQUESTS_TEMPLATE: '/horeca/requests/template',
+    HOREKA_REQUESTS_TEMPLATES: '/horeca/requests/templates',
     HOREKA_REQUEST: '/horeca/requests/:id',
     HOREKA_REQUESTS_FOR_PROVIDER: '/provider/requests/income',
     HOREKA_REQUESTS_FOR_PROVIDER_STATUS: '/provider/requests/income/status',

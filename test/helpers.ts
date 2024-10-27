@@ -19,6 +19,7 @@ import { HorecaRequestApproveProviderRequestDto } from '../src/horecaRequests/dt
 import { FavouritesCreateDto } from '../src/favourites/dto/favourites.create.dto'
 import { ChatCreateDto } from '../src/chat/dto/chat.create.dto'
 import { ChatDto } from '../src/chat/dto/chat.dto'
+import { HorecaRequestTemplateUpdateDto } from '../src/horecaRequests/dto/horecaRequest.template.update.dto'
 
 export const initApp = async (overwriteCb?: (mb: TestingModuleBuilder) => void, tmCb?: (tm: TestingModule) => void) => {
     const tmBuilder = Test.createTestingModule({
@@ -104,7 +105,7 @@ export const createHorecaRequestTemplate = async (
     payload: HorecaRequestTemplateCreateDto
 ) => {
     return request(app.getHttpServer())
-        .post(ENDPOINTS.HOREKA_REQUESTS_TEMPLATE)
+        .post(ENDPOINTS.HOREKA_REQUESTS_TEMPLATES)
         .set('Authorization', 'Bearer ' + accessToken)
         .send(payload)
         .then(res => {
@@ -112,14 +113,49 @@ export const createHorecaRequestTemplate = async (
         })
 }
 
+export const updateHorecaRequestTemplate = async (
+    app: INestApplication,
+    accessToken: string,
+    id: number,
+    payload: HorecaRequestTemplateUpdateDto
+) => {
+    return request(app.getHttpServer())
+        .put(ENDPOINTS.HOREKA_REQUESTS_TEMPLATES+ '/' + id)
+        .set('Authorization', 'Bearer ' + accessToken)
+        .send(payload)
+        .then(res => {
+            return res.body
+        })
+}
+
+
 export const getHorecaRequestTemplate = async (app: INestApplication, accessToken: string, id: number) => {
     return request(app.getHttpServer())
-        .get(ENDPOINTS.HOREKA_REQUESTS_TEMPLATE + '/' + id)
+        .get(ENDPOINTS.HOREKA_REQUESTS_TEMPLATES + '/' + id)
         .set('Authorization', 'Bearer ' + accessToken)
         .then(res => {
             return res.body
         })
 }
+
+export const deleteHorecaRequestTemplate = async (app: INestApplication, accessToken: string, id: number) => {
+    return request(app.getHttpServer())
+        .delete(ENDPOINTS.HOREKA_REQUESTS_TEMPLATES + '/' + id)
+        .set('Authorization', 'Bearer ' + accessToken)
+        .then(res => {
+            return res.body
+        })
+}
+
+export const getHorecaRequestTemplates = async (app: INestApplication, accessToken: string) => {
+    return request(app.getHttpServer())
+        .get(ENDPOINTS.HOREKA_REQUESTS_TEMPLATES)
+        .set('Authorization', 'Bearer ' + accessToken)
+        .then(res => {
+            return res.body
+        })
+}
+
 export const findAllHorecaRequest = async (
     app: INestApplication,
     accessToken: string,
