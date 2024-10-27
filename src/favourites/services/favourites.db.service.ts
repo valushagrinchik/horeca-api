@@ -22,6 +22,14 @@ export class FavouritesDbService {
         })
     }
 
+    async findAll(args: Prisma.HorecaFavouritesFindManyArgs) {
+        return this.db.horecaFavourites.findMany(args)
+    }
+
+    async count(args: Prisma.HorecaFavouritesCountArgs) {
+        return this.db.horecaFavourites.count(args)
+    }
+
     async delete(userId: number, providerId: number) {
         const fav = await this.db.horecaFavourites.findFirst({
             where: {

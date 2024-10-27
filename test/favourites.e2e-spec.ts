@@ -1,5 +1,5 @@
 import { INestApplication } from '@nestjs/common'
-import { addFavourites, authUser, deleteFavourites, getProfile, initApp } from './helpers'
+import { addFavourites, authUser, deleteFavourites, getFavourites, getProfile, initApp } from './helpers'
 import { ENDPOINTS } from './constants'
 import { AuthResultDto } from '../src/users/dto/auth.result.dto'
 import { horecaUserInput, providerUserInput } from './mock/seedData'
@@ -31,6 +31,20 @@ describe('FavouritesController (e2e)', () => {
             const res = await addFavourites(app, horecaAuth.accessToken, { providerId: provider.id })
 
             expect(res.status).toBe('ok')
+            return
+        })
+    })
+
+    describe('GET ' + ENDPOINTS.HOREKA_FAVOURITES, () => {
+        it('should return paginated data', async () => {
+            const res = await getFavourites(app, horecaAuth.accessToken)
+
+            expect(res).toHaveProperty('data')
+            expect(res).toHaveProperty('total')
+
+            expect(res.data.length).toBeGreaterThan(0)
+            expect(res.data[0]).toHaveProperty('providerId')
+            expect(res.data[0].providerId).toBe(provider.id)
             return
         })
     })

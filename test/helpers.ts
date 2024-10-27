@@ -81,6 +81,16 @@ export const addFavourites = async (app: INestApplication, accessToken: string, 
         })
 }
 
+export const getFavourites = async (app: INestApplication, accessToken: string) => {
+    return request(app.getHttpServer())
+        .get(ENDPOINTS.HOREKA_FAVOURITES)
+        .set('Authorization', 'Bearer ' + accessToken)
+        .then(res => {
+            return res.body
+        })
+}
+
+
 export const deleteFavourites = async (app: INestApplication, accessToken: string, providerId: number) => {
     return request(app.getHttpServer())
         .delete(ENDPOINTS.HOREKA_FAVOURITES + '/' + providerId)
