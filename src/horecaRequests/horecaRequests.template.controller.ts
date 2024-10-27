@@ -60,7 +60,7 @@ export class HorecaRequestsTemplateController {
     }
 
     @Delete(':id')
-    @ApiOperation({ summary: 'Get all templates' })
+    @ApiOperation({ summary: 'Delete template' })
     @RequestDecorator(SuccessDto)
     async delete(@AuthParamDecorator() auth: AuthInfoDto, @Param('id') id: number) {
         await this.service.delete(auth, +id)
