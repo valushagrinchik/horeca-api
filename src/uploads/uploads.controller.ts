@@ -9,12 +9,13 @@ import { UserRole } from '@prisma/client'
 import { RequestDecorator } from '../system/utils/swagger/decorators'
 import { UploadDto } from './dto/upload.dto'
 
-@AuthUser(UserRole.Provider, UserRole.Horeca, UserRole.Admin)
+
 @Controller('uploads')
 @ApiTags('Uploads')
 export class UploadsController {
     constructor(private readonly uploadsService: UploadsService) {}
 
+    @AuthUser(UserRole.Provider, UserRole.Horeca, UserRole.Admin)
     @Post()
     @ApiConsumes('multipart/form-data')
     @ApiBody({
@@ -42,6 +43,7 @@ export class UploadsController {
         return new StreamableFile(file)
     }
 
+    @AuthUser(UserRole.Provider, UserRole.Horeca, UserRole.Admin)
     @Delete(':id')
     async delete(@Param('id') id: number): Promise<{ id: number }> {
         await this.uploadsService.delete(id)
