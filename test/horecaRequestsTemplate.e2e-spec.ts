@@ -12,6 +12,7 @@ import { ENDPOINTS } from './constants'
 import { AuthResultDto } from '../src/users/dto/auth.result.dto'
 import { horecaRequestInput, horecaUserInput, providerUserInput } from './mock/seedData'
 import { ErrorCodes } from '../src/system/utils/enums/errorCodes.enum'
+import { Categories } from '../src/system/utils/enums'
 
 let app: INestApplication
 let horecaAuth: AuthResultDto
@@ -45,12 +46,24 @@ describe('HorecaRequestsTemplateController (e2e)', () => {
 
     describe('PUT ' + ENDPOINTS.HOREKA_REQUESTS_TEMPLATES, () => {
         it('should update template', async () => {
-            await updateHorecaRequestTemplate(app, horecaAuth.accessToken, createdTemplateId, {
+            const newTemplate = {
                 name: 'template2',
-            })
+                content: {
+                    items: [
+                        {
+                            name: 'BBB',
+                            amount: 2000,
+                            unit: 'eee',
+                            category: Categories.fish,
+                        },
+                    ]
+                },
+            }
+            await updateHorecaRequestTemplate(app, horecaAuth.accessToken, createdTemplateId, newTemplate)
             const res = await getHorecaRequestTemplate(app, horecaAuth.accessToken, createdTemplateId)
 
-            expect(res.name).toBe('template2')
+            expect(res.name).toBe(newTemplate.name)
+            expect(res.content).toBe(JSON.stringify(newTemplate.content))
             expect(res).toHaveProperty('id')
             return
         })
