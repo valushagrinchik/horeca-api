@@ -1,20 +1,17 @@
-import { Controller, Get, Param, Post, Delete, StreamableFile, UploadedFile, UseInterceptors } from '@nestjs/common'
+import { Controller, Param, Post, Delete, UploadedFile, UseInterceptors } from '@nestjs/common'
 import { UploadsService } from './uploads.service'
 import { FileInterceptor } from '@nestjs/platform-express/multer'
-import { createReadStream } from 'fs'
-import { join } from 'path'
 import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger'
 import { AuthUser } from '../system/utils/auth/decorators/auth.decorator'
 import { UserRole } from '@prisma/client'
-import { RequestDecorator } from '../system/utils/swagger/decorators'
 import { UploadDto } from './dto/upload.dto'
 
 @Controller('uploads')
 @ApiTags('Uploads')
+@AuthUser(UserRole.Provider, UserRole.Horeca, UserRole.Admin)
 export class UploadsController {
     constructor(private readonly uploadsService: UploadsService) {}
 
-    @AuthUser(UserRole.Provider, UserRole.Horeca, UserRole.Admin)
     @Post()
     @ApiConsumes('multipart/form-data')
     @ApiBody({
@@ -34,15 +31,6 @@ export class UploadsController {
         return new UploadDto(upload)
     }
 
-    @Get(':id')
-    @RequestDecorator(StreamableFile)
-    async read(@Param('id') id: number): Promise<StreamableFile> {
-        const upload = await this.uploadsService.findOne(id)
-        const file = createReadStream(join(process.cwd(), upload.path))
-        return new StreamableFile(file)
-    }
-
-    @AuthUser(UserRole.Provider, UserRole.Horeca, UserRole.Admin)
     @Delete(':id')
     async delete(@Param('id') id: number): Promise<{ id: number }> {
         await this.uploadsService.delete(id)

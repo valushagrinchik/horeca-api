@@ -4,6 +4,8 @@ import { AppModule } from './app.module'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 import { ClassSerializerInterceptor, Logger, ValidationPipe } from '@nestjs/common'
 import { PrismaClientExceptionFilter } from './prisma-client-exception.filter'
+import * as express from 'express'
+import { join } from 'node:path'
 
 process.on('unhandledRejection', (reason, promise) => {
     console.log('Unhandled Rejection at:', promise, 'reason:', reason)
@@ -40,6 +42,7 @@ async function bootstrap() {
     const document = SwaggerModule.createDocument(app, config)
     SwaggerModule.setup('api', app, document)
 
+    app.use('/uploads', express.static(join(process.cwd(), 'uploads')))
     await app.listen(process.env.PORT, () => {
         console.log(`Application is running on ${process.env.PORT}`)
     })

@@ -5,11 +5,8 @@ export class UploadDto implements Upload {
     id: number
     name: string
 
-    @Exclude()
     mimetype: string
-    @Exclude()
     size: number
-    @Exclude()
     path: string
 
     createdAt: Date
