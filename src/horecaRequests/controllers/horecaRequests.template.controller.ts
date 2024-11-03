@@ -1,21 +1,21 @@
 import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common'
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
-import { AuthUser } from '../system/utils/auth/decorators/auth.decorator'
+import { AuthUser } from '../../system/utils/auth/decorators/auth.decorator'
 import { UserRole } from '@prisma/client'
-import { HorecaRequestTemplateDto } from './dto/horecaRequest.template.dto'
+import { HorecaRequestTemplateDto } from '../dto/horecaRequest.template.dto'
 import {
     PaginateValidateType,
     RequestDecorator,
     RequestPaginatedDecorator,
     RequestPaginatedValidateParamsDecorator,
-} from '../system/utils/swagger/decorators'
-import { HorecaRequestTemplateCreateDto } from './dto/horecaRequest.template.create.dto'
-import { HorecaRequestsTemplateService } from './services/horecaRequests.template.service'
-import { AuthParamDecorator } from '../system/utils/auth/decorators/auth.param.decorator'
-import { AuthInfoDto } from '../users/dto/auth.info.dto'
-import { PaginatedDto } from '../system/utils/dto/paginated.dto'
-import { SuccessDto } from '../system/utils/dto/success.dto'
-import { HorecaRequestTemplateUpdateDto } from './dto/horecaRequest.template.update.dto'
+} from '../../system/utils/swagger/decorators'
+import { HorecaRequestTemplateCreateDto } from '../dto/horecaRequest.template.create.dto'
+import { HorecaRequestsTemplateService } from '../services/horecaRequests.template.service'
+import { AuthParamDecorator } from '../../system/utils/auth/decorators/auth.param.decorator'
+import { AuthInfoDto } from '../../users/dto/auth.info.dto'
+import { PaginatedDto } from '../../system/utils/dto/paginated.dto'
+import { SuccessDto } from '../../system/utils/dto/success.dto'
+import { HorecaRequestTemplateUpdateDto } from '../dto/horecaRequest.template.update.dto'
 
 @AuthUser(UserRole.Horeca)
 @Controller('horeca/requests/templates')

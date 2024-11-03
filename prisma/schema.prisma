@@ -60,6 +60,13 @@ enum ChatType {
   Private
 }
 
+enum HorecaRequestStatus {
+  WaitingForProviderRequests
+  Active
+  CompletedSuccessfully
+  CompletedUnsuccessfully
+}
+
 model User {
   id Int @id @default(autoincrement())
 
@@ -278,11 +285,14 @@ model HorecaRequest {
   items        HorecaRequestItem[]
   address      String
   deliveryTime DateTime            @map("delivery_time")
-  acceptUntill DateTime            @map("accept_untill")
+  acceptUntill DateTime            @map("accept_untill") @db.Date
   paymentType  PaymentType         @map("payment_type")
   comment      String?
   name         String
   phone        String
+
+  status       HorecaRequestStatus @default(WaitingForProviderRequests)
+
 
   // indicates whitch provider request was approved by horeca to start chating
   activeProviderRequest   ProviderRequest? @relation(fields: [activeProviderRequestId], references: [id])

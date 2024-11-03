@@ -29,3 +29,5 @@ export const DeliveryMethodsLabels: Record<DeliveryMethods, string> = {
     sameDayDelivery: 'доставка в день заказа',
     weekends: 'выходные праздничные дни',
 }
+
+export const DB_DATE_FORMAT = 'YYYY-MM-DD'

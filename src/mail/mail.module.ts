@@ -5,7 +5,7 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
 
 import { MailCronService } from './mail.cron.service'
 import { MailService } from './mail.service'
-import { CronPrismaService } from '../system/cron/cron.prisma.service'
+import { CronModule } from '../system/cron/cron.module'
 
 @Module({
     imports: [
@@ -35,8 +35,9 @@ import { CronPrismaService } from '../system/cron/cron.prisma.service'
                 },
             }),
         }),
+        CronModule,
     ],
-    providers: [MailService, CronPrismaService, MailCronService, Logger, ConfigService],
+    providers: [MailService, MailCronService, Logger, ConfigService],
     exports: [MailService],
 })
 export class MailModule {}

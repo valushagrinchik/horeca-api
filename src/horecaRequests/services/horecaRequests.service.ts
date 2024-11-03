@@ -121,4 +121,9 @@ export class HorecaRequestsService {
         const request = await this.horecaRequestsRep.get(auth.id, id)
         return !!request.activeProviderRequest
     }
+
+    async completePastRequests() {
+        await this.horecaRequestsRep.completePastRequests()
+        return true
+    }
 }

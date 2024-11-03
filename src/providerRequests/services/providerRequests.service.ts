@@ -14,6 +14,8 @@ import { HorecaRequestProviderStatusDto } from '../dto/horecaRequest.providerSta
 import { HorecaRequestProviderStatusDbService } from './horecaRequest.providerStatus.db.service'
 import { HorecaRequestSearchDto } from '../dto/horecaRequest.search.dto'
 import { HorecaRequestDto } from '../../horecaRequests/dto/horecaRequest.dto'
+import * as dayjs from 'dayjs'
+import { DB_DATE_FORMAT } from '../../system/utils/constants'
 
 @Injectable()
 export class ProviderRequestsService {
@@ -29,7 +31,7 @@ export class ProviderRequestsService {
         auth: AuthInfoDto,
         paginate: Partial<PaginateValidateType<HorecaRequestSearchDto>> = {}
     ): Promise<[HorecaRequestDto[], number]> {
-        const now = new Date()
+        const now = dayjs().format(DB_DATE_FORMAT)
         const provider = await this.usersService.get(auth)
         const categories = provider.profile.categories
         const filter = paginate.search
@@ -45,9 +47,8 @@ export class ProviderRequestsService {
                       is: null,
                   }
                 : { isNot: null },
-            //TODO: check only day not time
             acceptUntill: {
-                gte: now,
+                gte: new Date(now),
             },
         }
 

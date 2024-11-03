@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common'
 import { DatabaseService } from '../../system/database/database.service'
-import { Prisma } from '@prisma/client'
+import { HorecaRequestStatus, Prisma } from '@prisma/client'
 import { HorecaRequestApproveProviderRequestDto } from '../dto/horecaRequest.approveProviderRequest.dto'
+import * as dayjs from 'dayjs'
+import { DB_DATE_FORMAT } from '../../system/utils/constants'
 
 @Injectable()
 export class HorecaRequestsDbService {
@@ -38,6 +40,60 @@ export class HorecaRequestsDbService {
                 activeProviderRequest: {
                     connect: { id: dto.providerRequestId },
                 },
+                status: HorecaRequestStatus.Active,
+            },
+        })
+    }
+
+    completePastRequests = async () => {
+        const now = dayjs().format(DB_DATE_FORMAT)
+
+        await this.db.horecaRequest.updateMany({
+            where: {
+                OR: [
+                    {
+                        AND: {
+                            acceptUntill: { lt: now },
+                            providerRequests: {
+                                none: {},
+                            },
+                            status: {
+                                in: [HorecaRequestStatus.WaitingForProviderRequests],
+                            },
+                        },
+                    },
+                    {
+                        AND: {
+                            deliveryTime: { lt: new Date(now) },
+                            providerRequests: {
+                                some: {},
+                            },
+                            status: {
+                                in: [HorecaRequestStatus.WaitingForProviderRequests],
+                            },
+                        },
+                    },
+                ],
+            },
+            data: {
+                status: HorecaRequestStatus.CompletedUnsuccessfully,
+            },
+        })
+
+        await this.db.horecaRequest.updateMany({
+            where: {
+                AND: {
+                    deliveryTime: { lt: now },
+                    activeProviderRequest: {
+                        isNot: null,
+                    },
+                    status: {
+                        in: [HorecaRequestStatus.Active],
+                    },
+                },
+            },
+            data: {
+                status: HorecaRequestStatus.CompletedSuccessfully,
             },
         })
     }
