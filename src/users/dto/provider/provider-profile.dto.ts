@@ -16,12 +16,11 @@ export class ProviderProfileDto implements Profile {
     @Validate(TypeValidate.NUMBER)
     minOrderAmount: number
 
-    @Validate(TypeValidate.ARRAY, { minItems: 1, type: [Categories], enum: Categories, enumName: 'Categories' })
+    @Validate(TypeValidate.ARRAY, { minItems: 1, enum: Categories, enumName: 'Categories' })
     categories: Categories[]
 
     @Validate(TypeValidate.ARRAY, {
         minItems: 1,
-        type: [DeliveryMethods],
         enum: DeliveryMethods,
         enumName: 'DeliveryMethods',
     })

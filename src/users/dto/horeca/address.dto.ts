@@ -9,7 +9,7 @@ export class Address {
     @Validate(TypeValidate.STRING)
     address: string
 
-    @Validate(TypeValidate.ARRAY, { type: [Weekday], enum: Weekday, enumName: 'Weekday' })
+    @Validate(TypeValidate.ARRAY, { enum: Weekday, enumName: 'Weekday' })
     weekdays: Weekday[]
 
     // Monday

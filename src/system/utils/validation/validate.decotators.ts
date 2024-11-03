@@ -116,9 +116,6 @@ export function Validate(type: TypeValidate, options?: ApiPropertyOptions) {
     if (options?.minItems) {
         arr.push(ArrayMinSize(options.minItems))
     }
-    if (type == TypeValidate.ARRAY) {
-        arr.push(ValidateNested())
-    }
 
     if (options?.maxLength) {
         arr.push(MaxLength(options.maxLength))

@@ -1,7 +1,7 @@
 import { TypeValidate, Validate } from '../../system/utils/validation/validate.decotators'
 
 export class ProviderRequestItemCreateDto {
-    @Validate(TypeValidate.ARRAY, { type: [Number], default: [] })
+    @Validate(TypeValidate.ARRAY)
     imageIds?: number[] = []
 
     @Validate(TypeValidate.BOOLEAN)

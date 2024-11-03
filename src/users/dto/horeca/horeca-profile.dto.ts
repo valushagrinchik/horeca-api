@@ -2,6 +2,7 @@ import { Profile, ProfileType } from '@prisma/client'
 import { Exclude, Type } from 'class-transformer'
 import { TypeValidate, Validate } from '../../../system/utils/validation/validate.decotators'
 import { Address } from './address.dto'
+import { ValidateNested } from 'class-validator'
 
 export class HorecaProfileDto implements Profile {
     id: number
@@ -17,6 +18,7 @@ export class HorecaProfileDto implements Profile {
     info: string
 
     @Validate(TypeValidate.ARRAY, { minItems: 1 })
+    @ValidateNested()
     @Type(() => Address)
     addresses: Address[]
 
