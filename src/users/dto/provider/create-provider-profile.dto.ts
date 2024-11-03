@@ -1,4 +1,4 @@
-import { ArrayMinSize, ValidateIf } from 'class-validator'
+import { ValidateIf } from 'class-validator'
 import { Categories, DeliveryMethods } from '../../../system/utils/enums'
 import { TypeValidate, Validate } from '../../../system/utils/validation/validate.decotators'
 import { Profile } from '../profile.dto'
@@ -10,7 +10,6 @@ export class CreateProviderProfileDto extends Profile {
 
     @Validate(TypeValidate.ARRAY, { minItems: 1, type: [Categories], enum: Categories, enumName: 'Categories' })
     @ValidateIf(o => o.profileType)
-    @ArrayMinSize(1)
     categories: Categories[]
 
     @Validate(TypeValidate.ARRAY, {
@@ -20,7 +19,6 @@ export class CreateProviderProfileDto extends Profile {
         enumName: 'DeliveryMethods',
     })
     @ValidateIf(o => o.profileType)
-    @ArrayMinSize(1)
     deliveryMethods: DeliveryMethods[]
 
     constructor(partial: Partial<CreateProviderProfileDto>) {

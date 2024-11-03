@@ -251,12 +251,14 @@ describe('ChatWsGateway (e2e)', () => {
             it(`should return all user\'s chats`, async () => {
                 const res = await getChats(app, horecaAuth.accessToken)
                 expect(res.data.length).toEqual(2)
+                return
             })
         })
         describe('for Provider', () => {
             it(`should return all user\'s chats`, async () => {
                 const res = await getChats(app, providerAuth.accessToken)
                 expect(res.data.length).toEqual(2)
+                return
             })
         })
     })
@@ -270,6 +272,7 @@ describe('ChatWsGateway (e2e)', () => {
             expect(res).toHaveProperty('messages')
             expect(res).toHaveProperty('opponents')
             expect(res).toHaveProperty('id')
+            return
         })
     })
 
@@ -283,6 +286,7 @@ describe('ChatWsGateway (e2e)', () => {
             expect(res).toHaveProperty('total')
 
             expect(res.data.length).toBeGreaterThan(0)
+            return
         })
     })
 

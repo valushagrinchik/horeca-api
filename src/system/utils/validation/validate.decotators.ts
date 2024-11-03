@@ -1,6 +1,7 @@
 import { applyDecorators } from '@nestjs/common'
 import { ApiProperty, ApiPropertyOptions } from '@nestjs/swagger'
 import {
+    ArrayMinSize,
     IsArray,
     IsBoolean,
     IsDate,
@@ -15,7 +16,7 @@ import {
     IsString,
     IsUrl,
     MaxLength,
-    MinLength,
+    ValidateNested,
 } from 'class-validator'
 
 import { ErrorValidationCodeEnum } from './error.validation.code.enum'
@@ -100,6 +101,7 @@ const validateMap = {
 
 export function Validate(type: TypeValidate, options?: ApiPropertyOptions) {
     const { fn } = validateMap[type]
+
     const arr = [
         fn,
         options?.required === false
@@ -111,9 +113,19 @@ export function Validate(type: TypeValidate, options?: ApiPropertyOptions) {
               }),
         ApiProperty(options),
     ]
-    if (options && options.maxLength) {
+    if (options?.minItems) {
+        arr.push(ArrayMinSize(options.minItems))
+    }
+    if (type == TypeValidate.ARRAY) {
+        arr.push(ValidateNested())
+    }
+
+    if (options?.maxLength) {
         arr.push(MaxLength(options.maxLength))
     }
+
+    console
+
     return applyDecorators(...arr)
 }
 

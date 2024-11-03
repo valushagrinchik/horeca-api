@@ -160,6 +160,7 @@ describe('ProviderRequestsController (e2e)', () => {
             })
 
             expect(res.status).toBe('ok')
+            return
         })
     })
 })

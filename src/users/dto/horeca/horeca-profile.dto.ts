@@ -1,6 +1,5 @@
 import { Profile, ProfileType } from '@prisma/client'
 import { Exclude, Type } from 'class-transformer'
-import { ArrayMinSize, ValidateNested } from 'class-validator'
 import { TypeValidate, Validate } from '../../../system/utils/validation/validate.decotators'
 import { Address } from './address.dto'
 
@@ -17,10 +16,8 @@ export class HorecaProfileDto implements Profile {
     @Validate(TypeValidate.STRING, { required: false })
     info: string
 
-    @Validate(TypeValidate.ARRAY, { minItems: 1, type: [Address] })
-    @ValidateNested({ each: true })
+    @Validate(TypeValidate.ARRAY, { minItems: 1 })
     @Type(() => Address)
-    @ArrayMinSize(1)
     addresses: Address[]
 
     @Exclude()

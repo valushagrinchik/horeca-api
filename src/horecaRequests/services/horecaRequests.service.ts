@@ -27,7 +27,7 @@ export class HorecaRequestsService {
                 },
             },
             items: {
-                create: dto.items,
+                createMany: { data: dto.items },
             },
         })
 

@@ -1,6 +1,5 @@
 import { Address, Profile, ProfileType } from '@prisma/client'
 import { Exclude } from 'class-transformer'
-import { ArrayMinSize } from 'class-validator'
 import { Categories, DeliveryMethods } from '../../../system/utils/enums'
 import { TypeValidate, Validate } from '../../../system/utils/validation/validate.decotators'
 
@@ -18,7 +17,6 @@ export class ProviderProfileDto implements Profile {
     minOrderAmount: number
 
     @Validate(TypeValidate.ARRAY, { minItems: 1, type: [Categories], enum: Categories, enumName: 'Categories' })
-    @ArrayMinSize(1)
     categories: Categories[]
 
     @Validate(TypeValidate.ARRAY, {
@@ -27,7 +25,6 @@ export class ProviderProfileDto implements Profile {
         enum: DeliveryMethods,
         enumName: 'DeliveryMethods',
     })
-    @ArrayMinSize(1)
     deliveryMethods: DeliveryMethods[]
 
     @Exclude()

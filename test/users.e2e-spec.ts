@@ -23,6 +23,7 @@ describe('UsersController (e2e)', () => {
 
             expect(res).toHaveProperty('id')
             expect(res.email).toBe(horecaUserInput.email)
+            return
         })
     })
 
@@ -38,6 +39,7 @@ describe('UsersController (e2e)', () => {
             expect(res).toHaveProperty('id')
             expect(res.phone).toBe('123123')
             expect(res.profile.info).toBe('updated')
+            return
         })
     })
 })

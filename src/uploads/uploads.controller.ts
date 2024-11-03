@@ -9,7 +9,6 @@ import { UserRole } from '@prisma/client'
 import { RequestDecorator } from '../system/utils/swagger/decorators'
 import { UploadDto } from './dto/upload.dto'
 
-
 @Controller('uploads')
 @ApiTags('Uploads')
 export class UploadsController {
