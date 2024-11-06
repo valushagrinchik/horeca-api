@@ -1,15 +1,16 @@
-import { Injectable } from '@nestjs/common'
+import { BadRequestException, Injectable } from '@nestjs/common'
 import { HorecaRequestCreateDto } from '../dto/horecaRequest.create.dto'
 import { HorecaRequestDto } from '../dto/horecaRequest.dto'
 import { AuthInfoDto } from '../../users/dto/auth.info.dto'
-import { Prisma, UploadsLinkType } from '@prisma/client'
+import { HorecaRequestStatus, Prisma, UploadsLinkType } from '@prisma/client'
 import { PaginateValidateType } from '../../system/utils/swagger/decorators'
 import { UploadsLinkService } from '../../uploads/uploads.link.service'
 import { HorecaRequestItemDto } from '../dto/horecaRequest.item.dto'
 import { HorecaRequestsDbService } from './horecaRequests.db.service'
-import { HorecaRequestApproveProviderRequestDto } from '../dto/horecaRequest.approveProviderRequest.dto'
+import { HorecaRequestSetStatusDto } from '../dto/horecaRequest.approveProviderRequest.dto'
 import { HorecaRequestWithProviderRequestDto } from '../dto/horecaRequest.withProviderRequests.dto'
-import { HorecaRequestSearchDto } from '../../providerRequests/dto/horecaRequest.search.dto'
+import { ErrorDto } from '../../system/utils/dto/error.dto'
+import { ErrorCodes } from '../../system/utils/enums/errorCodes.enum'
 
 @Injectable()
 export class HorecaRequestsService {
@@ -17,6 +18,13 @@ export class HorecaRequestsService {
         private horecaRequestsRep: HorecaRequestsDbService,
         private uploadsLinkService: UploadsLinkService
     ) {}
+
+    async validate(auth: AuthInfoDto, id: number) {
+        const horecaRequest = await this.horecaRequestsRep.getRawById(auth.id, id)
+        if (!horecaRequest) {
+            throw new BadRequestException(new ErrorDto(ErrorCodes.ITEM_NOT_FOUND))
+        }
+    }
 
     async create(auth: AuthInfoDto, { imageIds, ...dto }: HorecaRequestCreateDto) {
         const horecaRequest = await this.horecaRequestsRep.create({
@@ -113,17 +121,22 @@ export class HorecaRequestsService {
         return this.horecaRequestsRep.count(args)
     }
 
-    async approveProviderRequest(auth: AuthInfoDto, dto: HorecaRequestApproveProviderRequestDto) {
-        await this.horecaRequestsRep.approveProviderRequest(auth.id, dto)
-    }
-
     async isReadyForChat(auth: AuthInfoDto, id: number) {
         const request = await this.horecaRequestsRep.get(auth.id, id)
-        return !!request.activeProviderRequest
+        return request.status == HorecaRequestStatus.Active
     }
 
     async completePastRequests() {
         await this.horecaRequestsRep.completePastRequests()
         return true
+    }
+
+    async approveProviderRequest(dto: HorecaRequestSetStatusDto) {
+        await this.horecaRequestsRep.approveProviderRequest(dto)
+    }
+
+    // Public method
+    async cancelProviderRequest(dto: HorecaRequestSetStatusDto) {
+        await this.horecaRequestsRep.cancelProviderRequest(dto)
     }
 }

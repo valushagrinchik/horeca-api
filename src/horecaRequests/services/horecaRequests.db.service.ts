@@ -1,13 +1,19 @@
 import { Injectable } from '@nestjs/common'
 import { DatabaseService } from '../../system/database/database.service'
-import { HorecaRequestStatus, Prisma } from '@prisma/client'
-import { HorecaRequestApproveProviderRequestDto } from '../dto/horecaRequest.approveProviderRequest.dto'
+import { HorecaRequestStatus, Prisma, ProviderRequestStatus } from '@prisma/client'
+import { HorecaRequestSetStatusDto } from '../dto/horecaRequest.approveProviderRequest.dto'
 import * as dayjs from 'dayjs'
 import { DB_DATE_FORMAT } from '../../system/utils/constants'
 
 @Injectable()
 export class HorecaRequestsDbService {
     constructor(private db: DatabaseService) {}
+
+    getRawById = async (userId: number, id: number) => {
+        return this.db.horecaRequest.findUnique({
+            where: { id, userId },
+        })
+    }
 
     create = async (data: Prisma.HorecaRequestCreateInput) => {
         return this.db.horecaRequest.create({
@@ -18,7 +24,7 @@ export class HorecaRequestsDbService {
     get = async (userId: number, id: number) => {
         return this.db.horecaRequest.findUnique({
             where: { id, userId },
-            include: { items: true, providerRequests: { include: { items: true } }, activeProviderRequest: true },
+            include: { items: true, providerRequests: { include: { items: true } } },
         })
     }
 
@@ -30,17 +36,44 @@ export class HorecaRequestsDbService {
         return this.db.horecaRequest.count(args)
     }
 
-    approveProviderRequest = async (userId: number, dto: HorecaRequestApproveProviderRequestDto) => {
+    approveProviderRequest = async (dto: HorecaRequestSetStatusDto) => {
         return this.db.horecaRequest.update({
             where: {
                 id: dto.horecaRequestId,
-                userId,
             },
             data: {
-                activeProviderRequest: {
-                    connect: { id: dto.providerRequestId },
+                providerRequests: {
+                    update: {
+                        where: {
+                            id: dto.providerRequestId,
+                        },
+                        data: {
+                            status: ProviderRequestStatus.Active,
+                        },
+                    },
                 },
                 status: HorecaRequestStatus.Active,
+            },
+        })
+    }
+
+    cancelProviderRequest = async (dto: HorecaRequestSetStatusDto) => {
+        return this.db.horecaRequest.update({
+            where: {
+                id: dto.horecaRequestId,
+            },
+            data: {
+                providerRequests: {
+                    update: {
+                        where: {
+                            id: dto.providerRequestId,
+                        },
+                        data: {
+                            status: ProviderRequestStatus.Canceled,
+                        },
+                    },
+                },
+                status: HorecaRequestStatus.Pending,
             },
         })
     }
@@ -48,29 +81,26 @@ export class HorecaRequestsDbService {
     completePastRequests = async () => {
         const now = dayjs().format(DB_DATE_FORMAT)
 
+        // CompletedUnsuccessfully
         await this.db.horecaRequest.updateMany({
             where: {
                 OR: [
                     {
-                        AND: {
-                            acceptUntill: { lt: now },
-                            providerRequests: {
-                                none: {},
-                            },
-                            status: {
-                                in: [HorecaRequestStatus.WaitingForProviderRequests],
-                            },
+                        acceptUntill: { lt: now },
+                        providerRequests: {
+                            none: {},
+                        },
+                        status: {
+                            in: [HorecaRequestStatus.Pending],
                         },
                     },
                     {
-                        AND: {
-                            deliveryTime: { lt: new Date(now) },
-                            providerRequests: {
-                                some: {},
-                            },
-                            status: {
-                                in: [HorecaRequestStatus.WaitingForProviderRequests],
-                            },
+                        deliveryTime: { lt: now },
+                        providerRequests: {
+                            some: {},
+                        },
+                        status: {
+                            in: [HorecaRequestStatus.Pending],
                         },
                     },
                 ],
@@ -80,21 +110,45 @@ export class HorecaRequestsDbService {
             },
         })
 
-        await this.db.horecaRequest.updateMany({
+        // CompletedSuccessfully
+        const data = await this.db.horecaRequest.findMany({
             where: {
-                AND: {
-                    deliveryTime: { lt: now },
-                    activeProviderRequest: {
-                        isNot: null,
+                deliveryTime: { lt: now },
+                providerRequests: {
+                    some: {
+                        status: ProviderRequestStatus.Active,
                     },
-                    status: {
-                        in: [HorecaRequestStatus.Active],
+                },
+                status: HorecaRequestStatus.Active,
+            },
+            include: {
+                providerRequests: {
+                    where: {
+                        status: ProviderRequestStatus.Active,
                     },
                 },
             },
-            data: {
-                status: HorecaRequestStatus.CompletedSuccessfully,
-            },
         })
+
+        const promises = data.map(record =>
+            this.db.horecaRequest.update({
+                where: { id: record.id },
+                data: {
+                    status: HorecaRequestStatus.CompletedSuccessfully,
+                    providerRequests: {
+                        updateMany: record.providerRequests.map(pRequest => ({
+                            where: {
+                                id: pRequest.id,
+                            },
+                            data: {
+                                status: ProviderRequestStatus.Finished,
+                            },
+                        })),
+                    },
+                },
+            })
+        )
+
+        await Promise.all(promises)
     }
 }

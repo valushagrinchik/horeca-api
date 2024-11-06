@@ -16,7 +16,7 @@ export class HorecaRequestDto extends SourceWithUploads implements HorecaRequest
 
     status: HorecaRequestStatus
 
-    activeProviderRequestId: number | null
+    // activeProviderRequestId: number | null
     chatId: number | null
 
     createdAt: Date

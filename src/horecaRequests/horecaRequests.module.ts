@@ -8,7 +8,7 @@ import { HorecaRequestsTemplateDbService } from './services/horecaRequests.templ
 import { HorecaRequestsTemplateController } from './controllers/horecaRequests.template.controller'
 import { HorecaRequestsTemplateService } from './services/horecaRequests.template.service'
 import { CronModule } from '../system/cron/cron.module'
-import { HorecaRequestsCronService } from './services/horecaRequests.cron.service'
+import { HorecaRequestsCronService } from './cron/horecaRequests.cron.service'
 @Module({
     imports: [UsersModule, UploadsModule, CronModule],
     controllers: [HorecaRequestsTemplateController, HorecaRequestsController],

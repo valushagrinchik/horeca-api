@@ -6,6 +6,12 @@ import { DatabaseService } from '../../system/database/database.service'
 export class ProviderRequestsDbService {
     constructor(private prisma: DatabaseService) {}
 
+    getRawById = async (userId: number, id: number) => {
+        return this.prisma.providerRequest.findUnique({
+            where: { id, userId },
+        })
+    }
+
     async create(data: Prisma.ProviderRequestCreateInput) {
         return this.prisma.providerRequest.create({
             data,

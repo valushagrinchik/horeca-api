@@ -61,10 +61,17 @@ enum ChatType {
 }
 
 enum HorecaRequestStatus {
-  WaitingForProviderRequests
+  Pending // Waiting for Provider requests
+  Active // Provider shosen and deliveryTime not yet passed
+  CompletedSuccessfully // Provider chosen and deliveryTime passed
+  CompletedUnsuccessfully // No provider requests or no chosen provider request by horeca until deliveryTime passed
+}
+
+enum ProviderRequestStatus {
+  Pending
   Active
-  CompletedSuccessfully
-  CompletedUnsuccessfully
+  Canceled
+  Finished
 }
 
 model User {
@@ -85,7 +92,7 @@ model User {
   profile Profile?
   mails   Mail[]
 
-  Product          Product[]
+  product          Product[]
   providerRequests ProviderRequest[]
   horecaRequests   HorecaRequest[]
 
@@ -94,11 +101,12 @@ model User {
   horecaRequestProviderStatuses HorecaRequestProviderStatus[]
 
   // horeca property
-  favourites HorecaFavourites[] @relation("user")
+  favourites             HorecaFavourites[]      @relation("user")
+  providerRequestReviews ProviderRequestReview[]
 
   // provider property
-  favouritesOf          HorecaFavourites[]      @relation("provider")
-  templates HorecaRequestTemplate[]
+  favouritesOf HorecaFavourites[]      @relation("provider")
+  templates    HorecaRequestTemplate[]
 
   @@map("users")
 }
@@ -291,12 +299,7 @@ model HorecaRequest {
   name         String
   phone        String
 
-  status       HorecaRequestStatus @default(WaitingForProviderRequests)
-
-
-  // indicates whitch provider request was approved by horeca to start chating
-  activeProviderRequest   ProviderRequest? @relation(fields: [activeProviderRequestId], references: [id])
-  activeProviderRequestId Int?             @unique @map("active_provider_request_id")
+  status HorecaRequestStatus @default(Pending)
 
   chat   Chat? @relation(fields: [chatId], references: [id])
   chatId Int?  @unique @map("chat_id")
@@ -346,8 +349,9 @@ model HorecaRequestTemplate {
 model HorecaRequestProviderStatus {
   horecaRequest   HorecaRequest @relation(fields: [horecaRequestId], references: [id])
   horecaRequestId Int           @unique @map("horeca_request_id")
-  viewed          Boolean       @default(false)
-  hidden          Boolean       @default(false)
+
+  viewed Boolean @default(false)
+  hidden Boolean @default(false)
 
   provider   User @relation(fields: [providerId], references: [id])
   providerId Int  @map("provider_id")
@@ -358,7 +362,6 @@ model HorecaRequestProviderStatus {
   @@map("horeca_request_provider_status")
 }
 
-// Provider Application
 model ProviderRequest {
   id      Int                   @id @default(autoincrement())
   comment String?
@@ -369,8 +372,9 @@ model ProviderRequest {
   horecaRequest   HorecaRequest @relation("allProviderRequests", fields: [horecaRequestId], references: [id])
   horecaRequestId Int           @map("horeca_request_id")
 
-  //just relation for  HorecaRequest.activeProviderRequest
-  for HorecaRequest?
+  providerRequestReview ProviderRequestReview?
+
+  status ProviderRequestStatus @default(Pending)
 
   // images - could be loaded on runtime from UploadsLink     
   createdAt DateTime @default(now()) @map("created_at")
@@ -378,6 +382,25 @@ model ProviderRequest {
 
   @@unique([userId, horecaRequestId])
   @@map("provider_requests")
+}
+
+model ProviderRequestReview {
+  id Int @id @default(autoincrement())
+
+  // Horeca
+  user   User @relation(fields: [userId], references: [id])
+  userId Int  @map("user_id")
+
+  isDelivered    Int @map("is_delivered")
+  isSuccessfully Int @map("is_successfully")
+
+  providerRequest   ProviderRequest @relation(fields: [providerRequestId], references: [id])
+  providerRequestId Int             @unique @map("provider_request_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@map("provider_requests_review")
 }
 
 model ProviderRequestItem {

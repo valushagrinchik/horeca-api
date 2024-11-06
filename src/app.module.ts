@@ -11,6 +11,7 @@ import { HorecaRequestsModule } from './horecaRequests/horecaRequests.module'
 import { DatabaseModule } from './system/database/database.module'
 import { FavouritesModule } from './favourites/favourites.module'
 import { CronModule } from './system/cron/cron.module'
+import { ReviewsModule } from './reviews/reviews.module'
 
 @Module({
     imports: [
@@ -31,6 +32,7 @@ import { CronModule } from './system/cron/cron.module'
         ProductsModule,
         ChatModule,
         FavouritesModule,
+        ReviewsModule
     ],
     controllers: [],
     providers: [],

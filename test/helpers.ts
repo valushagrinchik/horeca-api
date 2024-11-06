@@ -15,7 +15,7 @@ import { ProviderRequestCreateDto } from '../src/providerRequests/dto/providerRe
 import { HorecaRequestProviderStatusDto } from '../src/providerRequests/dto/horecaRequest.providerStatus.dto'
 import { HorecaRequestSearchDto } from '../src/providerRequests/dto/horecaRequest.search.dto'
 import { HorecaRequestTemplateCreateDto } from '../src/horecaRequests/dto/horecaRequest.template.create.dto'
-import { HorecaRequestApproveProviderRequestDto } from '../src/horecaRequests/dto/horecaRequest.approveProviderRequest.dto'
+import { HorecaRequestSetStatusDto } from '../src/horecaRequests/dto/horecaRequest.approveProviderRequest.dto'
 import { FavouritesCreateDto } from '../src/favourites/dto/favourites.create.dto'
 import { ChatCreateDto } from '../src/chat/dto/chat.create.dto'
 import { ChatDto } from '../src/chat/dto/chat.dto'
@@ -238,7 +238,7 @@ export const findAllProviderRequests = async (
 export const approveProviderRequest = async (
     app: INestApplication,
     accessToken: string,
-    payload: HorecaRequestApproveProviderRequestDto
+    payload: HorecaRequestSetStatusDto
 ) => {
     return request(app.getHttpServer())
         .post(ENDPOINTS.HOREKA_APPROVE_PROVIDER_REQUEST)

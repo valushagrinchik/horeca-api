@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common'
+import { BadRequestException, Injectable } from '@nestjs/common'
 
 import { AuthInfoDto } from '../../users/dto/auth.info.dto'
-import { UploadsLinkType } from '@prisma/client'
+import { ProviderRequestStatus, UploadsLinkType } from '@prisma/client'
 import { ProviderRequestCreateDto } from '../dto/providerRequest.create.dto'
 import { ProviderRequestDto } from '../dto/providerRequest.dto'
 import { UploadsLinkService } from '../../uploads/uploads.link.service'
@@ -16,6 +16,8 @@ import { HorecaRequestSearchDto } from '../dto/horecaRequest.search.dto'
 import { HorecaRequestDto } from '../../horecaRequests/dto/horecaRequest.dto'
 import * as dayjs from 'dayjs'
 import { DB_DATE_FORMAT } from '../../system/utils/constants'
+import { ErrorDto } from '../../system/utils/dto/error.dto'
+import { ErrorCodes } from '../../system/utils/enums/errorCodes.enum'
 
 @Injectable()
 export class ProviderRequestsService {
@@ -26,6 +28,13 @@ export class ProviderRequestsService {
         private horecaRequestService: HorecaRequestsService,
         private horecaRequestProviderStatusRep: HorecaRequestProviderStatusDbService
     ) {}
+
+    async validate(auth: AuthInfoDto, id: number) {
+        const pRequest = await this.providerRequestsRep.getRawById(auth.id, id)
+        if (!pRequest) {
+            throw new BadRequestException(new ErrorDto(ErrorCodes.ITEM_NOT_FOUND))
+        }
+    }
 
     async findHorecaRequests(
         auth: AuthInfoDto,
@@ -42,12 +51,14 @@ export class ProviderRequestsService {
                     category: { in: categories },
                 },
             },
+            // TODO: check income horeca requests for provider
             horecaRequestProviderStatus: !filter.inactive
                 ? {
                       is: null,
                   }
                 : { isNot: null },
             acceptUntill: {
+                // TODO: check date
                 gte: new Date(now),
             },
         }
@@ -77,7 +88,7 @@ export class ProviderRequestsService {
         return [data, total]
     }
 
-    async setStatus(auth: AuthInfoDto, dto: HorecaRequestProviderStatusDto) {
+    async setStatusForIncomeHorecaRequest(auth: AuthInfoDto, dto: HorecaRequestProviderStatusDto) {
         await this.horecaRequestProviderStatusRep.upsert({
             ...dto,
             providerId: auth.id,
@@ -110,7 +121,21 @@ export class ProviderRequestsService {
                 )
         )
 
-        return this.get(auth, providerRequest.id)
+        return this.get(providerRequest.id)
+    }
+
+    async cancel(id: number) {
+        const pRequest = await this.providerRequestsRep.get(id)
+        if (pRequest.status == ProviderRequestStatus.Active) {
+            await this.horecaRequestService.cancelProviderRequest({
+                horecaRequestId: pRequest.horecaRequestId,
+                providerRequestId: id,
+            })
+        } else {
+            await this.providerRequestsRep.update(id, {
+                status: ProviderRequestStatus.Canceled,
+            })
+        }
     }
 
     async findAllAndCount(
@@ -135,7 +160,7 @@ export class ProviderRequestsService {
         return [data, total]
     }
 
-    async get(auth: AuthInfoDto, id: number) {
+    async get(id: number) {
         const providerRequest = await this.providerRequestsRep.get(id)
 
         const images = await this.uploadsLinkService.getImages(

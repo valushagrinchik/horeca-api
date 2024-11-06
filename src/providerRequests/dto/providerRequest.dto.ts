@@ -1,4 +1,4 @@
-import { ProviderRequest } from '@prisma/client'
+import { $Enums, ProviderRequest, ProviderRequestStatus } from '@prisma/client'
 import { ProviderRequestItemDto } from './providerRequestItem.dto'
 
 export class ProviderRequestDto implements ProviderRequest {
@@ -11,6 +11,8 @@ export class ProviderRequestDto implements ProviderRequest {
     updatedAt: Date
 
     items: ProviderRequestItemDto[]
+
+    status: ProviderRequestStatus
 
     constructor(partial: Partial<ProviderRequest & { items: ProviderRequestItemDto[] }>) {
         Object.assign(this, partial)

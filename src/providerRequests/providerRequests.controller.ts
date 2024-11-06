@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common'
+import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common'
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { AuthUser } from '../system/utils/auth/decorators/auth.decorator'
 import { UserRole } from '@prisma/client'
@@ -30,7 +30,7 @@ export class ProviderRequestsController {
     //  TODO: dto chould be changed
     @RequestPaginatedDecorator(HorecaRequestDto)
     @ApiOperation({ summary: "List of HoReCa proposals that matches with provider's offers" })
-    async findForProvider(
+    async incomeHorecaRequests(
         @AuthParamDecorator() auth: AuthInfoDto,
         @RequestPaginatedValidateParamsDecorator() paginate: PaginateValidateType<HorecaRequestSearchDto>
     ) {
@@ -41,8 +41,11 @@ export class ProviderRequestsController {
     @Post('income/status')
     @RequestDecorator(SuccessDto, HorecaRequestProviderStatusDto)
     @ApiOperation({ summary: 'Hide or view income request' })
-    async setStatus(@AuthParamDecorator() auth: AuthInfoDto, @Body() dto: HorecaRequestProviderStatusDto) {
-        await this.service.setStatus(auth, dto)
+    async setStatusForIncomeHorecaRequest(
+        @AuthParamDecorator() auth: AuthInfoDto,
+        @Body() dto: HorecaRequestProviderStatusDto
+    ) {
+        await this.service.setStatusForIncomeHorecaRequest(auth, dto)
         return new SuccessDto('ok')
     }
 
@@ -51,6 +54,14 @@ export class ProviderRequestsController {
     @ApiOperation({ summary: "Create provider request on horeca's one" })
     async create(@AuthParamDecorator() auth: AuthInfoDto, @Body() dto: ProviderRequestCreateDto) {
         return this.service.create(auth, dto)
+    }
+
+    @Put('id')
+    @RequestDecorator(ProviderRequestDto, ProviderRequestCreateDto)
+    @ApiOperation({ summary: 'Cancel request' })
+    async cancel(@AuthParamDecorator() auth: AuthInfoDto, @Param('id') id: number) {
+        await this.service.validate(auth, +id)
+        return this.service.cancel(+id)
     }
 
     @Get()

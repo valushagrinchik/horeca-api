@@ -14,7 +14,7 @@ import {
 } from '../../system/utils/swagger/decorators'
 import { HorecaRequestsService } from '../services/horecaRequests.service'
 import { SuccessDto } from '../../system/utils/dto/success.dto'
-import { HorecaRequestApproveProviderRequestDto } from '../dto/horecaRequest.approveProviderRequest.dto'
+import { HorecaRequestSetStatusDto } from '../dto/horecaRequest.approveProviderRequest.dto'
 import { HorecaRequestWithProviderRequestDto } from '../dto/horecaRequest.withProviderRequests.dto'
 import { PaginatedDto } from '../../system/utils/dto/paginated.dto'
 
@@ -50,13 +50,20 @@ export class HorecaRequestsController {
     }
 
     @Post('approve')
-    @RequestDecorator(SuccessDto, HorecaRequestApproveProviderRequestDto)
+    @RequestDecorator(SuccessDto, HorecaRequestSetStatusDto)
     @ApiOperation({ summary: 'Approve one of providers request to be able to start chat with' })
-    async approveProviderRequest(
-        @AuthParamDecorator() auth: AuthInfoDto,
-        @Body() dto: HorecaRequestApproveProviderRequestDto
-    ) {
-        const res = await this.service.approveProviderRequest(auth, dto)
+    async approveProviderRequest(@AuthParamDecorator() auth: AuthInfoDto, @Body() dto: HorecaRequestSetStatusDto) {
+        await this.service.validate(auth, dto.horecaRequestId)
+        const res = await this.service.approveProviderRequest(dto)
+        return new SuccessDto('ok')
+    }
+
+    @Post('cancel')
+    @RequestDecorator(SuccessDto, HorecaRequestSetStatusDto)
+    @ApiOperation({ summary: 'Cancel earlier chosen provider request' })
+    async cancelProviderRequest(@AuthParamDecorator() auth: AuthInfoDto, @Body() dto: HorecaRequestSetStatusDto) {
+        await this.service.validate(auth, dto.horecaRequestId)
+        const res = await this.service.cancelProviderRequest(dto)
         return new SuccessDto('ok')
     }
 }

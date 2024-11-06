@@ -11,11 +11,11 @@ export class MailCronService {
     ) {}
 
     onModuleInit(): void {
-        void this.processMailTasks()
+        void this.processTasks()
     }
 
     @Cron(CronExpression.EVERY_30_SECONDS)
-    async processMailTasks(): Promise<void> {
+    async processTasks(): Promise<void> {
         await this.cron.processTasks(this.mailService, 'sendMail')
     }
 }
