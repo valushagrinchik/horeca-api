@@ -54,12 +54,11 @@ export function RequestPaginatedDecorator<DTO, SearchDto, ItemExtraDTO>(
                         properties: {
                             data: {
                                 type: 'array',
-                                items: {
-                                    allOf: [
-                                        { $ref: getSchemaPath(dto) },
-                                        itemExtraDto ? { $ref: getSchemaPath(itemExtraDto) } : {},
-                                    ],
-                                },
+                                items: itemExtraDto
+                                    ? {
+                                          allOf: [{ $ref: getSchemaPath(dto) }, { $ref: getSchemaPath(itemExtraDto) }],
+                                      }
+                                    : { $ref: getSchemaPath(dto) },
                             },
                             // Add additional DTOs to properties
                             ...argDtosOptions,

@@ -1,4 +1,4 @@
-import { $Enums, HorecaRequest, HorecaRequestItem, HorecaRequestStatus, PaymentType } from '@prisma/client'
+import { HorecaRequest, HorecaRequestItem, HorecaRequestStatus, PaymentType } from '@prisma/client'
 import { SourceWithUploads } from '../../uploads/dto/upload.dto'
 import { HorecaRequestItemDto } from './horecaRequest.item.dto'
 
@@ -17,8 +17,6 @@ export class HorecaRequestDto extends SourceWithUploads implements HorecaRequest
     status: HorecaRequestStatus
 
     reviewNotificationSent: boolean
-
-    chatId: number | null
 
     createdAt: Date
     updatedAt: Date

@@ -1,5 +1,4 @@
 import { Upload } from '@prisma/client'
-import { Exclude } from 'class-transformer'
 
 export class UploadDto implements Upload {
     id: number

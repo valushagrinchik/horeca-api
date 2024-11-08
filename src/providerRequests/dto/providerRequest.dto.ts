@@ -1,4 +1,4 @@
-import { $Enums, ProviderRequest, ProviderRequestStatus } from '@prisma/client'
+import { ProviderRequest, ProviderRequestStatus } from '@prisma/client'
 import { ProviderRequestItemDto } from './providerRequestItem.dto'
 
 export class ProviderRequestDto implements ProviderRequest {
@@ -9,6 +9,8 @@ export class ProviderRequestDto implements ProviderRequest {
 
     createdAt: Date
     updatedAt: Date
+
+    chatId: number | null
 
     items: ProviderRequestItemDto[]
 
