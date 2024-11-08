@@ -31,3 +31,7 @@ export const DeliveryMethodsLabels: Record<DeliveryMethods, string> = {
 }
 
 export const DB_DATE_FORMAT = 'YYYY-MM-DD'
+
+export const ChatServerMessages = {
+    requestCanceled: 'Одна из сторон отменила работу заказа',
+}

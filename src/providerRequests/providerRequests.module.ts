@@ -6,9 +6,11 @@ import { UploadsModule } from '../uploads/uploads.module'
 import { ProviderRequestsDbService } from './services/providerRequests.db.service'
 import { HorecaRequestsModule } from '../horecaRequests/horecaRequests.module'
 import { HorecaRequestProviderStatusDbService } from './services/horecaRequest.providerStatus.db.service'
+import { NotificationModule } from '../notifications/notification.module'
+import { ChatModule } from '../chat/chat.module'
 
 @Module({
-    imports: [UsersModule, UploadsModule, HorecaRequestsModule],
+    imports: [UsersModule, UploadsModule, HorecaRequestsModule, NotificationModule, ChatModule],
     controllers: [ProviderRequestsController],
     providers: [HorecaRequestProviderStatusDbService, ProviderRequestsDbService, ProviderRequestsService],
 })

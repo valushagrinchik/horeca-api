@@ -22,16 +22,6 @@ export class ChatMessageDbService {
         return this.db.chatMessage.count(args)
     }
 
-    async createMessage({ chatId, ...data }: Omit<Prisma.ChatMessageCreateInput, 'chat'> & { chatId: number }) {
-        return this.db.chatMessage.create({
-            data: {
-                ...data,
-                chat: {
-                    connect: { id: chatId },
-                },
-            },
-        })
-    }
     async update(id: number, data: Prisma.ChatMessageUpdateInput) {
         return this.db.chatMessage.update({
             where: {

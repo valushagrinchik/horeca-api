@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common'
+import { BadRequestException, forwardRef, Inject, Injectable } from '@nestjs/common'
 import { HorecaRequestCreateDto } from '../dto/horecaRequest.create.dto'
 import { HorecaRequestDto } from '../dto/horecaRequest.dto'
 import { AuthInfoDto } from '../../users/dto/auth.info.dto'
@@ -21,20 +21,28 @@ import { ErrorCodes } from '../../system/utils/enums/errorCodes.enum'
 import { NotificationWsGateway } from '../../notifications/notification.ws.gateway'
 import dayjs from 'dayjs'
 import { NotificationEvents } from '../../system/utils/enums/websocketEvents.enum'
+import { ChatWsGateway } from '../../chat/chat.ws.gateway'
+import { ChatServerMessages } from '../../system/utils/constants'
 
 @Injectable()
 export class HorecaRequestsService {
     constructor(
         private horecaRequestsRep: HorecaRequestsDbService,
         private uploadsLinkService: UploadsLinkService,
-        private notificationWsGateway: NotificationWsGateway
+        private notificationWsGateway: NotificationWsGateway,
+        @Inject(forwardRef(() => ChatWsGateway))
+        private chatWsGateway: ChatWsGateway
     ) {}
 
     async validate(auth: AuthInfoDto, id: number) {
-        const horecaRequest = await this.horecaRequestsRep.getRawById(auth.id, id)
-        if (!horecaRequest) {
+        const horecaRequest = await this.horecaRequestsRep.getRawById(id)
+        if (horecaRequest.userId != auth.id) {
             throw new BadRequestException(new ErrorDto(ErrorCodes.ITEM_NOT_FOUND))
         }
+    }
+
+    public async getRawById(id: number) {
+        return this.horecaRequestsRep.getRawById(id)
     }
 
     async create(auth: AuthInfoDto, { imageIds, ...dto }: HorecaRequestCreateDto) {
@@ -54,11 +62,11 @@ export class HorecaRequestsService {
             await this.uploadsLinkService.createMany(UploadsLinkType.HorecaRequest, horecaRequest.id, imageIds)
         }
 
-        return this.get(auth, horecaRequest.id)
+        return this.get(horecaRequest.id)
     }
 
-    async get(auth: AuthInfoDto, id: number) {
-        const horecaRequest = await this.horecaRequestsRep.get(auth.id, id)
+    async get(id: number) {
+        const horecaRequest = await this.horecaRequestsRep.get(id)
         const images = await this.uploadsLinkService.getImages(UploadsLinkType.HorecaRequest, [horecaRequest.id])
 
         return new HorecaRequestWithProviderRequestDto({
@@ -135,7 +143,7 @@ export class HorecaRequestsService {
     }
 
     async isReadyForChat(auth: AuthInfoDto, { pRequestId, hRequestId }: { pRequestId: number; hRequestId: number }) {
-        const request = await this.horecaRequestsRep.get(auth.id, hRequestId, {
+        const request = await this.horecaRequestsRep.get(hRequestId, {
             providerRequests: {
                 where: {
                     id: pRequestId,
@@ -152,7 +160,46 @@ export class HorecaRequestsService {
 
     // Public method
     async cancelProviderRequest(dto: HorecaRequestSetStatusDto) {
-        await this.horecaRequestsRep.cancelProviderRequest(dto)
+        const horecaRequest = await this.horecaRequestsRep.cancelProviderRequest(dto)
+        this.chatWsGateway.sendServerMessage({
+            chatId: horecaRequest.providerRequests[0].chatId,
+            message: ChatServerMessages.requestCanceled,
+        })
+        this.notificationWsGateway.sendNotification(
+            horecaRequest.userId,
+            NotificationEvents.PROVIDER_REQUEST_CANCELED,
+            {
+                pRequestId: dto.providerRequestId,
+                hRequestId: dto.horecaRequestId,
+            }
+        )
+    }
+
+    async cancel(id: number) {
+        const horecaRequest = await this.horecaRequestsRep.get(id, { providerRequests: true })
+        await this.horecaRequestsRep.cancel(id)
+
+        horecaRequest.providerRequests.map(providerRequest => {
+            if (providerRequest.status == ProviderRequestStatus.Active) {
+                this.chatWsGateway.sendServerMessage({
+                    chatId: providerRequest.chatId,
+                    message: ChatServerMessages.requestCanceled,
+                })
+            }
+            if (
+                providerRequest.status == ProviderRequestStatus.Active ||
+                providerRequest.status == ProviderRequestStatus.Pending
+            ) {
+                this.notificationWsGateway.sendNotification(
+                    horecaRequest.userId,
+                    NotificationEvents.HORECA_REQUEST_CANCELED,
+                    {
+                        pRequestId: providerRequest.id,
+                        hRequestId: horecaRequest.id,
+                    }
+                )
+            }
+        })
     }
 
     // Cron

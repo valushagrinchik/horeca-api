@@ -35,7 +35,8 @@ export class HorecaRequestsController {
     @RequestDecorator(HorecaRequestWithProviderRequestDto)
     @ApiOperation({ summary: "Get Horeca request with Provider's requests to compare" })
     async get(@AuthParamDecorator() auth: AuthInfoDto, @Param('id') id: number) {
-        return this.service.get(auth, +id)
+        await this.service.validate(auth, +id)
+        return this.service.get(+id)
     }
 
     @Get()
@@ -58,12 +59,21 @@ export class HorecaRequestsController {
         return new SuccessDto('ok')
     }
 
-    @Post('cancel')
+    @Post('cancelProviderRequest')
     @RequestDecorator(SuccessDto, HorecaRequestSetStatusDto)
     @ApiOperation({ summary: 'Cancel earlier chosen provider request' })
     async cancelProviderRequest(@AuthParamDecorator() auth: AuthInfoDto, @Body() dto: HorecaRequestSetStatusDto) {
         await this.service.validate(auth, dto.horecaRequestId)
         const res = await this.service.cancelProviderRequest(dto)
+        return new SuccessDto('ok')
+    }
+
+    @Get(':id/cancel')
+    @RequestDecorator(SuccessDto)
+    @ApiOperation({ summary: 'Cancel horeca request' })
+    async cancel(@AuthParamDecorator() auth: AuthInfoDto, @Param('id') id: number) {
+        await this.service.validate(auth, +id)
+        const res = await this.service.cancel(+id)
         return new SuccessDto('ok')
     }
 }

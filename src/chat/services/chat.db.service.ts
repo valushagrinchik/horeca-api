@@ -28,13 +28,21 @@ export class ChatDbService {
         })
     }
 
-    async getChat(userId: number, id: number) {
+    async getRawById(userId: number, id: number) {
         return this.db.chat.findUnique({
             where: {
                 id,
                 opponents: {
                     has: userId,
                 },
+            },
+        })
+    }
+
+    async getChat(id: number) {
+        return this.db.chat.findUnique({
+            where: {
+                id,
             },
             include: {
                 messages: {
@@ -43,16 +51,15 @@ export class ChatDbService {
                     },
                     take: 10,
                 },
+                providerRequest: {
+                    include: {
+                        providerRequestReview: true,
+                        horecaRequest: true,
+                    },
+                },
             },
         })
     }
-
-    // async getChatMessages(args: Prisma.ChatMessageFindManyArgs) {
-    //     return this.db.chatMessage.findMany(args)
-    // }
-    // async countChatMessages(args: Prisma.ChatMessageCountArgs) {
-    //     return this.db.chatMessage.count(args)
-    // }
 
     async createMessage({ chatId, ...data }: Omit<Prisma.ChatMessageCreateInput, 'chat'> & { chatId: number }) {
         return this.db.chatMessage.create({

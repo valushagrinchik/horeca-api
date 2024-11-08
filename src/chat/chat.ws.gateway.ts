@@ -10,6 +10,7 @@ import { ChatIncomeMessageCreateDto } from './dto/chat.income.message.create.dto
 import { ChatMessageDto } from './dto/chat.message.dto'
 import { WsGateway } from '../system/ws.gateway'
 import e from 'express'
+import { ChatServerMessageCreateDto } from './dto/chat.server.message.create.dto'
 
 const WS_PORT = Number(process.env.WS_PORT ?? 4000)
 
@@ -30,8 +31,18 @@ export class ChatWsGateway extends WsGateway<ChatEvents, ChatMessageDto> {
         @MessageBody() dto: ChatIncomeMessageCreateDto
     ): Promise<void> {
         const auth = (client as any).auth
-        const chat = await this.chatService.createIncomeMessage(auth, dto)
+        await this.chatService.validate(auth, dto.chatId)
+        const chat = await this.chatService.getChat(dto.chatId)
+        const message = await this.chatService.createIncomeMessage(dto)
         const sendTo = chat.opponents.find(o => o != dto.authorId)
-        this.sendTo(sendTo, ChatEvents.MESSAGE, chat.messages[0])
+        this.sendTo(sendTo, ChatEvents.MESSAGE, message)
+    }
+
+    async sendServerMessage(dto: ChatServerMessageCreateDto): Promise<void> {
+        const chat = await this.chatService.getChat(dto.chatId)
+        const message = await this.chatService.createServerMessage(dto)
+        chat.opponents.map(opponent => {
+            this.sendTo(opponent, ChatEvents.MESSAGE, message)
+        })
     }
 }

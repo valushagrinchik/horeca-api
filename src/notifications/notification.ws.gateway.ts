@@ -11,7 +11,12 @@ type ReviewNotificationPayload = {
     pRequestId: number
     chatId: number
 }
-type NotificationPayload = ReviewNotificationPayload | {}
+
+type ProviderRequestNotificationPayload = {
+    hRequestId: number
+    pRequestId: number
+}
+type NotificationPayload = ReviewNotificationPayload | ProviderRequestNotificationPayload | {}
 
 @WebSocketGateway(WS_PORT, { namespace: 'notifications', cors: true, transports: ['websocket'] })
 export class NotificationWsGateway extends WsGateway<NotificationEvents, NotificationPayload> {

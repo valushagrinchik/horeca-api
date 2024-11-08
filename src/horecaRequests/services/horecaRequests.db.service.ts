@@ -9,9 +9,9 @@ import { DB_DATE_FORMAT } from '../../system/utils/constants'
 export class HorecaRequestsDbService {
     constructor(private db: DatabaseService) {}
 
-    getRawById = async (userId: number, id: number) => {
+    getRawById = async (id: number) => {
         return this.db.horecaRequest.findUnique({
-            where: { id, userId },
+            where: { id },
         })
     }
 
@@ -26,12 +26,11 @@ export class HorecaRequestsDbService {
     }
 
     get = async (
-        userId: number,
         id: number,
         include: Prisma.HorecaRequestInclude = { items: true, providerRequests: { include: { items: true } } }
     ) => {
         return this.db.horecaRequest.findUnique({
-            where: { id, userId },
+            where: { id },
             include,
         })
     }
@@ -82,6 +81,37 @@ export class HorecaRequestsDbService {
                     },
                 },
                 status: HorecaRequestStatus.Pending,
+            },
+            include: {
+                providerRequests: {
+                    where: {
+                        id: dto.providerRequestId,
+                    },
+                },
+            },
+        })
+    }
+
+    cancel = async (id: number) => {
+        return this.db.horecaRequest.update({
+            where: {
+                id,
+            },
+            data: {
+                providerRequests: {
+                    updateMany: {
+                        where: {
+                            // status: { in: [ProviderRequestStatus.Pending, ProviderRequestStatus.Active]}
+                        },
+                        data: {
+                            status: ProviderRequestStatus.Canceled,
+                        },
+                    },
+                },
+                status: HorecaRequestStatus.CompletedUnsuccessfully,
+            },
+            include: {
+                providerRequests: true,
             },
         })
     }

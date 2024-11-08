@@ -1,6 +1,9 @@
 export enum NotificationEvents {
-    REVIEW = 'review',
-    REVIEW_REMINDER = 'reviewReminder',
+    REVIEW = 'REVIEW',
+    REVIEW_REMINDER = 'REVIEW_REMINDER',
+    PROVIDER_REQUEST = 'PROVIDER_REQUEST',
+    PROVIDER_REQUEST_CANCELED = 'PROVIDER_REQUEST_CANCELED',
+    HORECA_REQUEST_CANCELED = 'HORECA_REQUEST_CANCELED',
 }
 
 export enum ChatEvents {

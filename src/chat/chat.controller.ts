@@ -44,6 +44,7 @@ export class ChatsController {
     @RequestDecorator(ChatDto)
     @ApiOperation({ summary: 'Get chat' })
     async getChat(@AuthParamDecorator() auth: AuthInfoDto, @Param('id') id: number) {
-        return this.service.getChat(auth, +id)
+        await this.service.validate(auth, +id)
+        return this.service.getChat(+id)
     }
 }

@@ -18,6 +18,8 @@ import * as dayjs from 'dayjs'
 import { DB_DATE_FORMAT } from '../../system/utils/constants'
 import { ErrorDto } from '../../system/utils/dto/error.dto'
 import { ErrorCodes } from '../../system/utils/enums/errorCodes.enum'
+import { NotificationWsGateway } from '../../notifications/notification.ws.gateway'
+import { NotificationEvents } from '../../system/utils/enums/websocketEvents.enum'
 
 @Injectable()
 export class ProviderRequestsService {
@@ -26,7 +28,8 @@ export class ProviderRequestsService {
         private uploadsLinkService: UploadsLinkService,
         private usersService: UsersService,
         private horecaRequestService: HorecaRequestsService,
-        private horecaRequestProviderStatusRep: HorecaRequestProviderStatusDbService
+        private horecaRequestProviderStatusRep: HorecaRequestProviderStatusDbService,
+        private notificationWsGateway: NotificationWsGateway
     ) {}
 
     async validate(auth: AuthInfoDto, id: number) {
@@ -96,10 +99,11 @@ export class ProviderRequestsService {
     }
 
     async create(auth: AuthInfoDto, { horecaRequestId, items, ...dto }: ProviderRequestCreateDto) {
+        const horecaRequest = await this.horecaRequestService.getRawById(horecaRequestId)
         const providerRequest = await this.providerRequestsRep.create({
             ...dto,
             user: { connect: { id: auth.id } },
-            horecaRequest: { connect: { id: horecaRequestId } },
+            horecaRequest: { connect: horecaRequest },
             items: {
                 createMany: {
                     data: items,
@@ -120,6 +124,11 @@ export class ProviderRequestsService {
                     )
                 )
         )
+
+        this.notificationWsGateway.sendNotification(horecaRequest.userId, NotificationEvents.PROVIDER_REQUEST, {
+            hRequestId: horecaRequest.id,
+            pRequestId: providerRequest.id,
+        })
 
         return this.get(providerRequest.id)
     }

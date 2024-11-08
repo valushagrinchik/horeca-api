@@ -18,7 +18,7 @@ import { ChatsMessageController } from './chat.message.controller'
         }),
         UsersModule,
         FavouritesModule,
-        HorecaRequestsModule,
+        forwardRef(() => HorecaRequestsModule),
     ],
     providers: [ChatWsGateway, ChatDbService, ChatService, ChatMessageDbService, ChatMessageService],
     controllers: [ChatsController, ChatsMessageController],
