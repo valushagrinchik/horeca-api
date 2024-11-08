@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common'
-import { ApiOperation, ApiTags } from '@nestjs/swagger'
+import { ApiExtraModels, ApiOperation, ApiTags } from '@nestjs/swagger'
 import { AuthUser } from '../system/utils/auth/decorators/auth.decorator'
 import { UserRole } from '@prisma/client'
 import { AuthInfoDto } from '../users/dto/auth.info.dto'
@@ -15,6 +15,12 @@ import { ChatDto } from './dto/chat.dto'
 import { ChatCreateDto } from './dto/chat.create.dto'
 import { ChatSearchDto } from './dto/chat.search.dto'
 import { PaginatedDto } from '../system/utils/dto/paginated.dto'
+import {
+    ChatFullDto,
+    ChatProviderRequestDto,
+    ChatHorecaRequestDto,
+    ChatProviderRequestReviewDto,
+} from './dto/chat.full.dto'
 
 @AuthUser(UserRole.Provider, UserRole.Horeca)
 @Controller('chats')
@@ -41,10 +47,29 @@ export class ChatsController {
     }
 
     @Get(':id')
-    @RequestDecorator(ChatDto)
+    @RequestDecorator(ChatFullDto)
+    @ApiExtraModels(ChatProviderRequestDto, ChatHorecaRequestDto, ChatProviderRequestReviewDto)
     @ApiOperation({ summary: 'Get chat' })
     async getChat(@AuthParamDecorator() auth: AuthInfoDto, @Param('id') id: number) {
         await this.service.validate(auth, +id)
-        return this.service.getChat(+id)
+        const chat = await this.service.getChat(+id)
+        return new ChatFullDto({
+            ...chat,
+            ...(chat.providerRequest
+                ? {
+                      providerRequest: new ChatProviderRequestDto({
+                          ...chat.providerRequest,
+                          horecaRequest: new ChatHorecaRequestDto(chat.providerRequest.horecaRequest),
+                          ...(chat.providerRequest.providerRequestReview
+                              ? {
+                                    providerRequestReview: new ChatProviderRequestReviewDto(
+                                        chat.providerRequest.providerRequestReview
+                                    ),
+                                }
+                              : {}),
+                      }),
+                  }
+                : {}),
+        })
     }
 }

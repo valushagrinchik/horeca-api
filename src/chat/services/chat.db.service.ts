@@ -40,7 +40,7 @@ export class ChatDbService {
     }
 
     async getChat(id: number) {
-        return this.db.chat.findUnique({
+        const chat = await this.db.chat.findUnique({
             where: {
                 id,
             },
@@ -59,6 +59,7 @@ export class ChatDbService {
                 },
             },
         })
+        return chat
     }
 
     async createMessage({ chatId, ...data }: Omit<Prisma.ChatMessageCreateInput, 'chat'> & { chatId: number }) {

@@ -37,8 +37,7 @@ export class ChatService {
     }
 
     async getChat(id: number) {
-        const chat = await this.chatRep.getChat(id)
-        return new ChatDto({ ...chat, messages: chat.messages.map(m => new ChatMessageDto(m)) })
+        return this.chatRep.getChat(id)
     }
 
     async validateChatCreation(auth: AuthInfoDto, dto: ChatCreateDto) {

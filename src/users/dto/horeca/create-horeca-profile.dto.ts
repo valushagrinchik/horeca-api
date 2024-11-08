@@ -2,9 +2,9 @@ import { Type } from 'class-transformer'
 import { ValidateIf, ValidateNested } from 'class-validator'
 import { TypeValidate, Validate } from '../../../system/utils/validation/validate.decotators'
 import { Address } from './address.dto'
-import { Profile } from '../profile.dto'
+import { CreateProfileDto } from '../create-profile.dto'
 
-export class CreateHorecaProfileDto extends Profile {
+export class CreateHorecaProfileDto extends CreateProfileDto {
     @Validate(TypeValidate.STRING, { required: false })
     @ValidateIf(o => o.profileType)
     info: string

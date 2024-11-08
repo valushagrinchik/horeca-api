@@ -5,22 +5,17 @@ import { HorecaProfileDto } from './horeca/horeca-profile.dto'
 import { ProviderProfileDto } from './provider/provider-profile.dto'
 
 export class UserDto implements User {
-    @ApiProperty()
     id: number
 
-    @ApiProperty({ enum: UserRole })
+    @ApiProperty({ enum: UserRole, enumName: 'UserRole' })
     role: UserRole
 
-    @ApiProperty()
     name: string
 
-    @ApiProperty()
     tin: string
 
-    @ApiProperty()
     email: string
 
-    @ApiProperty()
     phone: string
 
     @Exclude()

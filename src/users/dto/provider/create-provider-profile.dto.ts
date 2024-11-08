@@ -1,9 +1,9 @@
 import { ValidateIf } from 'class-validator'
 import { Categories, DeliveryMethods } from '../../../system/utils/enums'
 import { TypeValidate, Validate } from '../../../system/utils/validation/validate.decotators'
-import { Profile } from '../profile.dto'
+import { CreateProfileDto } from '../create-profile.dto'
 
-export class CreateProviderProfileDto extends Profile {
+export class CreateProviderProfileDto extends CreateProfileDto {
     @Validate(TypeValidate.NUMBER)
     @ValidateIf(o => o.profileType)
     minOrderAmount: number

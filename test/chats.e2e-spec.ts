@@ -117,6 +117,7 @@ describe('ChatWsGateway (e2e)', () => {
                     providerRequestId: providerRequest.id,
                     type: ChatType.Order,
                 })
+
                 expect(chat).toHaveProperty('id')
                 expect(chat.opponents).toEqual([horeca.id, provider.id])
                 return
@@ -269,7 +270,13 @@ describe('ChatWsGateway (e2e)', () => {
         it(`should return chat`, async () => {
             const chatRes = await getChats(app, providerAuth.accessToken)
 
-            const res = await getChat(app, horecaAuth.accessToken, chatRes.data[0].id)
+            const res = await getChat(app, horecaAuth.accessToken, chatRes.data[1].id)
+
+            expect(res.type).toBe(ChatType.Order)
+            expect(res.providerRequest).not.toBeNull()
+            expect(res.providerRequest.horecaRequest).not.toBeNull()
+            expect(res.providerRequest.horecaRequest.reviewNotificationSent).toBeFalsy()
+            expect(res.providerRequest.providerRequestReview).toBeNull()
 
             expect(res).toHaveProperty('messages')
             expect(res).toHaveProperty('opponents')
