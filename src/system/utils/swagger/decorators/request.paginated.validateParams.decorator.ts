@@ -1,31 +1,34 @@
-import { BadRequestException, ExecutionContext, createParamDecorator } from '@nestjs/common'
+import { BadRequestException, ExecutionContext, Type, createParamDecorator } from '@nestjs/common'
 import type { Request as ExpressRequest } from 'express'
 import { ErrorCodes } from '../../enums/errorCodes.enum'
 import { ErrorDto } from '../../dto/error.dto'
 
 export const RequestPaginatedValidateParamsDecorator = createParamDecorator((data: unknown, ctx: ExecutionContext) => {
     const request: ExpressRequest = ctx.switchToHttp().getRequest()
-    const query = request.query
+    const { sort, search: searchInput, offset, limit } = request.query
     let search = {}
-    let sort: PaginateValidateSortType | undefined = new PaginateValidateSortType({ field: 'createdAt', order: 'desc' })
-    if (query.sort) {
+    let sortType: PaginateValidateSortType | undefined = new PaginateValidateSortType({
+        field: 'createdAt',
+        order: 'desc',
+    })
+    if (sort) {
         //TODO Сделать проверку на валидность поля order
-        const [field, order] = query.sort.toString().split('|')
+        const [field, order] = sort.toString().split('|')
         if (order !== 'asc' && order !== 'desc') {
             throw new BadRequestException(new ErrorDto(ErrorCodes.INVALID_QUERY_STRING))
         }
-        sort = new PaginateValidateSortType({ field, order: order })
+        sortType = new PaginateValidateSortType({ field, order: order })
     }
 
-    if (query.search) {
-        search = JSON.parse(query.search.toString())
+    if (searchInput) {
+        search = JSON.parse(searchInput.toString())
     }
 
     return new PaginateValidateType({
-        offset: query.offset ? parseInt(query.offset.toString(), 10) : 0,
-        limit: query.limit ? parseInt(query.limit.toString(), 10) : 60,
+        offset: offset ? parseInt(offset.toString(), 10) : 0,
+        limit: limit ? parseInt(limit.toString(), 10) : 60,
         search,
-        sort: sort,
+        sort: sortType,
     })
 })
 
@@ -37,6 +40,7 @@ export class PaginateValidateType<T = object> {
     search: T
 
     sort: PaginateValidateSortType
+
     constructor(partial: Partial<PaginateValidateType<T>>) {
         Object.assign(this, partial)
     }

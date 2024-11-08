@@ -12,7 +12,7 @@ import { UsersService } from '../../users/services/users.service'
 import { HorecaRequestsService } from '../../horecaRequests/services/horecaRequests.service'
 import { HorecaRequestProviderStatusDto } from '../dto/horecaRequest.providerStatus.dto'
 import { HorecaRequestProviderStatusDbService } from './horecaRequest.providerStatus.db.service'
-import { HorecaRequestSearchDto } from '../dto/horecaRequest.search.dto'
+import { ProviderHorecaRequestSearchDto } from '../dto/provider.horecaRequest.search.dto'
 import { HorecaRequestDto } from '../../horecaRequests/dto/horecaRequest.dto'
 import * as dayjs from 'dayjs'
 import { DB_DATE_FORMAT } from '../../system/utils/constants'
@@ -20,6 +20,8 @@ import { ErrorDto } from '../../system/utils/dto/error.dto'
 import { ErrorCodes } from '../../system/utils/enums/errorCodes.enum'
 import { NotificationWsGateway } from '../../notifications/notification.ws.gateway'
 import { NotificationEvents } from '../../system/utils/enums/websocketEvents.enum'
+import { ProviderRequestSearchDto } from '../dto/providerRequest.search.dto'
+import { Categories } from '../../system/utils/enums'
 
 @Injectable()
 export class ProviderRequestsService {
@@ -41,25 +43,26 @@ export class ProviderRequestsService {
 
     async findHorecaRequests(
         auth: AuthInfoDto,
-        paginate: Partial<PaginateValidateType<HorecaRequestSearchDto>> = {}
+        paginate: Partial<PaginateValidateType<ProviderHorecaRequestSearchDto>> = {}
     ): Promise<[HorecaRequestDto[], number]> {
         const now = dayjs().format(DB_DATE_FORMAT)
         const provider = await this.usersService.get(auth)
-        const categories = provider.profile.categories
-        const filter = paginate.search
+        const categories = provider.profile.categories as Categories[]
+        const { includeHiddenAndViewed, category } = paginate.search
+
+        if (category && !categories.includes(category)) {
+            throw new BadRequestException(new ErrorDto(ErrorCodes.FORBIDDEN_ACTION))
+        }
+
+        const categoriesFilter = category ? [category] : categories
 
         const where = {
             items: {
                 some: {
-                    category: { in: categories },
+                    category: { in: categoriesFilter },
                 },
             },
-            // TODO: check income horeca requests for provider
-            horecaRequestProviderStatus: !filter.inactive
-                ? {
-                      is: null,
-                  }
-                : { isNot: null },
+            ...(includeHiddenAndViewed ? {} : { horecaRequestProviderStatus: { is: null } }),
             acceptUntill: {
                 // TODO: check date
                 gte: new Date(now),
@@ -149,12 +152,12 @@ export class ProviderRequestsService {
 
     async findAllAndCount(
         auth: AuthInfoDto,
-        paginate: Partial<PaginateValidateType> = {}
+        paginate: Partial<PaginateValidateType<ProviderRequestSearchDto>> = {}
     ): Promise<[ProviderRequestDto[], number]> {
+        const { status } = paginate.search
+        const where = { userId: auth.id, status }
         const data = await this.providerRequestsRep.findAll({
-            where: {
-                userId: auth.id,
-            },
+            where,
             orderBy: {
                 [paginate.sort.field]: paginate.sort.order,
             },
@@ -162,9 +165,7 @@ export class ProviderRequestsService {
             skip: paginate.offset,
         })
         const total = await this.providerRequestsRep.count({
-            where: {
-                userId: auth.id,
-            },
+            where,
         })
         return [data, total]
     }

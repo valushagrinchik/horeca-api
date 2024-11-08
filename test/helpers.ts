@@ -5,15 +5,13 @@ import { LoginUserDto } from '../src/users/dto/login-user.dto'
 import { RegistrateUserDto } from '../src/users/dto/registrate-user.dto'
 import { UpdateUserDto } from '../src/users/dto/update-user.dto'
 import { HorecaRequestCreateDto } from '../src/horecaRequests/dto/horecaRequest.create.dto'
-import { Categories } from '../src/system/utils/enums'
-import { generateAcceptUntil } from '../src/system/utils/date'
 import { PaginateValidateType } from '../src/system/utils/swagger/decorators'
 import { Test, TestingModule, TestingModuleBuilder } from '@nestjs/testing'
 import { AppModule } from '../src/app.module'
 import { AuthResultDto } from '../src/users/dto/auth.result.dto'
 import { ProviderRequestCreateDto } from '../src/providerRequests/dto/providerRequest.create.dto'
 import { HorecaRequestProviderStatusDto } from '../src/providerRequests/dto/horecaRequest.providerStatus.dto'
-import { HorecaRequestSearchDto } from '../src/providerRequests/dto/horecaRequest.search.dto'
+import { ProviderHorecaRequestSearchDto } from '../src/providerRequests/dto/provider.horecaRequest.search.dto'
 import { HorecaRequestTemplateCreateDto } from '../src/horecaRequests/dto/horecaRequest.template.create.dto'
 import { HorecaRequestSetStatusDto } from '../src/horecaRequests/dto/horecaRequest.approveProviderRequest.dto'
 import { FavouritesCreateDto } from '../src/favourites/dto/favourites.create.dto'
@@ -183,7 +181,7 @@ export const findAllHorecaRequest = async (
 export const findAllHorecaRequestForProvider = async (
     app: INestApplication,
     accessToken: string,
-    paginate: Partial<PaginateValidateType<HorecaRequestSearchDto>> = {}
+    paginate: any = {}
 ) => {
     return request(app.getHttpServer())
         .get(ENDPOINTS.HOREKA_REQUESTS_FOR_PROVIDER)

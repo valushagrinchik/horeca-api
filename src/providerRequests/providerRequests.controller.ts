@@ -14,11 +14,11 @@ import { ProviderRequestsService } from './services/providerRequests.service'
 import { ProviderRequestCreateDto } from './dto/providerRequest.create.dto'
 import { ProviderRequestDto } from './dto/providerRequest.dto'
 import { SuccessDto } from '../system/utils/dto/success.dto'
-import { HorecaRequestDto } from '../horecaRequests/dto/horecaRequest.dto'
 import { HorecaRequestProviderStatusDto } from './dto/horecaRequest.providerStatus.dto'
-import { HorecaRequestSearchDto } from './dto/horecaRequest.search.dto'
+import { ProviderHorecaRequestSearchDto } from './dto/provider.horecaRequest.search.dto'
 import { PaginatedDto } from '../system/utils/dto/paginated.dto'
 import { ProviderRequestSearchDto } from './dto/providerRequest.search.dto'
+import { HorecaRequestDto } from '../horecaRequests/dto/horecaRequest.dto'
 
 @AuthUser(UserRole.Provider)
 @Controller('provider/requests')
@@ -27,12 +27,11 @@ export class ProviderRequestsController {
     constructor(private readonly service: ProviderRequestsService) {}
 
     @Get('income')
-    //  TODO: dto chould be changed
-    @RequestPaginatedDecorator(HorecaRequestDto)
+    @RequestPaginatedDecorator(HorecaRequestDto, ProviderHorecaRequestSearchDto)
     @ApiOperation({ summary: "List of HoReCa proposals that matches with provider's offers" })
     async incomeHorecaRequests(
         @AuthParamDecorator() auth: AuthInfoDto,
-        @RequestPaginatedValidateParamsDecorator() paginate: PaginateValidateType<HorecaRequestSearchDto>
+        @RequestPaginatedValidateParamsDecorator() paginate: PaginateValidateType<ProviderHorecaRequestSearchDto>
     ) {
         const [data, total] = await this.service.findHorecaRequests(auth, paginate)
         return new PaginatedDto<HorecaRequestDto>(data, total)
@@ -65,7 +64,7 @@ export class ProviderRequestsController {
     }
 
     @Get()
-    @RequestPaginatedDecorator(ProviderRequestDto)
+    @RequestPaginatedDecorator(ProviderRequestDto, ProviderRequestSearchDto)
     @ApiOperation({ summary: 'Get all provider requests' })
     async findAll(
         @AuthParamDecorator() auth: AuthInfoDto,

@@ -67,13 +67,13 @@ describe('ProviderRequestsController (e2e)', () => {
                 return
             })
         })
-        describe('with search filter {inactive: true}', () => {
-            it('should return array of inactive horeca requests that matche with providers categories', async () => {
+        describe('with search filter {includeHiddenAndViewed: true}', () => {
+            it('should return array of inactive horeca requests that match with providers categories', async () => {
                 const res = await findAllHorecaRequestForProvider(app, providerAuth.accessToken, {
-                    search: { inactive: true },
+                    search: JSON.stringify({ includeHiddenAndViewed: true }),
                 })
 
-                expect(res.data.length).toBe(0)
+                expect(res.data.length).toBe(1)
 
                 return
             })

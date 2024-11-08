@@ -41,7 +41,7 @@ export class HorecaRequestsController {
     }
 
     @Get()
-    @RequestPaginatedDecorator(HorecaRequestDto)
+    @RequestPaginatedDecorator(HorecaRequestDto, HorecaRequestSearchDto)
     @ApiOperation({ summary: 'All Horeca requests' })
     async findAll(
         @AuthParamDecorator() auth: AuthInfoDto,

@@ -89,11 +89,13 @@ export class HorecaRequestsService {
     ): Promise<[HorecaRequestDto[], number]> {
         const { status } = paginate.search
 
+        const where = {
+            userId: auth.id,
+            status,
+        }
+
         const horecaRequests = await this.horecaRequestsRep.findManyWithItems({
-            where: {
-                userId: auth.id,
-                status,
-            },
+            where,
             orderBy: {
                 createdAt: 'desc',
                 [paginate.sort.field]: paginate.sort.order,
@@ -103,9 +105,7 @@ export class HorecaRequestsService {
         })
 
         const total = await this.horecaRequestsRep.count({
-            where: {
-                userId: auth.id,
-            },
+            where,
         })
 
         const images = await this.uploadsLinkService.getImages(
