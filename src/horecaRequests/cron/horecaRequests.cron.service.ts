@@ -11,11 +11,12 @@ export class HorecaRequestsCronService {
     ) {}
 
     onModuleInit(): void {
-        void this.processTasks()
+        this.processTasks()
     }
 
-    @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+    @Cron(CronExpression.EVERY_HOUR)
     async processTasks(): Promise<void> {
-        await this.cron.processTasks(this.service, 'completePastRequests')
+        await this.cron.processTasks(this.service, 'pastRequests')
+        await this.cron.processTasks(this.service, 'sendReviewNotification')
     }
 }

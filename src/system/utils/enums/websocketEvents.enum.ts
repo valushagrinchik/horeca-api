@@ -1,7 +1,8 @@
-export enum WebsocketEvents {
-    MESSAGE = 'newMessage',
-    MESSAGE_VIEWED = 'messageViewed',
+export enum NotificationEvents {
+    REVIEW = 'review',
+    REVIEW_REMINDER = 'reviewReminder',
+}
 
-    CHAT = 'newChat',
-    CHAT_REMOVED = 'chatRemoved',
+export enum ChatEvents {
+    MESSAGE = 'message',
 }

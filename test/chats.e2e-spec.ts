@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common'
 import { io } from 'socket.io-client'
 import { ChatWsGateway } from '../src/chat/chat.ws.gateway'
-import { WebsocketEvents } from '../src/system/utils/enums/websocketEvents.enum'
+import { ChatEvents } from '../src/system/utils/enums/websocketEvents.enum'
 import {
     addFavourites,
     approveProviderRequest,
@@ -97,6 +97,7 @@ describe('ChatWsGateway (e2e)', () => {
                 const res = await createChat(app, horecaAuth.accessToken, {
                     opponentId: provider.id,
                     horecaRequestId: horecaRequest.id,
+                    providerRequestId: providerRequest.id,
                     type: ChatType.Order,
                 })
 
@@ -113,6 +114,7 @@ describe('ChatWsGateway (e2e)', () => {
                 chat = await createChat(app, horecaAuth.accessToken, {
                     opponentId: provider.id,
                     horecaRequestId: horecaRequest.id,
+                    providerRequestId: providerRequest.id,
                     type: ChatType.Order,
                 })
                 expect(chat).toHaveProperty('id')
@@ -139,23 +141,23 @@ describe('ChatWsGateway (e2e)', () => {
                 expect.assertions(2)
 
                 return new Promise<void>(resolve => {
-                    providerWsClient.on(WebsocketEvents.MESSAGE, data => {
+                    providerWsClient.on(ChatEvents.MESSAGE, data => {
                         const res = expect(data.message).toBe('Hello!')
                         horecaWsClient.disconnect()
                         providerWsClient.disconnect()
                         return resolve(res)
                     })
 
-                    providerWsClient.emit(WebsocketEvents.MESSAGE, {
+                    providerWsClient.emit(ChatEvents.MESSAGE, {
                         chatId: chat.id,
                         message: 'Hi!',
                         authorId: provider.id,
                     })
 
-                    horecaWsClient.on(WebsocketEvents.MESSAGE, data => {
+                    horecaWsClient.on(ChatEvents.MESSAGE, data => {
                         expect(data.message).toBe('Hi!')
 
-                        horecaWsClient.emit(WebsocketEvents.MESSAGE, {
+                        horecaWsClient.emit(ChatEvents.MESSAGE, {
                             chatId: chat.id,
                             message: 'Hello!',
                             authorId: horeca.id,
@@ -210,23 +212,23 @@ describe('ChatWsGateway (e2e)', () => {
                 expect.assertions(2)
 
                 return new Promise<void>(resolve => {
-                    providerWsClient.on(WebsocketEvents.MESSAGE, data => {
+                    providerWsClient.on(ChatEvents.MESSAGE, data => {
                         const res = expect(data.message).toBe('Hello!')
                         horecaWsClient.disconnect()
                         providerWsClient.disconnect()
                         return resolve(res)
                     })
 
-                    providerWsClient.emit(WebsocketEvents.MESSAGE, {
+                    providerWsClient.emit(ChatEvents.MESSAGE, {
                         chatId: chat.id,
                         message: 'Hi!',
                         authorId: provider.id,
                     })
 
-                    horecaWsClient.on(WebsocketEvents.MESSAGE, data => {
+                    horecaWsClient.on(ChatEvents.MESSAGE, data => {
                         expect(data.message).toBe('Hi!')
 
-                        horecaWsClient.emit(WebsocketEvents.MESSAGE, {
+                        horecaWsClient.emit(ChatEvents.MESSAGE, {
                             chatId: chat.id,
                             message: 'Hello!',
                             authorId: horeca.id,

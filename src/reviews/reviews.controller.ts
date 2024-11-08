@@ -6,9 +6,7 @@ import { ReviewsService } from './reviews.service'
 import { AuthInfoDto } from '../users/dto/auth.info.dto'
 import { AuthParamDecorator } from '../system/utils/auth/decorators/auth.param.decorator'
 import { ReviewDto } from './dto/review.dto'
-import {
-    RequestDecorator,
-} from '../system/utils/swagger/decorators'
+import { RequestDecorator } from '../system/utils/swagger/decorators'
 import { ReviewCreateDto } from './dto/review.create.dto'
 
 @AuthUser(UserRole.Horeca)
@@ -19,7 +17,7 @@ export class ReviewsController {
 
     @Post()
     @RequestDecorator(ReviewDto, ReviewCreateDto)
-    @ApiOperation({ summary: "Create review on succesfully finished provider request" })
+    @ApiOperation({ summary: 'Create review on succesfully finished provider request' })
     async create(@AuthParamDecorator() auth: AuthInfoDto, @Body() dto: ReviewCreateDto) {
         return this.service.create(auth, dto)
     }

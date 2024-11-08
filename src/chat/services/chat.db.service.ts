@@ -12,14 +12,14 @@ export class ChatDbService {
         private db: DatabaseService
     ) {}
 
-    async createChat(userId: number, { opponentId, horecaRequestId, ...dto }: ChatCreateDto) {
+    async createChat(userId: number, { opponentId, providerRequestId, horecaRequestId, ...dto }: ChatCreateDto) {
         return this.db.chat.create({
             data: {
                 ...dto,
-                ...(horecaRequestId
+                ...(providerRequestId
                     ? {
-                          horecaRequest: {
-                              connect: { id: horecaRequestId },
+                          providerRequest: {
+                              connect: { id: providerRequestId },
                           },
                       }
                     : {}),
@@ -47,33 +47,12 @@ export class ChatDbService {
         })
     }
 
-    async getChatWithPaginatedMessages(userId: number, id: number, paginate: PaginateValidateType) {
-        return this.db.chat.findUnique({
-            where: {
-                id,
-                opponents: {
-                    has: userId,
-                },
-            },
-            include: {
-                messages: {
-                    orderBy: {
-                        createdAt: 'desc',
-                        [paginate.sort.field]: paginate.sort.order,
-                    },
-                    take: paginate.limit,
-                    skip: paginate.offset,
-                },
-            },
-        })
-    }
-
-    async getChatMessages(args: Prisma.ChatMessageFindManyArgs) {
-        return this.db.chatMessage.findMany(args)
-    }
-    async countChatMessages(args: Prisma.ChatMessageCountArgs) {
-        return this.db.chatMessage.count(args)
-    }
+    // async getChatMessages(args: Prisma.ChatMessageFindManyArgs) {
+    //     return this.db.chatMessage.findMany(args)
+    // }
+    // async countChatMessages(args: Prisma.ChatMessageCountArgs) {
+    //     return this.db.chatMessage.count(args)
+    // }
 
     async createMessage({ chatId, ...data }: Omit<Prisma.ChatMessageCreateInput, 'chat'> & { chatId: number }) {
         return this.db.chatMessage.create({

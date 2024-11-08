@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common'
+import { forwardRef, Module } from '@nestjs/common'
 import { ChatsController } from './chat.controller'
 import { ChatService } from './services/chat.service'
 import { UsersModule } from '../users/users.module'
@@ -7,6 +7,9 @@ import { ChatDbService } from './services/chat.db.service'
 import { ConfigModule } from '@nestjs/config'
 import { HorecaRequestsModule } from '../horecaRequests/horecaRequests.module'
 import { FavouritesModule } from '../favourites/favourites.module'
+import { ChatMessageDbService } from './services/chat.message.db.service'
+import { ChatMessageService } from './services/chat.message.service'
+import { ChatsMessageController } from './chat.message.controller'
 
 @Module({
     imports: [
@@ -14,11 +17,11 @@ import { FavouritesModule } from '../favourites/favourites.module'
             isGlobal: true,
         }),
         UsersModule,
-        HorecaRequestsModule,
         FavouritesModule,
+        HorecaRequestsModule,
     ],
-    providers: [ChatWsGateway, ChatDbService, ChatService],
-    controllers: [ChatsController],
-    exports: [ChatService],
+    providers: [ChatWsGateway, ChatDbService, ChatService, ChatMessageDbService, ChatMessageService],
+    controllers: [ChatsController, ChatsMessageController],
+    exports: [ChatService, ChatWsGateway],
 })
 export class ChatModule {}

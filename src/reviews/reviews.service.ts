@@ -6,16 +6,14 @@ import { ReviewDto } from './dto/review.dto'
 
 @Injectable()
 export class ReviewsService {
-    constructor(
-        private prisma: DatabaseService,
-    ) {}
+    constructor(private prisma: DatabaseService) {}
 
-    async create(auth: AuthInfoDto, dto: ReviewCreateDto ) {
+    async create(auth: AuthInfoDto, dto: ReviewCreateDto) {
         const review = await this.prisma.providerRequestReview.create({
             data: {
                 userId: auth.id,
-                ...dto
-            }
+                ...dto,
+            },
         })
         return new ReviewDto(review)
     }
@@ -23,5 +21,4 @@ export class ReviewsService {
     async sendReview() {
         // TODO
     }
-
 }

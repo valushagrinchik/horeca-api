@@ -21,10 +21,18 @@ export class HorecaRequestsDbService {
         })
     }
 
-    get = async (userId: number, id: number) => {
+    update = async (args: Prisma.HorecaRequestUpdateArgs) => {
+        return this.db.horecaRequest.update(args)
+    }
+
+    get = async (
+        userId: number,
+        id: number,
+        include: Prisma.HorecaRequestInclude = { items: true, providerRequests: { include: { items: true } } }
+    ) => {
         return this.db.horecaRequest.findUnique({
             where: { id, userId },
-            include: { items: true, providerRequests: { include: { items: true } } },
+            include,
         })
     }
 
@@ -78,53 +86,73 @@ export class HorecaRequestsDbService {
         })
     }
 
-    completePastRequests = async () => {
+    pastRequests = async () => {
         const now = dayjs().format(DB_DATE_FORMAT)
 
         // CompletedUnsuccessfully
+        // no provider requests untill acceptUntill passed
+        // set horecaRequest.status to CompletedUnsuccessfully
         await this.db.horecaRequest.updateMany({
             where: {
-                OR: [
-                    {
-                        acceptUntill: { lt: now },
-                        providerRequests: {
-                            none: {},
-                        },
-                        status: {
-                            in: [HorecaRequestStatus.Pending],
-                        },
-                    },
-                    {
-                        deliveryTime: { lt: now },
-                        providerRequests: {
-                            some: {},
-                        },
-                        status: {
-                            in: [HorecaRequestStatus.Pending],
-                        },
-                    },
-                ],
+                acceptUntill: { lt: now },
+                providerRequests: {
+                    none: {},
+                },
+                status: {
+                    in: [HorecaRequestStatus.Pending],
+                },
             },
             data: {
                 status: HorecaRequestStatus.CompletedUnsuccessfully,
             },
         })
 
-        // CompletedSuccessfully
+        // No сhosen provider request until deliveryTime passed
+        // set horecaRequest.status to CompletedUnsuccessfully
+        // set providerRequest.status to Canceled
+        await this.pastHorecaRequestsSetStatusTo(
+            HorecaRequestStatus.Pending,
+            HorecaRequestStatus.CompletedUnsuccessfully,
+            ProviderRequestStatus.Pending,
+            ProviderRequestStatus.Canceled,
+            now
+        )
+
+        // Chosen provider request, deliveryTime passed
+        // set horecaRequest.status to Finished
+        // set providerRequest.status to Finished for chosen one and Canceled for others
+        await this.pastHorecaRequestsSetStatusTo(
+            HorecaRequestStatus.Active,
+            HorecaRequestStatus.Finished,
+            ProviderRequestStatus.Active,
+            ProviderRequestStatus.Finished,
+            now
+        )
+        await this.pastHorecaRequestsSetStatusTo(
+            HorecaRequestStatus.Active,
+            HorecaRequestStatus.Finished,
+            ProviderRequestStatus.Pending,
+            ProviderRequestStatus.Canceled,
+            now
+        )
+    }
+
+    async pastHorecaRequestsSetStatusTo(
+        hrStatusFrom: HorecaRequestStatus,
+        hrStatusTo: HorecaRequestStatus,
+        prStatusFrom: ProviderRequestStatus,
+        prStatusTo: ProviderRequestStatus,
+        now = dayjs().format(DB_DATE_FORMAT)
+    ) {
         const data = await this.db.horecaRequest.findMany({
             where: {
                 deliveryTime: { lt: now },
-                providerRequests: {
-                    some: {
-                        status: ProviderRequestStatus.Active,
-                    },
-                },
-                status: HorecaRequestStatus.Active,
+                status: hrStatusFrom,
             },
             include: {
                 providerRequests: {
                     where: {
-                        status: ProviderRequestStatus.Active,
+                        status: prStatusFrom,
                     },
                 },
             },
@@ -134,14 +162,14 @@ export class HorecaRequestsDbService {
             this.db.horecaRequest.update({
                 where: { id: record.id },
                 data: {
-                    status: HorecaRequestStatus.CompletedSuccessfully,
+                    status: hrStatusTo,
                     providerRequests: {
                         updateMany: record.providerRequests.map(pRequest => ({
                             where: {
                                 id: pRequest.id,
                             },
                             data: {
-                                status: ProviderRequestStatus.Finished,
+                                status: prStatusTo,
                             },
                         })),
                     },
@@ -150,5 +178,52 @@ export class HorecaRequestsDbService {
         )
 
         await Promise.all(promises)
+    }
+
+    async findAllForReview() {
+        const hours24Ago = dayjs().add(-1, 'day').toDate()
+
+        return this.db.horecaRequest.findMany({
+            where: {
+                status: ProviderRequestStatus.Finished,
+                reviewNotificationSent: false,
+                deliveryTime: { lt: hours24Ago },
+            },
+            include: {
+                providerRequests: {
+                    where: {
+                        status: ProviderRequestStatus.Finished,
+                    },
+                },
+            },
+        })
+    }
+
+    async findAllForReviewSecondNotification() {
+        // 48 hours after first notification
+        const hours72Ago = dayjs().add(-3, 'day').toDate()
+
+        return this.db.horecaRequest.findMany({
+            where: {
+                status: ProviderRequestStatus.Finished,
+                reviewNotificationSent: true,
+                providerRequests: {
+                    some: {
+                        status: ProviderRequestStatus.Finished,
+                        providerRequestReview: {
+                            is: null,
+                        },
+                    },
+                },
+                deliveryTime: { lt: hours72Ago },
+            },
+            include: {
+                providerRequests: {
+                    where: {
+                        status: ProviderRequestStatus.Finished,
+                    },
+                },
+            },
+        })
     }
 }

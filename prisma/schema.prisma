@@ -63,14 +63,19 @@ enum ChatType {
 enum HorecaRequestStatus {
   Pending // Waiting for Provider requests
   Active // Provider shosen and deliveryTime not yet passed
+  Finished // DeliveryTime passed but request not reviewed yet
   CompletedSuccessfully // Provider chosen and deliveryTime passed
-  CompletedUnsuccessfully // No provider requests or no chosen provider request by horeca until deliveryTime passed
+  CompletedUnsuccessfully // No provider requests or no chosen provider request by horeca until deliveryTime passed; or according review if any of review options is not positive
 }
 
 enum ProviderRequestStatus {
+  // Not approved by horeca yet
   Pending
+  // Approved by horeca
   Active
+  // Canceled by horeca or provider or deliveryTime passed and wasn't chosen by horeca
   Canceled
+  // Approved by horeca and deliveryTime passed 
   Finished
 }
 
@@ -292,17 +297,19 @@ model HorecaRequest {
   userId       Int                 @map("user_id")
   items        HorecaRequestItem[]
   address      String
+
   deliveryTime DateTime            @map("delivery_time")
   acceptUntill DateTime            @map("accept_untill") @db.Date
+
   paymentType  PaymentType         @map("payment_type")
   comment      String?
   name         String
   phone        String
 
+  reviewNotificationSent Boolean @default(false)  @map("review_notification_sent")
+
   status HorecaRequestStatus @default(Pending)
 
-  chat   Chat? @relation(fields: [chatId], references: [id])
-  chatId Int?  @unique @map("chat_id")
 
   providerRequests            ProviderRequest[]            @relation("allProviderRequests")
   // shouldn't be used
@@ -376,6 +383,9 @@ model ProviderRequest {
 
   status ProviderRequestStatus @default(Pending)
 
+  chat   Chat? @relation(fields: [chatId], references: [id])
+  chatId Int?  @unique @map("chat_id")
+
   // images - could be loaded on runtime from UploadsLink     
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
@@ -431,7 +441,7 @@ model Chat {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
-  horecaRequest HorecaRequest?
+  providerRequest ProviderRequest?
 
   @@map("chats")
 }
@@ -443,6 +453,9 @@ model ChatMessage {
   chat   Chat @relation(fields: [chatId], references: [id])
 
   message String
+
+  // indicates that opponent has viewed the message  
+  opponentViewed Boolean @default(false)
 
   // as it can be server message
   authorId Int?    @map("author_id")

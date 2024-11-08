@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common'
+import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common'
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { AuthUser } from '../system/utils/auth/decorators/auth.decorator'
 import { UserRole } from '@prisma/client'
@@ -15,7 +15,6 @@ import { ChatDto } from './dto/chat.dto'
 import { ChatCreateDto } from './dto/chat.create.dto'
 import { ChatSearchDto } from './dto/chat.search.dto'
 import { PaginatedDto } from '../system/utils/dto/paginated.dto'
-import { ChatMessageDto } from './dto/chat.message.dto'
 
 @AuthUser(UserRole.Provider, UserRole.Horeca)
 @Controller('chats')
@@ -46,17 +45,5 @@ export class ChatsController {
     @ApiOperation({ summary: 'Get chat' })
     async getChat(@AuthParamDecorator() auth: AuthInfoDto, @Param('id') id: number) {
         return this.service.getChat(auth, +id)
-    }
-
-    @Get(':id/messages')
-    @RequestPaginatedDecorator(ChatMessageDto)
-    @ApiOperation({ summary: 'Get chat messages' })
-    async getChatMessages(
-        @AuthParamDecorator() auth: AuthInfoDto,
-        @Param('id') id: number,
-        @RequestPaginatedValidateParamsDecorator() paginate: PaginateValidateType
-    ) {
-        const [data, total] = await this.service.getChatMessages(auth, +id, paginate)
-        return new PaginatedDto<ChatMessageDto>(data, total)
     }
 }

@@ -6,6 +6,7 @@ export class ChatMessageDto implements ChatMessage {
     message: string
     authorId: number | null
     isServer: boolean = false
+    opponentViewed: boolean = false
     createdAt: Date
     updatedAt: Date
 

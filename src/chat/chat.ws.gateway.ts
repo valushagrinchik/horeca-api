@@ -1,82 +1,37 @@
 import { JwtService } from '@nestjs/jwt'
-import {
-    ConnectedSocket,
-    MessageBody,
-    OnGatewayConnection,
-    OnGatewayDisconnect,
-    SubscribeMessage,
-    WebSocketGateway,
-    WebSocketServer,
-} from '@nestjs/websockets'
-import { Server, Socket } from 'socket.io'
+import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway } from '@nestjs/websockets'
+import { Socket } from 'socket.io'
 
-import { WebsocketEvents } from '../system/utils/enums/websocketEvents.enum'
+import { ChatEvents } from '../system/utils/enums/websocketEvents.enum'
 import { ConfigService } from '@nestjs/config'
 import { ChatService } from './services/chat.service'
-import { OnModuleInit } from '@nestjs/common'
-import { ChatMessageCreateDto } from '../chat/dto/chat.message.create.dto'
+import { forwardRef, Inject } from '@nestjs/common'
+import { ChatIncomeMessageCreateDto } from './dto/chat.income.message.create.dto'
 import { ChatMessageDto } from './dto/chat.message.dto'
+import { WsGateway } from '../system/ws.gateway'
+import e from 'express'
 
 const WS_PORT = Number(process.env.WS_PORT ?? 4000)
 
 @WebSocketGateway(WS_PORT, { namespace: 'chats', cors: true, transports: ['websocket'] })
-export class ChatWsGateway implements OnModuleInit, OnGatewayConnection, OnGatewayDisconnect {
-    @WebSocketServer() server: Server
-    private clients: { userId: number; client: Socket }[] = []
-
+export class ChatWsGateway extends WsGateway<ChatEvents, ChatMessageDto> {
     constructor(
-        private jwtService: JwtService,
-        private configService: ConfigService,
-        private chatService: ChatService
-    ) {}
-
-    onModuleInit() {
-        this.server.on('error', error => {
-            console.log(error, 'error!!!')
-        })
+        protected jwtService: JwtService,
+        protected configService: ConfigService,
+        @Inject(forwardRef(() => ChatService))
+        protected chatService: ChatService
+    ) {
+        super(jwtService, configService)
     }
 
-    async handleConnection(client: Socket) {
-        try {
-            if (typeof client.handshake.headers.authorization === 'string') {
-                const payload = this.jwtService.verify(client.handshake.headers.authorization.replace('Bearer ', ''), {
-                    secret: this.configService.get('JWT_ACCESS_TOKEN_SECRET'),
-                })
-
-                client = Object.assign(client, {
-                    auth: payload,
-                })
-                this.clients.push({ userId: payload.id, client })
-            } else {
-                client.disconnect()
-            }
-        } catch (error) {
-            client.disconnect()
-        }
-    }
-
-    handleDisconnect(client: Socket) {
-        this.clients = this.clients.filter(data => data.client !== client)
-    }
-
-    @SubscribeMessage(WebsocketEvents.MESSAGE)
+    @SubscribeMessage(ChatEvents.MESSAGE)
     async handleSendMessage(
         @ConnectedSocket() client: Socket,
-        @MessageBody() dto: ChatMessageCreateDto
+        @MessageBody() dto: ChatIncomeMessageCreateDto
     ): Promise<void> {
         const auth = (client as any).auth
-        const chat = await this.chatService.createMessage(auth, dto)
-        this.emitToOpponent(
-            chat.opponents.find(o => o != dto.authorId),
-            WebsocketEvents.MESSAGE,
-            chat.messages[0]
-        )
-    }
-
-    public emitToOpponent(userId: number, event: WebsocketEvents, payload: ChatMessageDto) {
-        const connected = this.clients.find(client => client.userId == userId)
-        if (connected) {
-            connected.client.emit(event, payload)
-        }
+        const chat = await this.chatService.createIncomeMessage(auth, dto)
+        const sendTo = chat.opponents.find(o => o != dto.authorId)
+        this.sendTo(sendTo, ChatEvents.MESSAGE, chat.messages[0])
     }
 }

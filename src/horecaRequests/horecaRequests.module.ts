@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common'
+import { forwardRef, Module } from '@nestjs/common'
 import { UsersModule } from '../users/users.module'
 import { HorecaRequestsService } from './services/horecaRequests.service'
 import { HorecaRequestsController } from './controllers/horecaRequests.controller'
@@ -9,8 +9,9 @@ import { HorecaRequestsTemplateController } from './controllers/horecaRequests.t
 import { HorecaRequestsTemplateService } from './services/horecaRequests.template.service'
 import { CronModule } from '../system/cron/cron.module'
 import { HorecaRequestsCronService } from './cron/horecaRequests.cron.service'
+import { NotificationModule } from '../notifications/notification.module'
 @Module({
-    imports: [UsersModule, UploadsModule, CronModule],
+    imports: [UsersModule, UploadsModule, CronModule, NotificationModule],
     controllers: [HorecaRequestsTemplateController, HorecaRequestsController],
     providers: [
         HorecaRequestsTemplateDbService,

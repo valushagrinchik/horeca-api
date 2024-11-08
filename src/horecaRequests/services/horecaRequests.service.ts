@@ -2,7 +2,14 @@ import { BadRequestException, Injectable } from '@nestjs/common'
 import { HorecaRequestCreateDto } from '../dto/horecaRequest.create.dto'
 import { HorecaRequestDto } from '../dto/horecaRequest.dto'
 import { AuthInfoDto } from '../../users/dto/auth.info.dto'
-import { HorecaRequestStatus, Prisma, UploadsLinkType } from '@prisma/client'
+import {
+    HorecaRequestStatus,
+    Prisma,
+    ProviderRequestStatus,
+    UploadsLinkType,
+    ProviderRequest,
+    ProviderRequestItem,
+} from '@prisma/client'
 import { PaginateValidateType } from '../../system/utils/swagger/decorators'
 import { UploadsLinkService } from '../../uploads/uploads.link.service'
 import { HorecaRequestItemDto } from '../dto/horecaRequest.item.dto'
@@ -11,12 +18,16 @@ import { HorecaRequestSetStatusDto } from '../dto/horecaRequest.approveProviderR
 import { HorecaRequestWithProviderRequestDto } from '../dto/horecaRequest.withProviderRequests.dto'
 import { ErrorDto } from '../../system/utils/dto/error.dto'
 import { ErrorCodes } from '../../system/utils/enums/errorCodes.enum'
+import { NotificationWsGateway } from '../../notifications/notification.ws.gateway'
+import dayjs from 'dayjs'
+import { NotificationEvents } from '../../system/utils/enums/websocketEvents.enum'
 
 @Injectable()
 export class HorecaRequestsService {
     constructor(
         private horecaRequestsRep: HorecaRequestsDbService,
-        private uploadsLinkService: UploadsLinkService
+        private uploadsLinkService: UploadsLinkService,
+        private notificationWsGateway: NotificationWsGateway
     ) {}
 
     async validate(auth: AuthInfoDto, id: number) {
@@ -53,10 +64,12 @@ export class HorecaRequestsService {
         return new HorecaRequestWithProviderRequestDto({
             ...horecaRequest,
             items: horecaRequest.items.map(item => new HorecaRequestItemDto(item)),
-            providerRequests: horecaRequest.providerRequests.map(pR => ({
-                ...pR,
-                cover: pR.items.length / horecaRequest.items.length,
-            })),
+            providerRequests: horecaRequest.providerRequests.map(
+                (pR: ProviderRequest & { items: ProviderRequestItem[] }) => ({
+                    ...pR,
+                    cover: pR.items.length / horecaRequest.items.length,
+                })
+            ),
             images: (images[id] || []).map(image => image.image),
         })
     }
@@ -121,14 +134,16 @@ export class HorecaRequestsService {
         return this.horecaRequestsRep.count(args)
     }
 
-    async isReadyForChat(auth: AuthInfoDto, id: number) {
-        const request = await this.horecaRequestsRep.get(auth.id, id)
-        return request.status == HorecaRequestStatus.Active
-    }
-
-    async completePastRequests() {
-        await this.horecaRequestsRep.completePastRequests()
-        return true
+    async isReadyForChat(auth: AuthInfoDto, { pRequestId, hRequestId }: { pRequestId: number; hRequestId: number }) {
+        const request = await this.horecaRequestsRep.get(auth.id, hRequestId, {
+            providerRequests: {
+                where: {
+                    id: pRequestId,
+                    status: ProviderRequestStatus.Active,
+                },
+            },
+        })
+        return request?.status == HorecaRequestStatus.Active
     }
 
     async approveProviderRequest(dto: HorecaRequestSetStatusDto) {
@@ -138,5 +153,111 @@ export class HorecaRequestsService {
     // Public method
     async cancelProviderRequest(dto: HorecaRequestSetStatusDto) {
         await this.horecaRequestsRep.cancelProviderRequest(dto)
+    }
+
+    // Cron
+    async pastRequests() {
+        await this.horecaRequestsRep.pastRequests()
+        return true
+    }
+
+    async sendReviewNotification() {
+        await this.sendFirstReviewNotification()
+
+        await this.sendSecondReviewNotification()
+
+        await this.validateRequestsOnReview()
+
+        return true
+    }
+
+    // To render review block on the ui request to get review required and in case no review ws listen for notification
+    async sendFirstReviewNotification() {
+        const firstReviewNotificationRequests = await this.horecaRequestsRep.findAllForReview()
+
+        for (const request of firstReviewNotificationRequests) {
+            this.notificationWsGateway.sendNotification(request.userId, NotificationEvents.REVIEW, {
+                hRequestId: request.id,
+                pRequestId: request.providerRequests[0].id,
+                chatId: request.providerRequests[0].chatId,
+            })
+            await this.horecaRequestsRep.update({
+                where: {
+                    id: request.id,
+                },
+                data: {
+                    reviewNotificationSent: true,
+                },
+            })
+        }
+    }
+
+    async sendSecondReviewNotification() {
+        const secondReviewNotificationRequests = await this.horecaRequestsRep.findAllForReviewSecondNotification()
+        for (const request of secondReviewNotificationRequests) {
+            this.notificationWsGateway.sendNotification(request.userId, NotificationEvents.REVIEW_REMINDER, {
+                hRequestId: request.id,
+                pRequestId: request.providerRequests[0].id,
+                chatId: request.providerRequests[0].chatId,
+            })
+        }
+    }
+
+    async validateRequestsOnReview() {
+        // 12 hours after second notification
+        const hours84Ago = dayjs().add(-3, 'day').toDate()
+        await this.horecaRequestsRep.update({
+            where: {
+                status: HorecaRequestStatus.Finished,
+                deliveryTime: { lt: hours84Ago },
+                providerRequests: {
+                    some: {
+                        OR: [
+                            {
+                                status: ProviderRequestStatus.Finished,
+                                providerRequestReview: {
+                                    is: null,
+                                },
+                            },
+                            {
+                                status: ProviderRequestStatus.Finished,
+                                providerRequestReview: {
+                                    isDelivered: 1,
+                                    isSuccessfully: 1,
+                                },
+                            },
+                        ],
+                    },
+                },
+            } as Prisma.HorecaRequestWhereUniqueInput,
+            data: {
+                status: HorecaRequestStatus.CompletedSuccessfully,
+            },
+        })
+
+        await this.horecaRequestsRep.update({
+            where: {
+                status: HorecaRequestStatus.Finished,
+                deliveryTime: { lt: hours84Ago },
+                providerRequests: {
+                    some: {
+                        status: ProviderRequestStatus.Finished,
+                        providerRequestReview: {
+                            OR: [
+                                {
+                                    isDelivered: 0,
+                                },
+                                {
+                                    isSuccessfully: 1,
+                                },
+                            ],
+                        },
+                    },
+                },
+            } as Prisma.HorecaRequestWhereUniqueInput,
+            data: {
+                status: HorecaRequestStatus.CompletedUnsuccessfully,
+            },
+        })
     }
 }

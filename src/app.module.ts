@@ -12,6 +12,7 @@ import { DatabaseModule } from './system/database/database.module'
 import { FavouritesModule } from './favourites/favourites.module'
 import { CronModule } from './system/cron/cron.module'
 import { ReviewsModule } from './reviews/reviews.module'
+import { NotificationModule } from './notifications/notification.module'
 
 @Module({
     imports: [
@@ -32,7 +33,8 @@ import { ReviewsModule } from './reviews/reviews.module'
         ProductsModule,
         ChatModule,
         FavouritesModule,
-        ReviewsModule
+        ReviewsModule,
+        NotificationModule,
     ],
     controllers: [],
     providers: [],
