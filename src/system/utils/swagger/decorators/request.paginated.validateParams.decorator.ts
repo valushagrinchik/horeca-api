@@ -6,7 +6,7 @@ import { ErrorDto } from '../../dto/error.dto'
 export const RequestPaginatedValidateParamsDecorator = createParamDecorator((data: unknown, ctx: ExecutionContext) => {
     const request: ExpressRequest = ctx.switchToHttp().getRequest()
     const query = request.query
-
+    let search = {}
     let sort: PaginateValidateSortType | undefined = new PaginateValidateSortType({ field: 'createdAt', order: 'desc' })
     if (query.sort) {
         //TODO Сделать проверку на валидность поля order
@@ -17,10 +17,14 @@ export const RequestPaginatedValidateParamsDecorator = createParamDecorator((dat
         sort = new PaginateValidateSortType({ field, order: order })
     }
 
+    if (query.search) {
+        search = JSON.parse(query.search.toString())
+    }
+
     return new PaginateValidateType({
         offset: query.offset ? parseInt(query.offset.toString(), 10) : 0,
         limit: query.limit ? parseInt(query.limit.toString(), 10) : 60,
-        search: query.search || {},
+        search,
         sort: sort,
     })
 })

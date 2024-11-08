@@ -17,6 +17,7 @@ import { SuccessDto } from '../../system/utils/dto/success.dto'
 import { HorecaRequestSetStatusDto } from '../dto/horecaRequest.approveProviderRequest.dto'
 import { HorecaRequestWithProviderRequestDto } from '../dto/horecaRequest.withProviderRequests.dto'
 import { PaginatedDto } from '../../system/utils/dto/paginated.dto'
+import { HorecaRequestSearchDto } from '../dto/horecaRequest.search.dto'
 
 @AuthUser(UserRole.Horeca)
 @Controller('horeca/requests')
@@ -44,7 +45,7 @@ export class HorecaRequestsController {
     @ApiOperation({ summary: 'All Horeca requests' })
     async findAll(
         @AuthParamDecorator() auth: AuthInfoDto,
-        @RequestPaginatedValidateParamsDecorator() paginate: PaginateValidateType
+        @RequestPaginatedValidateParamsDecorator() paginate: PaginateValidateType<HorecaRequestSearchDto>
     ) {
         const [data, total] = await this.service.findAllAndCount(auth, paginate)
         return new PaginatedDto<HorecaRequestDto>(data, total)

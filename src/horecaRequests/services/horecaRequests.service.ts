@@ -23,6 +23,7 @@ import dayjs from 'dayjs'
 import { NotificationEvents } from '../../system/utils/enums/websocketEvents.enum'
 import { ChatWsGateway } from '../../chat/chat.ws.gateway'
 import { ChatServerMessages } from '../../system/utils/constants'
+import { HorecaRequestSearchDto } from '../dto/horecaRequest.search.dto'
 
 @Injectable()
 export class HorecaRequestsService {
@@ -84,11 +85,14 @@ export class HorecaRequestsService {
 
     async findAllAndCount(
         auth: AuthInfoDto,
-        paginate: Partial<PaginateValidateType> = {}
+        paginate: Partial<PaginateValidateType<HorecaRequestSearchDto>> = {}
     ): Promise<[HorecaRequestDto[], number]> {
+        const { status } = paginate.search
+
         const horecaRequests = await this.horecaRequestsRep.findManyWithItems({
             where: {
                 userId: auth.id,
+                status,
             },
             orderBy: {
                 createdAt: 'desc',

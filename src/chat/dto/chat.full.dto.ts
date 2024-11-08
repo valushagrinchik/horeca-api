@@ -57,7 +57,7 @@ export class ChatProviderRequestDto implements ProviderRequest {
     status: ProviderRequestStatus
     chatId: number
 
-    providerRequestReview?: ChatProviderRequestReviewDto 
+    providerRequestReview?: ChatProviderRequestReviewDto
     horecaRequest: ChatHorecaRequestDto
 
     createdAt: Date

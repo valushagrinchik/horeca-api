@@ -28,3 +28,13 @@ horeca!
 admin@test.com
 admin!
 
+## Вопросы
+1 Finished - статус после deliveryTime до review - не отображен на ui
+export const HorecaRequestStatus: {
+  Pending: 'Pending',
+  Active: 'Active',
+  Finished: 'Finished',   
+  CompletedSuccessfully: 'CompletedSuccessfully',
+  CompletedUnsuccessfully: 'CompletedUnsuccessfully'
+};
+
