@@ -164,8 +164,11 @@ export class HorecaRequestsService {
             dto.providerRequestId,
             NotificationEvents.PROVIDER_REQUEST_STATUS_CHANGED,
             {
-                pRequestId: dto.providerRequestId,
-                status: ProviderRequestStatus.Active,
+                data: {
+                    pRequestId: dto.providerRequestId,
+                    hRequestId: dto.horecaRequestId,
+                    status: ProviderRequestStatus.Active,
+                },
             }
         )
     }
@@ -183,9 +186,11 @@ export class HorecaRequestsService {
                 horecaRequest.providerRequests[0].userId,
                 NotificationEvents.PROVIDER_REQUEST_STATUS_CHANGED,
                 {
-                    pRequestId: dto.providerRequestId,
-                    hRequestId: dto.horecaRequestId,
-                    status: horecaRequest.providerRequests[0].status,
+                    data: {
+                        pRequestId: dto.providerRequestId,
+                        hRequestId: dto.horecaRequestId,
+                        status: horecaRequest.providerRequests[0].status,
+                    },
                 }
             )
         } else {
@@ -194,9 +199,11 @@ export class HorecaRequestsService {
                 horecaRequest.userId,
                 NotificationEvents.PROVIDER_REQUEST_STATUS_CHANGED,
                 {
-                    pRequestId: dto.providerRequestId,
-                    hRequestId: dto.horecaRequestId,
-                    status: horecaRequest.providerRequests[0].status,
+                    data: {
+                        pRequestId: dto.providerRequestId,
+                        hRequestId: dto.horecaRequestId,
+                        status: horecaRequest.providerRequests[0].status,
+                    },
                 }
             )
         }
@@ -226,8 +233,11 @@ export class HorecaRequestsService {
                 horecaRequest.userId,
                 NotificationEvents.PROVIDER_REQUEST_STATUS_CHANGED,
                 {
-                    pRequestId: providerRequest.id,
-                    status: ProviderRequestStatus.Canceled,
+                    data: {
+                        pRequestId: providerRequest.id,
+                        hRequestId: horecaRequest.id,
+                        status: ProviderRequestStatus.Canceled,
+                    },
                 }
             )
         })
@@ -239,9 +249,11 @@ export class HorecaRequestsService {
 
         for (const request of firstReviewNotificationRequests) {
             this.notificationWsGateway.sendNotification(request.userId, NotificationEvents.REVIEW, {
-                hRequestId: request.id,
-                pRequestId: request.providerRequests[0].id,
-                chatId: request.providerRequests[0].chatId,
+                data: {
+                    hRequestId: request.id,
+                    pRequestId: request.providerRequests[0].id,
+                    chatId: request.providerRequests[0].chatId,
+                },
             })
             await this.horecaRequestsRep.update({
                 where: {
@@ -258,9 +270,11 @@ export class HorecaRequestsService {
         const secondReviewNotificationRequests = await this.horecaRequestsRep.findAllForReviewSecondNotification()
         for (const request of secondReviewNotificationRequests) {
             this.notificationWsGateway.sendNotification(request.userId, NotificationEvents.REVIEW_REMINDER, {
-                hRequestId: request.id,
-                pRequestId: request.providerRequests[0].id,
-                chatId: request.providerRequests[0].chatId,
+                data: {
+                    hRequestId: request.id,
+                    pRequestId: request.providerRequests[0].id,
+                    chatId: request.providerRequests[0].chatId,
+                },
             })
         }
     }

@@ -9,9 +9,7 @@ import { forwardRef, Inject } from '@nestjs/common'
 import { WsMessageCreateDto } from './dto/ws.message.create.dto'
 import { ChatMessageDto } from './dto/chat.message.dto'
 import { WsGateway } from '../system/ws.gateway'
-import e from 'express'
 import { ChatServerMessageCreateDto } from './dto/chat.server.message.create.dto'
-import { ApiExtraModels } from '@nestjs/swagger'
 
 const WS_PORT = Number(process.env.WS_PORT ?? 4000)
 

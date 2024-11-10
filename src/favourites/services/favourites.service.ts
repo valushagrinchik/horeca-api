@@ -6,6 +6,7 @@ import { PaginateValidateType } from '../../system/utils/swagger/decorators'
 import { FavouritesDto } from '../dto/favourites.dto'
 import { NotificationWsGateway } from '../../notifications/notification.ws.gateway'
 import { NotificationEvents } from '../../system/utils/enums/websocketEvents.enum'
+import { ProviderAddedToFavouritesNotificationPayload } from 'src/notifications/dto/notification.payload.dto'
 
 @Injectable()
 export class FavouritesService {
@@ -17,7 +18,7 @@ export class FavouritesService {
     async create(auth: AuthInfoDto, dto: FavouritesCreateDto) {
         const fav = await this.favsRep.create(auth.id, dto)
         this.notificationWsGateway.sendNotification(dto.providerId, NotificationEvents.PROVIDER_ADDED_TO_FAVOURITES, {
-            horecaId: auth.id,
+            data: { horecaId: auth.id },
         })
         return fav
     }
@@ -25,7 +26,9 @@ export class FavouritesService {
     async delete(auth: AuthInfoDto, providerId: number) {
         const fav = this.favsRep.delete(auth.id, providerId)
         this.notificationWsGateway.sendNotification(providerId, NotificationEvents.PROVIDER_DELETED_FROM_FAVOURITES, {
-            horecaId: auth.id,
+            data: {
+                horecaId: auth.id,
+            },
         })
         return fav
     }

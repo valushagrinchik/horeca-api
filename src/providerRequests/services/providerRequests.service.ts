@@ -136,8 +136,10 @@ export class ProviderRequestsService {
         )
 
         this.notificationWsGateway.sendNotification(horecaRequest.userId, NotificationEvents.PROVIDER_REQUEST_CREATED, {
-            hRequestId: horecaRequest.id,
-            pRequestId: providerRequest.id,
+            data: {
+                hRequestId: horecaRequest.id,
+                pRequestId: providerRequest.id,
+            },
         })
 
         return this.get(providerRequest.id)
