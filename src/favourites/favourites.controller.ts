@@ -24,10 +24,10 @@ export class FavouritesController {
 
     @Post()
     @ApiOperation({ summary: 'Add provider in favourites to be able to chat' })
-    @RequestDecorator(SuccessDto, FavouritesCreateDto)
+    @RequestDecorator(FavouritesDto, FavouritesCreateDto)
     async create(@AuthParamDecorator() auth: AuthInfoDto, @Body() dto: FavouritesCreateDto) {
-        await this.service.create(auth, dto)
-        return new SuccessDto('ok')
+        const fav = await this.service.create(auth, dto)
+        return new FavouritesDto(fav)
     }
 
     @Delete(':providerId')

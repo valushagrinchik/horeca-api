@@ -13,9 +13,13 @@ export class ChatCreateDto {
     @ValidateIf(o => o.type == ChatType.Order)
     horecaRequestId?: number
 
-    // @Validate(TypeValidate.NUMBER, { required: false })
-    // @ValidateIf(o => o.type == ChatType.Private)
-    // horecaFavouriteId?: number
+    @Validate(TypeValidate.NUMBER, { required: false })
+    @ValidateIf(o => o.type == ChatType.Private)
+    horecaFavouriteId?: number
+
+    @Validate(TypeValidate.NUMBER, { required: false })
+    @ValidateIf(o => o.type == ChatType.Support)
+    supportRequestId?: number
 
     @Validate(TypeValidate.STRING, { enum: ChatType })
     type: ChatType

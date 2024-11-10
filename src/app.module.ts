@@ -13,6 +13,7 @@ import { FavouritesModule } from './favourites/favourites.module'
 import { CronModule } from './system/cron/cron.module'
 import { ReviewsModule } from './reviews/reviews.module'
 import { NotificationModule } from './notifications/notification.module'
+import { SupportRequestsModule } from './supportRequests/supportRequests.module'
 
 @Module({
     imports: [
@@ -35,6 +36,7 @@ import { NotificationModule } from './notifications/notification.module'
         FavouritesModule,
         ReviewsModule,
         NotificationModule,
+        SupportRequestsModule,
     ],
     controllers: [],
     providers: [],

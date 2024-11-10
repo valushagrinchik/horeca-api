@@ -13,7 +13,7 @@ import { RequestDecorator } from '../system/utils/swagger/decorators'
 
 @Controller('users')
 @ApiTags('Users')
-@AuthUser(UserRole.Provider, UserRole.Horeca)
+@AuthUser(UserRole.Provider, UserRole.Horeca, UserRole.Admin)
 export class UsersController {
     constructor(private readonly usersService: UsersService) {}
 

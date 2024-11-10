@@ -9,11 +9,12 @@ import {
     ProviderRequest,
     ProviderRequestReview,
     ProviderRequestStatus,
+    SupportRequest,
+    SupportRequestStatus,
 } from '@prisma/client'
 import { ChatMessageDto } from './chat.message.dto'
 import { ApiProperty } from '@nestjs/swagger'
 import { TypeValidate, Validate } from '../../system/utils/validation/validate.decotators'
-import { Expose } from 'class-transformer'
 
 export class ChatProviderRequestReviewDto implements ProviderRequestReview {
     id: number
@@ -80,7 +81,28 @@ export class ChatHorecaFavouritesDto implements HorecaFavourites {
     chatId: number
     createdAt: Date
     updatedAt: Date
+
+    constructor(partial: Partial<HorecaFavourites>) {
+        Object.assign(this, partial)
+    }
 }
+
+export class ChatSupportRequestDto implements SupportRequest {
+    id: number
+    userId: number
+    content: string
+    @ApiProperty({ enum: SupportRequestStatus, enumName: 'SupportRequestStatus' })
+    status: SupportRequestStatus
+    adminId: number
+    chatId: number
+    createdAt: Date
+    updatedAt: Date
+
+    constructor(partial: Partial<SupportRequest>) {
+        Object.assign(this, partial)
+    }
+}
+
 export class ChatFullDto implements Chat {
     id: number
     @Validate(TypeValidate.ARRAY)
@@ -90,6 +112,7 @@ export class ChatFullDto implements Chat {
 
     providerRequest?: ChatProviderRequestDto
     horecaFavourites?: ChatHorecaFavouritesDto
+    supportRequest?: ChatSupportRequestDto
     messages: ChatMessageDto[]
 
     createdAt: Date
@@ -97,16 +120,20 @@ export class ChatFullDto implements Chat {
 
     get isChattable(): Boolean {
         return (
-            (this.type === ChatType.Order && this.providerRequest.status == ProviderRequestStatus.Active) ||
+            (this.type === ChatType.Order && this.providerRequest?.status == ProviderRequestStatus.Active) ||
             (this.type === ChatType.Private && !!this.horecaFavourites) ||
-            // TODO: fix after merge with support chat
-            this.type === ChatType.Support
+            (this.type === ChatType.Support && this.supportRequest?.status == SupportRequestStatus.Active)
         )
     }
 
     constructor(
         partial: Partial<
-            Chat & { messages: ChatMessage[]; providerRequest: ProviderRequest; horecaFavourites: HorecaFavourites }
+            Chat & {
+                messages: ChatMessage[]
+                providerRequest: ProviderRequest
+                horecaFavourites: HorecaFavourites
+                supportRequest: SupportRequest
+            }
         >
     ) {
         Object.assign(this, partial)

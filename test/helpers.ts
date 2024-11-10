@@ -18,6 +18,7 @@ import { ChatCreateDto } from '../src/chat/dto/chat.create.dto'
 import { ChatDto } from '../src/chat/dto/chat.dto'
 import { HorecaRequestTemplateUpdateDto } from '../src/horecaRequests/dto/horecaRequest.template.update.dto'
 import { io, Socket } from 'socket.io-client'
+import { SupportRequestCreateDto } from 'src/supportRequests/dto/supportRequest.create.dto'
 
 export const ioClient = (namespace: string, accessToken: string): Socket => {
     return io(process.env.WS_URL + namespace, {
@@ -298,5 +299,24 @@ export const updateProfile = async (app: INestApplication, accessToken: string, 
         .put(ENDPOINTS.PROFILE)
         .set('Authorization', 'Bearer ' + accessToken)
         .send(payload)
+        .then(res => res.body)
+}
+
+export const createSupportRequest = async (
+    app: INestApplication,
+    accessToken: string,
+    payload: SupportRequestCreateDto
+): Promise<ChatDto | any> => {
+    return request(app.getHttpServer())
+        .post(ENDPOINTS.SUPPORT)
+        .set('Authorization', 'Bearer ' + accessToken)
+        .send(payload)
+        .then(res => res.body)
+}
+
+export const assignAdminToSupportRequest = async (app: INestApplication, accessToken: string, id: number) => {
+    return request(app.getHttpServer())
+        .post(ENDPOINTS.SUPPORT_ADMIN.replace(':id', id.toString()))
+        .set('Authorization', 'Bearer ' + accessToken)
         .then(res => res.body)
 }

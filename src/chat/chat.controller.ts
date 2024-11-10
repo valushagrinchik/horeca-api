@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common'
 import { ApiExtraModels, ApiOperation, ApiTags } from '@nestjs/swagger'
 import { AuthUser } from '../system/utils/auth/decorators/auth.decorator'
 import { UserRole } from '@prisma/client'
@@ -20,9 +20,11 @@ import {
     ChatProviderRequestDto,
     ChatHorecaRequestDto,
     ChatProviderRequestReviewDto,
+    ChatHorecaFavouritesDto,
+    ChatSupportRequestDto,
 } from './dto/chat.full.dto'
 
-@AuthUser(UserRole.Provider, UserRole.Horeca)
+@AuthUser(UserRole.Provider, UserRole.Horeca, UserRole.Admin)
 @Controller('chats')
 @ApiTags('Chats')
 export class ChatsController {
@@ -48,7 +50,13 @@ export class ChatsController {
 
     @Get(':id')
     @RequestDecorator(ChatFullDto)
-    @ApiExtraModels(ChatProviderRequestDto, ChatHorecaRequestDto, ChatProviderRequestReviewDto)
+    @ApiExtraModels(
+        ChatProviderRequestDto,
+        ChatHorecaRequestDto,
+        ChatProviderRequestReviewDto,
+        ChatHorecaFavouritesDto,
+        ChatSupportRequestDto
+    )
     @ApiOperation({ summary: 'Get chat' })
     async getChat(@AuthParamDecorator() auth: AuthInfoDto, @Param('id') id: number) {
         await this.service.validate(auth, +id)
@@ -70,6 +78,8 @@ export class ChatsController {
                       }),
                   }
                 : {}),
+            ...(chat.horecaFavourites ? { horecaFavourites: new ChatHorecaFavouritesDto(chat.horecaFavourites) } : {}),
+            ...(chat.supportRequest ? { supportRequest: new ChatSupportRequestDto(chat.supportRequest) } : {}),
         })
     }
 }

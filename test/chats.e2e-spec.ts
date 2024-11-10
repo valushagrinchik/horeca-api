@@ -5,10 +5,12 @@ import { ChatEvents } from '../src/system/utils/enums/websocketEvents.enum'
 import {
     addFavourites,
     approveProviderRequest,
+    assignAdminToSupportRequest,
     authUser,
     createChat,
     createHorecaRequest,
     createProviderRequest,
+    createSupportRequest,
     getChat,
     getChatMessages,
     getChats,
@@ -17,7 +19,7 @@ import {
     ioClient,
 } from './helpers'
 import { AuthResultDto } from '../src/users/dto/auth.result.dto'
-import { horecaUserInput, providerUserInput } from './mock/seedData'
+import { adminUserInput, horecaUserInput, providerUserInput } from './mock/seedData'
 import { ChatType } from '@prisma/client'
 import { ENDPOINTS } from './constants'
 import { generateAcceptUntil } from '../src/system/utils/date'
@@ -32,8 +34,10 @@ let app: INestApplication
 let gateway: ChatWsGateway
 let horecaAuth: AuthResultDto
 let providerAuth: AuthResultDto
+let adminAuth: AuthResultDto
 let provider: UserDto
 let horeca: UserDto
+let admin: UserDto
 
 beforeAll(async () => {
     app = await initApp(undefined, tm => {
@@ -42,8 +46,10 @@ beforeAll(async () => {
 
     horecaAuth = await authUser(app, horecaUserInput)
     providerAuth = await authUser(app, providerUserInput)
+    adminAuth = await authUser(app, adminUserInput)
     provider = await getProfile(app, providerAuth.accessToken)
     horeca = await getProfile(app, horecaAuth.accessToken)
+    admin = await getProfile(app, adminAuth.accessToken)
 })
 
 afterAll(async () => {
@@ -118,6 +124,8 @@ describe('ChatWsGateway (e2e)', () => {
                     providerRequestId: providerRequest.id,
                     type: ChatType.Order,
                 })
+                const chatDetails = await getChat(app, horecaAuth.accessToken, chat.id)
+                expect(chatDetails.providerId).not.toBeNull()
 
                 expect(chat).toHaveProperty('id')
                 expect(chat.opponents).toEqual([horeca.id, provider.id])
@@ -174,13 +182,17 @@ describe('ChatWsGateway (e2e)', () => {
             })
 
             it('should return chat', async () => {
-                await addFavourites(app, horecaAuth.accessToken, {
+                const fav = await addFavourites(app, horecaAuth.accessToken, {
                     providerId: provider.id,
                 })
                 chat = await createChat(app, horecaAuth.accessToken, {
                     opponentId: provider.id,
+                    horecaFavouriteId: fav.id,
                     type: ChatType.Private,
                 })
+                const chatDetails = await getChat(app, horecaAuth.accessToken, chat.id)
+
+                expect(chatDetails.horecaFavourites).not.toBeNull()
                 expect(chat).toHaveProperty('id')
                 expect(chat.opponents).toEqual([horeca.id, provider.id])
                 return
@@ -221,7 +233,77 @@ describe('ChatWsGateway (e2e)', () => {
                 })
             })
         })
-        describe(`with type=${ChatType.Support}`, () => {})
+        describe(`with type=${ChatType.Support}`, () => {
+            let chat: ChatDto
+
+            it('should thow an error in case chat is not allowed', async () => {
+                const res = await createChat(app, adminAuth.accessToken, {
+                    opponentId: provider.id,
+                    supportRequestId: 10,
+                    type: ChatType.Support,
+                })
+
+                expect(res.statusCode).toEqual(400)
+                expect(res.errorMessage).toEqual(ErrorCodes.FORBIDDEN_ACTION)
+                return
+            })
+
+            it('should return chat', async () => {
+                const supportRequest = await createSupportRequest(app, providerAuth.accessToken, {
+                    content: 'I need help!',
+                })
+
+                await assignAdminToSupportRequest(app, adminAuth.accessToken, supportRequest.id)
+
+                chat = await createChat(app, adminAuth.accessToken, {
+                    opponentId: provider.id,
+                    supportRequestId: supportRequest.id,
+                    type: ChatType.Support,
+                })
+
+                const chatDetails = await getChat(app, adminAuth.accessToken, chat.id)
+
+                expect(chatDetails.supportRequest).not.toBeNull()
+                expect(chat).toHaveProperty('id')
+                expect(chat.opponents).toEqual([admin.id, provider.id])
+                return
+            })
+
+            it('should be possible for opponents to communicate with each other', async () => {
+                const adminWsClient = ioClient('chats', adminAuth.accessToken)
+                const providerWsClient = ioClient('chats', providerAuth.accessToken)
+
+                adminWsClient.connect()
+                providerWsClient.connect()
+
+                expect.assertions(2)
+
+                return new Promise<void>(resolve => {
+                    providerWsClient.on(ChatEvents.MESSAGE, data => {
+                        const res = expect(data.message).toBe('Hello!')
+                        adminWsClient.disconnect()
+                        providerWsClient.disconnect()
+                        return resolve(res)
+                    })
+
+                    adminWsClient.on(ChatEvents.MESSAGE, data => {
+                        expect(data.message).toBe('Hi!')
+
+                        adminWsClient.emit(ChatEvents.MESSAGE, {
+                            chatId: chat.id,
+                            message: 'Hello!',
+                            authorId: admin.id,
+                        })
+                    })
+
+                    providerWsClient.emit(ChatEvents.MESSAGE, {
+                        chatId: chat.id,
+                        message: 'Hi!',
+                        authorId: provider.id,
+                    })
+                })
+            })
+        })
     })
 
     describe('GET ' + ENDPOINTS.CHATS, () => {
@@ -243,7 +325,14 @@ describe('ChatWsGateway (e2e)', () => {
         describe('for Provider', () => {
             it(`should return all user\'s chats`, async () => {
                 const res = await getChats(app, providerAuth.accessToken)
-                expect(res.data.length).toEqual(2)
+                expect(res.data.length).toEqual(3)
+                return
+            })
+        })
+        describe('for Admin', () => {
+            it(`should return all user\'s chats`, async () => {
+                const res = await getChats(app, adminAuth.accessToken)
+                expect(res.data.length).toEqual(1)
                 return
             })
         })
@@ -252,8 +341,8 @@ describe('ChatWsGateway (e2e)', () => {
     describe('GET ' + ENDPOINTS.CHAT, () => {
         it(`should return chat`, async () => {
             const chatRes = await getChats(app, providerAuth.accessToken)
-
-            const res = await getChat(app, horecaAuth.accessToken, chatRes.data[1].id)
+            const orderChat = chatRes.data.find(chat => chat.type == ChatType.Order)
+            const res = await getChat(app, horecaAuth.accessToken, orderChat.id)
 
             expect(res.type).toBe(ChatType.Order)
             expect(res.providerRequest).not.toBeNull()

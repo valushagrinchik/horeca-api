@@ -10,6 +10,7 @@ import { FavouritesModule } from '../favourites/favourites.module'
 import { ChatMessageDbService } from './services/chat.message.db.service'
 import { ChatMessageService } from './services/chat.message.service'
 import { ChatsMessageController } from './chat.message.controller'
+import { SupportRequestsModule } from '../supportRequests/supportRequests.module'
 
 @Module({
     imports: [
@@ -19,6 +20,7 @@ import { ChatsMessageController } from './chat.message.controller'
         UsersModule,
         FavouritesModule,
         forwardRef(() => HorecaRequestsModule),
+        SupportRequestsModule,
     ],
     providers: [ChatWsGateway, ChatDbService, ChatService, ChatMessageDbService, ChatMessageService],
     controllers: [ChatsController, ChatsMessageController],

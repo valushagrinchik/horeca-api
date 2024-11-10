@@ -12,7 +12,10 @@ export class ChatDbService {
         private db: DatabaseService
     ) {}
 
-    async createChat(userId: number, { opponentId, providerRequestId, horecaRequestId, ...dto }: ChatCreateDto) {
+    async createChat(
+        userId: number,
+        { opponentId, providerRequestId, horecaRequestId, horecaFavouriteId, supportRequestId, ...dto }: ChatCreateDto
+    ) {
         return this.db.chat.create({
             data: {
                 ...dto,
@@ -20,6 +23,20 @@ export class ChatDbService {
                     ? {
                           providerRequest: {
                               connect: { id: providerRequestId },
+                          },
+                      }
+                    : {}),
+                ...(horecaFavouriteId
+                    ? {
+                          horecaFavourites: {
+                              connect: { id: horecaFavouriteId },
+                          },
+                      }
+                    : {}),
+                ...(supportRequestId
+                    ? {
+                          supportRequest: {
+                              connect: { id: supportRequestId },
                           },
                       }
                     : {}),
@@ -57,6 +74,8 @@ export class ChatDbService {
                         horecaRequest: true,
                     },
                 },
+                horecaFavourites: true,
+                supportRequest: true,
             },
         })
         return chat
@@ -78,11 +97,9 @@ export class ChatDbService {
         paginate: PaginateValidateType<ChatSearchDto>
     ): Promise<[ChatDto[], number]> {
         const search = paginate.search || { type: ChatType.Order }
-        const where = {
-            AND: {
-                opponents: {
-                    has: opponentId,
-                },
+        const where: Prisma.ChatWhereInput = {
+            opponents: {
+                has: opponentId,
             },
             type: search.type,
         }

@@ -12,13 +12,15 @@ import { ErrorCodes } from '../../system/utils/enums/errorCodes.enum'
 import { HorecaRequestsService } from '../../horecaRequests/services/horecaRequests.service'
 import { FavouritesService } from '../../favourites/services/favourites.service'
 import { ChatServerMessageCreateDto } from '../dto/chat.server.message.create.dto'
+import { SupportRequestsService } from '../../supportRequests/services/supportRequests.service'
 
 export class ChatService {
     constructor(
         @Inject(forwardRef(() => ChatDbService))
         private chatRep: ChatDbService,
         private favouritesService: FavouritesService,
-        private horecaRequestsService: HorecaRequestsService
+        private horecaRequestsService: HorecaRequestsService,
+        private supportRequestsService: SupportRequestsService
     ) {}
 
     async validate(auth: AuthInfoDto, id: number) {
@@ -42,21 +44,19 @@ export class ChatService {
     async validateChatCreation(auth: AuthInfoDto, dto: ChatCreateDto) {
         switch (dto.type) {
             case ChatType.Order: {
-                const valid = await this.horecaRequestsService.isReadyForChat(auth, {
+                return this.horecaRequestsService.isReadyForChat(auth, {
                     pRequestId: dto.providerRequestId,
                     hRequestId: dto.horecaRequestId,
                 })
-                if (!valid) {
-                    throw new BadRequestException(new ErrorDto(ErrorCodes.FORBIDDEN_ACTION))
-                }
-                return
             }
             case ChatType.Private: {
-                const valid = await this.favouritesService.isReadyForChat(auth, dto.opponentId)
-                if (!valid) {
-                    throw new BadRequestException(new ErrorDto(ErrorCodes.FORBIDDEN_ACTION))
-                }
-                return
+                return this.favouritesService.isReadyForChat(auth, {
+                    id: dto.horecaFavouriteId,
+                    providerId: dto.opponentId,
+                })
+            }
+            case ChatType.Support: {
+                return this.supportRequestsService.isReadyForChat(auth, dto.supportRequestId)
             }
             default: {
                 throw new BadRequestException(new ErrorDto(ErrorCodes.FORBIDDEN_ACTION))
@@ -66,19 +66,27 @@ export class ChatService {
 
     /** Returns chat object and latest just created message */
     async createChat(auth: AuthInfoDto, dto: ChatCreateDto) {
-        await this.validateChatCreation(auth, dto)
+        const valid = await this.validateChatCreation(auth, dto)
+        if (!valid) {
+            throw new BadRequestException(new ErrorDto(ErrorCodes.FORBIDDEN_ACTION))
+        }
         const chat = await this.chatRep.createChat(auth.id, dto)
+        const messages = []
 
-        const messages = await Promise.all([
-            this.createServerMessage({
-                message: '[horecaRequest]',
-                chatId: chat.id,
-            }),
-            this.createServerMessage({
-                message: '[providerRequest]',
-                chatId: chat.id,
-            }),
-        ])
+        if (chat.type === ChatType.Order) {
+            messages.push(
+                ...(await Promise.all([
+                    this.createServerMessage({
+                        message: '[horecaRequest]',
+                        chatId: chat.id,
+                    }),
+                    this.createServerMessage({
+                        message: '[providerRequest]',
+                        chatId: chat.id,
+                    }),
+                ]))
+            )
+        }
 
         return new ChatDto({ ...chat, messages })
     }

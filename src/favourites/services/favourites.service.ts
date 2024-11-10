@@ -32,8 +32,9 @@ export class FavouritesService {
         return fav
     }
 
-    async isReadyForChat(auth: AuthInfoDto, providerId: number) {
-        const request = await this.favsRep.find({ userId: auth.id, providerId })
+    // Horeca creates Private chat, Admin creates Support chat, Horeca creates Order chat
+    async isReadyForChat(auth: AuthInfoDto, { id, providerId }: { providerId: number; id: number }) {
+        const request = await this.favsRep.find({ userId: auth.id, providerId, id })
         return !!request
     }
 

@@ -1,5 +1,5 @@
 import { ApiProperty, getSchemaPath } from '@nestjs/swagger'
-import { ProfileType, User, UserRole } from '@prisma/client'
+import { Profile, ProfileType, User, UserRole } from '@prisma/client'
 import { Exclude, Transform, Type } from 'class-transformer'
 import { HorecaProfileDto } from './horeca/horeca-profile.dto'
 import { ProviderProfileDto } from './provider/provider-profile.dto'
@@ -33,11 +33,17 @@ export class UserDto implements User {
     @ApiProperty({ oneOf: [{ $ref: getSchemaPath(HorecaProfileDto) }, { $ref: getSchemaPath(ProviderProfileDto) }] })
     @Type(({ object }) => (object.profile.profileType == ProfileType.Horeca ? HorecaProfileDto : ProviderProfileDto))
     @Transform(({ value }) => {
-        return value.profileType == ProfileType.Horeca ? new HorecaProfileDto(value) : new ProviderProfileDto(value)
+        if (value.profileType == ProfileType.Horeca) {
+            return new HorecaProfileDto(value)
+        }
+        if (value.profileType == ProfileType.Provider) {
+            return new ProviderProfileDto(value)
+        }
+        return null
     })
-    profile: HorecaProfileDto | ProviderProfileDto
+    profile: HorecaProfileDto | ProviderProfileDto | null
 
-    constructor(partial: Partial<User>) {
+    constructor(partial: Partial<User & { profile: Profile }>) {
         Object.assign(this, partial)
     }
 }

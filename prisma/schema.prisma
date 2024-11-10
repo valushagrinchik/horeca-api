@@ -55,9 +55,9 @@ enum PaymentType {
 }
 
 enum ChatType {
-  Support
-  Order // Aggrement between horeca and provider requests
-  Private
+  Support // Between horeca or provider and Admin
+  Order // Between horeca and provider based on request
+  Private // Between horeca and one of favourite providers
 }
 
 enum HorecaRequestStatus {
@@ -76,6 +76,12 @@ enum ProviderRequestStatus {
   Canceled
   // Approved by horeca and deliveryTime passed 
   Finished
+}
+
+enum SupportRequestStatus {
+  Default
+  Active
+  Resolved
 }
 
 model User {
@@ -112,7 +118,11 @@ model User {
   favouritesOf HorecaFavourites[]      @relation("provider")
   templates    HorecaRequestTemplate[]
 
+  // support requests
+  supportRequest SupportRequest[]
+
   @@map("users")
+  
 }
 
 model Profile {
@@ -444,11 +454,10 @@ model Chat {
 
   providerRequest ProviderRequest?
   horecaFavourites HorecaFavourites?
+  supportRequest SupportRequest?
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
-
-
 
   @@map("chats")
 }
@@ -473,4 +482,25 @@ model ChatMessage {
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
   @@map("chat_messages")
+}
+
+
+model SupportRequest {
+  id Int @id @default(autoincrement())
+
+  user   User @relation(fields: [userId], references: [id])
+  userId Int  @map("user_id")
+  
+  content String?
+  status SupportRequestStatus @default(Default)
+
+  adminId Int? @map("admin_id")
+
+  chat   Chat? @relation(fields: [chatId], references: [id])
+  chatId Int?  @unique @map("chat_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@map("support_requests")
 }

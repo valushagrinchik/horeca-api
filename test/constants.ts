@@ -14,4 +14,6 @@ export const ENDPOINTS = {
     CHAT: '/chats/:id',
     CHAT_MESSAGES: '/messages',
     HOREKA_APPROVE_PROVIDER_REQUEST: '/horeca/requests/approve',
+    SUPPORT: '/support/requests',
+    SUPPORT_ADMIN: '/support/requests/:id/assign',
 }
