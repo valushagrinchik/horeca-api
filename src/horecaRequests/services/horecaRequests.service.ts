@@ -270,7 +270,7 @@ export class HorecaRequestsService {
         const hours84Ago = dayjs().add(-3, 'day').toDate()
         await this.horecaRequestsRep.update({
             where: {
-                status: HorecaRequestStatus.Finished,
+                status: HorecaRequestStatus.Active,
                 deliveryTime: { lt: hours84Ago },
                 providerRequests: {
                     some: {
@@ -299,7 +299,7 @@ export class HorecaRequestsService {
 
         await this.horecaRequestsRep.update({
             where: {
-                status: HorecaRequestStatus.Finished,
+                status: HorecaRequestStatus.Active,
                 deliveryTime: { lt: hours84Ago },
                 providerRequests: {
                     some: {
@@ -348,14 +348,14 @@ export class HorecaRequestsService {
         // set providerRequest.status to Finished for chosen one and Canceled for others
         await this.horecaRequestsRep.pastHorecaRequestsSetStatuses(
             HorecaRequestStatus.Active,
-            HorecaRequestStatus.Finished,
+            HorecaRequestStatus.Active,
             ProviderRequestStatus.Active,
             ProviderRequestStatus.Finished,
             now
         )
         await this.horecaRequestsRep.pastHorecaRequestsSetStatuses(
             HorecaRequestStatus.Active,
-            HorecaRequestStatus.Finished,
+            HorecaRequestStatus.Active,
             ProviderRequestStatus.Pending,
             ProviderRequestStatus.Canceled,
             now

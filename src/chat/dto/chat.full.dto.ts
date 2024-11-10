@@ -12,6 +12,7 @@ import {
 import { ChatMessageDto } from './chat.message.dto'
 import { ApiProperty } from '@nestjs/swagger'
 import { TypeValidate, Validate } from '../../system/utils/validation/validate.decotators'
+import { Expose } from 'class-transformer'
 
 export class ChatProviderRequestReviewDto implements ProviderRequestReview {
     id: number
@@ -85,6 +86,13 @@ export class ChatFullDto implements Chat {
 
     createdAt: Date
     updatedAt: Date
+
+    // TODO: check why Expose doesn't work
+    // @Expose()
+    // @ApiProperty({ type: Boolean })
+    // get isChattable() {
+    //     return this.providerRequest.status == ProviderRequestStatus.Active
+    // }
 
     constructor(partial: Partial<Chat & { messages: ChatMessage[]; providerRequest: ProviderRequest }>) {
         Object.assign(this, partial)

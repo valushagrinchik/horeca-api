@@ -189,7 +189,7 @@ export class HorecaRequestsDbService {
 
         return this.db.horecaRequest.findMany({
             where: {
-                status: ProviderRequestStatus.Finished,
+                status: HorecaRequestStatus.Active,
                 reviewNotificationSent: false,
                 deliveryTime: { lt: hours24Ago },
             },
@@ -209,7 +209,7 @@ export class HorecaRequestsDbService {
 
         return this.db.horecaRequest.findMany({
             where: {
-                status: ProviderRequestStatus.Finished,
+                status: HorecaRequestStatus.Active,
                 reviewNotificationSent: true,
                 providerRequests: {
                     some: {
