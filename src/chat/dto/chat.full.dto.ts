@@ -2,6 +2,7 @@ import {
     Chat,
     ChatMessage,
     ChatType,
+    HorecaFavourites,
     HorecaRequest,
     HorecaRequestStatus,
     PaymentType,
@@ -72,7 +73,14 @@ export class ChatProviderRequestDto implements ProviderRequest {
         Object.assign(this, partial)
     }
 }
-
+export class ChatHorecaFavouritesDto implements HorecaFavourites {
+    id: number
+    userId: number
+    providerId: number
+    chatId: number
+    createdAt: Date
+    updatedAt: Date
+}
 export class ChatFullDto implements Chat {
     id: number
     @Validate(TypeValidate.ARRAY)
@@ -81,20 +89,26 @@ export class ChatFullDto implements Chat {
     type: ChatType
 
     providerRequest?: ChatProviderRequestDto
+    horecaFavourites?: ChatHorecaFavouritesDto
     messages: ChatMessageDto[]
-    active: boolean
 
     createdAt: Date
     updatedAt: Date
 
-    // TODO: check why Expose doesn't work
-    // @Expose()
-    // @ApiProperty({ type: Boolean })
-    // get isChattable() {
-    //     return this.providerRequest.status == ProviderRequestStatus.Active
-    // }
+    get isChattable(): Boolean {
+        return (
+            (this.type === ChatType.Order && this.providerRequest.status == ProviderRequestStatus.Active) ||
+            (this.type === ChatType.Private && !!this.horecaFavourites) ||
+            // TODO: fix after merge with support chat
+            this.type === ChatType.Support
+        )
+    }
 
-    constructor(partial: Partial<Chat & { messages: ChatMessage[]; providerRequest: ProviderRequest }>) {
+    constructor(
+        partial: Partial<
+            Chat & { messages: ChatMessage[]; providerRequest: ProviderRequest; horecaFavourites: HorecaFavourites }
+        >
+    ) {
         Object.assign(this, partial)
     }
 }

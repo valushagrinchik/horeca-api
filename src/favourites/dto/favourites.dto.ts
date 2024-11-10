@@ -4,6 +4,7 @@ export class FavouritesDto implements HorecaFavourites {
     providerId: number
     id: number
     userId: number
+    chatId: number
     createdAt: Date
     updatedAt: Date
 

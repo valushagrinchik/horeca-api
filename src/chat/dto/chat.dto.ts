@@ -10,7 +10,6 @@ export class ChatDto implements Chat {
     @ApiProperty({ enum: ChatType, enumName: 'ChatType' })
     type: ChatType
     messages: ChatMessageDto[]
-    active: boolean
 
     createdAt: Date
     updatedAt: Date

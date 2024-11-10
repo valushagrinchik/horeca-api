@@ -6,7 +6,6 @@ import { PaginateValidateType } from '../../system/utils/swagger/decorators'
 import { FavouritesDto } from '../dto/favourites.dto'
 import { NotificationWsGateway } from '../../notifications/notification.ws.gateway'
 import { NotificationEvents } from '../../system/utils/enums/websocketEvents.enum'
-import { ProviderAddedToFavouritesNotificationPayload } from 'src/notifications/dto/notification.payload.dto'
 
 @Injectable()
 export class FavouritesService {

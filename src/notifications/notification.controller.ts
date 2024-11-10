@@ -13,7 +13,7 @@ import { AuthParamDecorator } from '../system/utils/auth/decorators/auth.param.d
 import { AuthInfoDto } from '../users/dto/auth.info.dto'
 import { UserRole } from '@prisma/client'
 import { AuthUser } from '../system/utils/auth/decorators/auth.decorator'
-import { SuccessDto } from 'src/system/utils/dto/success.dto'
+import { SuccessDto } from '../system/utils/dto/success.dto'
 
 @AuthUser(UserRole.Admin)
 @Controller('notifications')
