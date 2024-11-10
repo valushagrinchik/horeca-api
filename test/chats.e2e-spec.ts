@@ -14,6 +14,7 @@ import {
     getChats,
     getProfile,
     initApp,
+    ioClient,
 } from './helpers'
 import { AuthResultDto } from '../src/users/dto/auth.result.dto'
 import { horecaUserInput, providerUserInput } from './mock/seedData'
@@ -33,6 +34,9 @@ let horecaAuth: AuthResultDto
 let providerAuth: AuthResultDto
 let provider: UserDto
 let horeca: UserDto
+
+
+
 
 beforeAll(async () => {
     app = await initApp(undefined, tm => {
@@ -124,17 +128,8 @@ describe('ChatWsGateway (e2e)', () => {
             })
 
             it('should be possible for opponents to communicate with each other', async () => {
-                const horecaWsClient = io(process.env.WS_URL, {
-                    autoConnect: false,
-                    transports: ['websocket'],
-                    extraHeaders: { authorization: 'Bearer ' + horecaAuth.accessToken },
-                })
-
-                const providerWsClient = io(process.env.WS_URL, {
-                    autoConnect: false,
-                    transports: ['websocket'],
-                    extraHeaders: { authorization: 'Bearer ' + providerAuth.accessToken },
-                })
+                const horecaWsClient = ioClient('chats',  horecaAuth.accessToken)
+                const providerWsClient = ioClient('chats',  providerAuth.accessToken)
 
                 horecaWsClient.connect()
                 providerWsClient.connect()
@@ -195,17 +190,8 @@ describe('ChatWsGateway (e2e)', () => {
             })
 
             it('should be possible for opponents to communicate with each other', async () => {
-                const horecaWsClient = io(process.env.WS_URL, {
-                    autoConnect: false,
-                    transports: ['websocket'],
-                    extraHeaders: { authorization: 'Bearer ' + horecaAuth.accessToken },
-                })
-
-                const providerWsClient = io(process.env.WS_URL, {
-                    autoConnect: false,
-                    transports: ['websocket'],
-                    extraHeaders: { authorization: 'Bearer ' + providerAuth.accessToken },
-                })
+                const horecaWsClient = ioClient('chats',  horecaAuth.accessToken)
+                const providerWsClient = ioClient('chats',  providerAuth.accessToken)
 
                 horecaWsClient.connect()
                 providerWsClient.connect()

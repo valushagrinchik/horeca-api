@@ -62,8 +62,7 @@ enum ChatType {
 
 enum HorecaRequestStatus {
   Pending // Waiting for Provider requests
-  Active // Provider shosen and deliveryTime not yet passed
-  Finished // DeliveryTime passed but request not reviewed yet
+  Active // Provider shosen and deliveryTime not yet passed or deliveryTime is passed but request not reviewed yet
   CompletedSuccessfully // Provider chosen and deliveryTime passed
   CompletedUnsuccessfully // No provider requests or no chosen provider request by horeca until deliveryTime passed; or according review if any of review options is not positive
 }
@@ -312,6 +311,8 @@ model HorecaRequest {
 
 
   providerRequests            ProviderRequest[]            @relation("allProviderRequests")
+
+  
   // shouldn't be used
   horecaRequestProviderStatus HorecaRequestProviderStatus?
 

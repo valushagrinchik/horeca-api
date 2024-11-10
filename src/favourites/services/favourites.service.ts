@@ -4,17 +4,30 @@ import { AuthInfoDto } from '../../users/dto/auth.info.dto'
 import { FavouritesCreateDto } from '../dto/favourites.create.dto'
 import { PaginateValidateType } from '../../system/utils/swagger/decorators'
 import { FavouritesDto } from '../dto/favourites.dto'
+import { NotificationWsGateway } from '../../notifications/notification.ws.gateway'
+import { NotificationEvents } from '../../system/utils/enums/websocketEvents.enum'
 
 @Injectable()
 export class FavouritesService {
-    constructor(private readonly favsRep: FavouritesDbService) {}
+    constructor(
+        private readonly favsRep: FavouritesDbService,
+        private notificationWsGateway: NotificationWsGateway
+    ) {}
 
     async create(auth: AuthInfoDto, dto: FavouritesCreateDto) {
-        return this.favsRep.create(auth.id, dto)
+        const fav = await this.favsRep.create(auth.id, dto)
+        this.notificationWsGateway.sendNotification(dto.providerId, NotificationEvents.PROVIDER_ADDED_TO_FAVOURITES, {
+            horecaId: auth.id,
+        })
+        return fav
     }
 
     async delete(auth: AuthInfoDto, providerId: number) {
-        return this.favsRep.delete(auth.id, providerId)
+        const fav = this.favsRep.delete(auth.id, providerId)
+        this.notificationWsGateway.sendNotification(providerId, NotificationEvents.PROVIDER_DELETED_FROM_FAVOURITES, {
+            horecaId: auth.id,
+        })
+        return fav
     }
 
     async isReadyForChat(auth: AuthInfoDto, providerId: number) {

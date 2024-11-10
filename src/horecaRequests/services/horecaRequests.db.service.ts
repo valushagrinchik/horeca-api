@@ -101,7 +101,7 @@ export class HorecaRequestsDbService {
                 providerRequests: {
                     updateMany: {
                         where: {
-                            // status: { in: [ProviderRequestStatus.Pending, ProviderRequestStatus.Active]}
+                            status: { in: [ProviderRequestStatus.Pending, ProviderRequestStatus.Active] },
                         },
                         data: {
                             status: ProviderRequestStatus.Canceled,
@@ -110,19 +110,13 @@ export class HorecaRequestsDbService {
                 },
                 status: HorecaRequestStatus.CompletedUnsuccessfully,
             },
-            include: {
-                providerRequests: true,
-            },
         })
     }
 
-    pastRequests = async () => {
+    pastHorecaRequestsWithoutProviderOnes = async () => {
         const now = dayjs().format(DB_DATE_FORMAT)
 
-        // CompletedUnsuccessfully
-        // no provider requests untill acceptUntill passed
-        // set horecaRequest.status to CompletedUnsuccessfully
-        await this.db.horecaRequest.updateMany({
+        const withoutProviderRequests = await this.db.horecaRequest.findMany({
             where: {
                 acceptUntill: { lt: now },
                 providerRequests: {
@@ -132,42 +126,22 @@ export class HorecaRequestsDbService {
                     in: [HorecaRequestStatus.Pending],
                 },
             },
-            data: {
-                status: HorecaRequestStatus.CompletedUnsuccessfully,
-            },
         })
 
-        // No сhosen provider request until deliveryTime passed
-        // set horecaRequest.status to CompletedUnsuccessfully
-        // set providerRequest.status to Canceled
-        await this.pastHorecaRequestsSetStatusTo(
-            HorecaRequestStatus.Pending,
-            HorecaRequestStatus.CompletedUnsuccessfully,
-            ProviderRequestStatus.Pending,
-            ProviderRequestStatus.Canceled,
-            now
-        )
+        const promises = withoutProviderRequests.map(record => {
+            this.db.horecaRequest.update({
+                where: { id: record.id },
+                data: {
+                    status: HorecaRequestStatus.CompletedUnsuccessfully,
+                },
+            })
+        })
 
-        // Chosen provider request, deliveryTime passed
-        // set horecaRequest.status to Finished
-        // set providerRequest.status to Finished for chosen one and Canceled for others
-        await this.pastHorecaRequestsSetStatusTo(
-            HorecaRequestStatus.Active,
-            HorecaRequestStatus.Finished,
-            ProviderRequestStatus.Active,
-            ProviderRequestStatus.Finished,
-            now
-        )
-        await this.pastHorecaRequestsSetStatusTo(
-            HorecaRequestStatus.Active,
-            HorecaRequestStatus.Finished,
-            ProviderRequestStatus.Pending,
-            ProviderRequestStatus.Canceled,
-            now
-        )
+        await Promise.all(promises)
+        return withoutProviderRequests
     }
 
-    async pastHorecaRequestsSetStatusTo(
+    async pastHorecaRequestsSetStatuses(
         hrStatusFrom: HorecaRequestStatus,
         hrStatusTo: HorecaRequestStatus,
         prStatusFrom: ProviderRequestStatus,

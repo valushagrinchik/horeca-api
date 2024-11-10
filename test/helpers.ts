@@ -11,13 +11,21 @@ import { AppModule } from '../src/app.module'
 import { AuthResultDto } from '../src/users/dto/auth.result.dto'
 import { ProviderRequestCreateDto } from '../src/providerRequests/dto/providerRequest.create.dto'
 import { HorecaRequestProviderStatusDto } from '../src/providerRequests/dto/horecaRequest.providerStatus.dto'
-import { ProviderHorecaRequestSearchDto } from '../src/providerRequests/dto/provider.horecaRequest.search.dto'
 import { HorecaRequestTemplateCreateDto } from '../src/horecaRequests/dto/horecaRequest.template.create.dto'
 import { HorecaRequestSetStatusDto } from '../src/horecaRequests/dto/horecaRequest.approveProviderRequest.dto'
 import { FavouritesCreateDto } from '../src/favourites/dto/favourites.create.dto'
 import { ChatCreateDto } from '../src/chat/dto/chat.create.dto'
 import { ChatDto } from '../src/chat/dto/chat.dto'
 import { HorecaRequestTemplateUpdateDto } from '../src/horecaRequests/dto/horecaRequest.template.update.dto'
+import { io, Socket } from 'socket.io-client'
+
+export const ioClient = (namespace: string, accessToken: string): Socket => {
+    return io(process.env.WS_URL + namespace, {
+        autoConnect: false,
+        transports: ['websocket'],
+        extraHeaders: { authorization: 'Bearer ' + accessToken },
+    })
+}
 
 export const initApp = async (overwriteCb?: (mb: TestingModuleBuilder) => void, tmCb?: (tm: TestingModule) => void) => {
     const tmBuilder = Test.createTestingModule({

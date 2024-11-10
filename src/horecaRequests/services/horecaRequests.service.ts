@@ -22,7 +22,7 @@ import { NotificationWsGateway } from '../../notifications/notification.ws.gatew
 import dayjs from 'dayjs'
 import { NotificationEvents } from '../../system/utils/enums/websocketEvents.enum'
 import { ChatWsGateway } from '../../chat/chat.ws.gateway'
-import { ChatServerMessages } from '../../system/utils/constants'
+import { ChatServerMessages, DB_DATE_FORMAT } from '../../system/utils/constants'
 import { HorecaRequestSearchDto } from '../dto/horecaRequest.search.dto'
 
 @Injectable()
@@ -160,27 +160,58 @@ export class HorecaRequestsService {
 
     async approveProviderRequest(dto: HorecaRequestSetStatusDto) {
         await this.horecaRequestsRep.approveProviderRequest(dto)
+        this.notificationWsGateway.sendNotification(
+            dto.providerRequestId,
+            NotificationEvents.PROVIDER_REQUEST_STATUS_CHANGED,
+            {
+                pRequestId: dto.providerRequestId,
+                status: ProviderRequestStatus.Active,
+            }
+        )
     }
 
     // Public method
-    async cancelProviderRequest(dto: HorecaRequestSetStatusDto) {
+    async cancelProviderRequest(dto: HorecaRequestSetStatusDto, byHoreca = true) {
         const horecaRequest = await this.horecaRequestsRep.cancelProviderRequest(dto)
         this.chatWsGateway.sendServerMessage({
             chatId: horecaRequest.providerRequests[0].chatId,
             message: ChatServerMessages.requestCanceled,
         })
-        this.notificationWsGateway.sendNotification(
-            horecaRequest.userId,
-            NotificationEvents.PROVIDER_REQUEST_CANCELED,
-            {
-                pRequestId: dto.providerRequestId,
-                hRequestId: dto.horecaRequestId,
-            }
-        )
+        if (byHoreca) {
+            this.notificationWsGateway.sendNotification(
+                // to provider
+                horecaRequest.providerRequests[0].userId,
+                NotificationEvents.PROVIDER_REQUEST_STATUS_CHANGED,
+                {
+                    pRequestId: dto.providerRequestId,
+                    hRequestId: dto.horecaRequestId,
+                    status: horecaRequest.providerRequests[0].status,
+                }
+            )
+        } else {
+            // Notification to horeca only if request was active before
+            this.notificationWsGateway.sendNotification(
+                horecaRequest.userId,
+                NotificationEvents.PROVIDER_REQUEST_STATUS_CHANGED,
+                {
+                    pRequestId: dto.providerRequestId,
+                    hRequestId: dto.horecaRequestId,
+                    status: horecaRequest.providerRequests[0].status,
+                }
+            )
+        }
     }
 
     async cancel(id: number) {
-        const horecaRequest = await this.horecaRequestsRep.get(id, { providerRequests: true })
+        const horecaRequest = await this.horecaRequestsRep.get(id, {
+            providerRequests: {
+                where: {
+                    status: {
+                        in: [ProviderRequestStatus.Active, ProviderRequestStatus.Pending],
+                    },
+                },
+            },
+        })
         await this.horecaRequestsRep.cancel(id)
 
         horecaRequest.providerRequests.map(providerRequest => {
@@ -190,36 +221,16 @@ export class HorecaRequestsService {
                     message: ChatServerMessages.requestCanceled,
                 })
             }
-            if (
-                providerRequest.status == ProviderRequestStatus.Active ||
-                providerRequest.status == ProviderRequestStatus.Pending
-            ) {
-                this.notificationWsGateway.sendNotification(
-                    horecaRequest.userId,
-                    NotificationEvents.HORECA_REQUEST_CANCELED,
-                    {
-                        pRequestId: providerRequest.id,
-                        hRequestId: horecaRequest.id,
-                    }
-                )
-            }
+
+            this.notificationWsGateway.sendNotification(
+                horecaRequest.userId,
+                NotificationEvents.PROVIDER_REQUEST_STATUS_CHANGED,
+                {
+                    pRequestId: providerRequest.id,
+                    status: ProviderRequestStatus.Canceled,
+                }
+            )
         })
-    }
-
-    // Cron
-    async pastRequests() {
-        await this.horecaRequestsRep.pastRequests()
-        return true
-    }
-
-    async sendReviewNotification() {
-        await this.sendFirstReviewNotification()
-
-        await this.sendSecondReviewNotification()
-
-        await this.validateRequestsOnReview()
-
-        return true
     }
 
     // To render review block on the ui request to get review required and in case no review ws listen for notification
@@ -310,5 +321,55 @@ export class HorecaRequestsService {
                 status: HorecaRequestStatus.CompletedUnsuccessfully,
             },
         })
+    }
+
+    // Cron
+    async pastRequests() {
+        const now = dayjs().format(DB_DATE_FORMAT)
+
+        // CompletedUnsuccessfully
+        // no provider requests untill acceptUntill passed
+        // set horecaRequest.status to CompletedUnsuccessfully
+        await this.horecaRequestsRep.pastHorecaRequestsWithoutProviderOnes()
+
+        // No сhosen provider request until deliveryTime passed
+        // set horecaRequest.status to CompletedUnsuccessfully
+        // set providerRequest.status to Canceled
+        await this.horecaRequestsRep.pastHorecaRequestsSetStatuses(
+            HorecaRequestStatus.Pending,
+            HorecaRequestStatus.CompletedUnsuccessfully,
+            ProviderRequestStatus.Pending,
+            ProviderRequestStatus.Canceled,
+            now
+        )
+
+        // Chosen provider request, deliveryTime passed
+        // set horecaRequest.status to Finished
+        // set providerRequest.status to Finished for chosen one and Canceled for others
+        await this.horecaRequestsRep.pastHorecaRequestsSetStatuses(
+            HorecaRequestStatus.Active,
+            HorecaRequestStatus.Finished,
+            ProviderRequestStatus.Active,
+            ProviderRequestStatus.Finished,
+            now
+        )
+        await this.horecaRequestsRep.pastHorecaRequestsSetStatuses(
+            HorecaRequestStatus.Active,
+            HorecaRequestStatus.Finished,
+            ProviderRequestStatus.Pending,
+            ProviderRequestStatus.Canceled,
+            now
+        )
+        return true
+    }
+
+    async sendReviewNotification() {
+        await this.sendFirstReviewNotification()
+
+        await this.sendSecondReviewNotification()
+
+        await this.validateRequestsOnReview()
+
+        return true
     }
 }

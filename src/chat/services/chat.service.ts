@@ -2,7 +2,7 @@ import { AuthInfoDto } from '../../users/dto/auth.info.dto'
 import { PaginateValidateType } from '../../system/utils/swagger/decorators'
 import { ChatCreateDto } from '../dto/chat.create.dto'
 import { ChatType } from '@prisma/client'
-import { ChatIncomeMessageCreateDto } from '../dto/chat.income.message.create.dto'
+import { WsMessageCreateDto } from '../dto/ws.message.create.dto'
 import { ChatDto } from '../dto/chat.dto'
 import { ChatDbService } from './chat.db.service'
 import { BadRequestException, Inject, forwardRef } from '@nestjs/common'
@@ -12,7 +12,6 @@ import { ErrorCodes } from '../../system/utils/enums/errorCodes.enum'
 import { HorecaRequestsService } from '../../horecaRequests/services/horecaRequests.service'
 import { FavouritesService } from '../../favourites/services/favourites.service'
 import { ChatServerMessageCreateDto } from '../dto/chat.server.message.create.dto'
-import { ChatMessageDto } from '../dto/chat.message.dto'
 
 export class ChatService {
     constructor(
@@ -84,7 +83,7 @@ export class ChatService {
         return new ChatDto({ ...chat, messages })
     }
 
-    async createIncomeMessage(dto: ChatIncomeMessageCreateDto) {
+    async createIncomeMessage(dto: WsMessageCreateDto) {
         return this.chatRep.createMessage(dto)
     }
 

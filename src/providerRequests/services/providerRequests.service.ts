@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
 
 import { AuthInfoDto } from '../../users/dto/auth.info.dto'
-import { ProviderRequestStatus, UploadsLinkType } from '@prisma/client'
+import { HorecaRequestStatus, ProviderRequestStatus, UploadsLinkType } from '@prisma/client'
 import { ProviderRequestCreateDto } from '../dto/providerRequest.create.dto'
 import { ProviderRequestDto } from '../dto/providerRequest.dto'
 import { UploadsLinkService } from '../../uploads/uploads.link.service'
@@ -22,6 +22,7 @@ import { NotificationWsGateway } from '../../notifications/notification.ws.gatew
 import { NotificationEvents } from '../../system/utils/enums/websocketEvents.enum'
 import { ProviderRequestSearchDto } from '../dto/providerRequest.search.dto'
 import { Categories } from '../../system/utils/enums'
+import { stat } from 'fs'
 
 @Injectable()
 export class ProviderRequestsService {
@@ -61,6 +62,7 @@ export class ProviderRequestsService {
                 some: {
                     category: { in: categoriesFilter },
                 },
+                status: HorecaRequestStatus.Pending,
             },
             ...(includeHiddenAndViewed ? {} : { horecaRequestProviderStatus: { is: null } }),
             acceptUntill: {
@@ -103,6 +105,11 @@ export class ProviderRequestsService {
 
     async create(auth: AuthInfoDto, { horecaRequestId, items, ...dto }: ProviderRequestCreateDto) {
         const horecaRequest = await this.horecaRequestService.getRawById(horecaRequestId)
+
+        if (horecaRequest.status != HorecaRequestStatus.Pending) {
+            throw new BadRequestException(new ErrorDto(ErrorCodes.FORBIDDEN_ACTION))
+        }
+
         const providerRequest = await this.providerRequestsRep.create({
             ...dto,
             user: { connect: { id: auth.id } },
@@ -128,7 +135,7 @@ export class ProviderRequestsService {
                 )
         )
 
-        this.notificationWsGateway.sendNotification(horecaRequest.userId, NotificationEvents.PROVIDER_REQUEST, {
+        this.notificationWsGateway.sendNotification(horecaRequest.userId, NotificationEvents.PROVIDER_REQUEST_CREATED, {
             hRequestId: horecaRequest.id,
             pRequestId: providerRequest.id,
         })
@@ -139,10 +146,13 @@ export class ProviderRequestsService {
     async cancel(id: number) {
         const pRequest = await this.providerRequestsRep.get(id)
         if (pRequest.status == ProviderRequestStatus.Active) {
-            await this.horecaRequestService.cancelProviderRequest({
-                horecaRequestId: pRequest.horecaRequestId,
-                providerRequestId: id,
-            })
+            await this.horecaRequestService.cancelProviderRequest(
+                {
+                    horecaRequestId: pRequest.horecaRequestId,
+                    providerRequestId: id,
+                },
+                false
+            )
         } else {
             await this.providerRequestsRep.update(id, {
                 status: ProviderRequestStatus.Canceled,
