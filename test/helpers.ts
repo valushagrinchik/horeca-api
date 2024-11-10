@@ -96,7 +96,6 @@ export const getFavourites = async (app: INestApplication, accessToken: string) 
         })
 }
 
-
 export const deleteFavourites = async (app: INestApplication, accessToken: string, providerId: number) => {
     return request(app.getHttpServer())
         .delete(ENDPOINTS.HOREKA_FAVOURITES + '/' + providerId)
@@ -136,14 +135,13 @@ export const updateHorecaRequestTemplate = async (
     payload: HorecaRequestTemplateUpdateDto
 ) => {
     return request(app.getHttpServer())
-        .put(ENDPOINTS.HOREKA_REQUESTS_TEMPLATES+ '/' + id)
+        .put(ENDPOINTS.HOREKA_REQUESTS_TEMPLATES + '/' + id)
         .set('Authorization', 'Bearer ' + accessToken)
         .send(payload)
         .then(res => {
             return res.body
         })
 }
-
 
 export const getHorecaRequestTemplate = async (app: INestApplication, accessToken: string, id: number) => {
     return request(app.getHttpServer())
@@ -255,8 +253,11 @@ export const approveProviderRequest = async (
         })
 }
 
-
-export const createChat = async (app: INestApplication, accessToken: string, payload: ChatCreateDto): Promise<ChatDto | any> => {
+export const createChat = async (
+    app: INestApplication,
+    accessToken: string,
+    payload: ChatCreateDto
+): Promise<ChatDto | any> => {
     return request(app.getHttpServer())
         .post(ENDPOINTS.CHATS)
         .set('Authorization', 'Bearer ' + accessToken)
@@ -280,11 +281,10 @@ export const getChat = async (app: INestApplication, accessToken: string, id: nu
 
 export const getChatMessages = async (app: INestApplication, accessToken: string, id: number) => {
     return request(app.getHttpServer())
-        .get(ENDPOINTS.CHAT_MESSAGES + '?chatId='+ id)  
+        .get(ENDPOINTS.CHAT_MESSAGES + '?chatId=' + id)
         .set('Authorization', 'Bearer ' + accessToken)
         .then(res => res.body)
 }
-
 
 export const getProfile = async (app: INestApplication, accessToken: string) => {
     return request(app.getHttpServer())

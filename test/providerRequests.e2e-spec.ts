@@ -92,7 +92,7 @@ describe('ProviderRequestsController (e2e)', () => {
             expect(res.status).toBe('ok')
 
             const horecaRequestsRes2 = await findAllHorecaRequestForProvider(app, providerAuth.accessToken)
-            expect(horecaRequestsRes2.data.length).toBe(horecaRequestsRes.data.length-1)
+            expect(horecaRequestsRes2.data.length).toBe(horecaRequestsRes.data.length - 1)
 
             return
         })
@@ -147,7 +147,7 @@ describe('ProviderRequestsController (e2e)', () => {
 
             expect(res.data.length).toBeGreaterThan(0)
             expect(res.data[0]).toHaveProperty('items')
-            return 
+            return
         })
     })
 

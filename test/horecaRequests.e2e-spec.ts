@@ -1,5 +1,12 @@
 import { INestApplication } from '@nestjs/common'
-import { authUser, createHorecaRequest, createProviderRequest, findAllHorecaRequest, getHorecaRequest, initApp } from './helpers'
+import {
+    authUser,
+    createHorecaRequest,
+    createProviderRequest,
+    findAllHorecaRequest,
+    getHorecaRequest,
+    initApp,
+} from './helpers'
 import { ENDPOINTS } from './constants'
 import { AuthResultDto } from './../src/users/dto/auth.result.dto'
 import { horecaRequestInput, horecaUserInput, providerUserInput } from './mock/seedData'
@@ -43,8 +50,8 @@ describe('HorecaRequestsController (e2e)', () => {
                     available: true,
                     manufacturer: 'smb',
                     cost: 3000,
-                    horecaRequestItemId: item.horecaRequestId
-                }))
+                    horecaRequestItemId: item.horecaRequestId,
+                })),
             })
 
             const res = await getHorecaRequest(app, horecaAuth.accessToken, createdHorecaRequest.id)

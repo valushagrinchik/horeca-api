@@ -35,9 +35,6 @@ let providerAuth: AuthResultDto
 let provider: UserDto
 let horeca: UserDto
 
-
-
-
 beforeAll(async () => {
     app = await initApp(undefined, tm => {
         gateway = tm.get<ChatWsGateway>(ChatWsGateway)
@@ -128,8 +125,8 @@ describe('ChatWsGateway (e2e)', () => {
             })
 
             it('should be possible for opponents to communicate with each other', async () => {
-                const horecaWsClient = ioClient('chats',  horecaAuth.accessToken)
-                const providerWsClient = ioClient('chats',  providerAuth.accessToken)
+                const horecaWsClient = ioClient('chats', horecaAuth.accessToken)
+                const providerWsClient = ioClient('chats', providerAuth.accessToken)
 
                 horecaWsClient.connect()
                 providerWsClient.connect()
@@ -190,8 +187,8 @@ describe('ChatWsGateway (e2e)', () => {
             })
 
             it('should be possible for opponents to communicate with each other', async () => {
-                const horecaWsClient = ioClient('chats',  horecaAuth.accessToken)
-                const providerWsClient = ioClient('chats',  providerAuth.accessToken)
+                const horecaWsClient = ioClient('chats', horecaAuth.accessToken)
+                const providerWsClient = ioClient('chats', providerAuth.accessToken)
 
                 horecaWsClient.connect()
                 providerWsClient.connect()
@@ -284,5 +281,4 @@ describe('ChatWsGateway (e2e)', () => {
             return
         })
     })
-
 })

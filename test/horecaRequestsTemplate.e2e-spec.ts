@@ -56,7 +56,7 @@ describe('HorecaRequestsTemplateController (e2e)', () => {
                             unit: 'eee',
                             category: Categories.fish,
                         },
-                    ]
+                    ],
                 },
             }
             await updateHorecaRequestTemplate(app, horecaAuth.accessToken, createdTemplateId, newTemplate)
