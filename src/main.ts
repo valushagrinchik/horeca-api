@@ -31,7 +31,6 @@ async function bootstrap() {
             },
             whitelist: true,
             exceptionFactory: (errors: ValidationError[]) => {
-                console.log(errors, 'errors')
                 return new BadRequestException(
                     new ErrorDto(ErrorCodes.VALIDATION_ERROR, errors.map(e => Object.values(e.constraints)).flat())
                 )

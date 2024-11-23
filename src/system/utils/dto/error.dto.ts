@@ -8,7 +8,7 @@ export class ErrorDto {
     errorMessage?: ErrorCodes
 
     @ApiProperty({
-        type: () => String,
+        type: [String],
         required: false,
         isArray: true,
         example: [`password|${ErrorValidationCodeEnum.IS_NOT_EMPTY}`],

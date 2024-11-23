@@ -74,11 +74,11 @@ export class UsersService {
         const user = await this.usersRep.getUserByEmail(dto.email)
 
         if (!user?.isActivated) {
-            throw new BadRequestException(new ErrorDto(ErrorCodes.AUTH_FAIL))
+            throw new BadRequestException(new ErrorDto(ErrorCodes.AUTH_FAIL, ['user_is_not_activated']))
         }
 
         if (!validPassword(dto.password, user.password)) {
-            throw new BadRequestException(new ErrorDto(ErrorCodes.AUTH_FAIL))
+            throw new BadRequestException(new ErrorDto(ErrorCodes.AUTH_FAIL, ['incorrect_username_or_password']))
         }
 
         return this.authService.login(user)
