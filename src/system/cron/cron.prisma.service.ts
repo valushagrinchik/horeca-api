@@ -10,7 +10,7 @@ export class CronPrismaService {
         private prisma: DatabaseService,
         private readonly logger: Logger = new Logger()
     ) {
-        this.MAX_TRIES = this.configService.get('CRON_MAX_TRIES') || 100
+        this.MAX_TRIES = this.configService.get('CRON_MAX_TRIES') || 3
     }
 
     MAX_TRIES: number = 0
