@@ -168,17 +168,39 @@ export class ProviderRequestsService {
     ): Promise<[ProviderRequestDto[], number]> {
         const { status } = paginate.search
         const where = { userId: auth.id, status }
-        const data = await this.providerRequestsRep.findAll({
+        const providerRequests = await this.providerRequestsRep.findAll({
             where,
             orderBy: {
                 [paginate.sort.field]: paginate.sort.order,
             },
             take: paginate.limit,
             skip: paginate.offset,
+            include: {
+                items: true,
+                horecaRequest: true,
+            },
         })
         const total = await this.providerRequestsRep.count({
             where,
         })
+
+        const sourceIds = providerRequests.map(p => p.items.map(item => item.id)).flat()
+
+        const images = await this.uploadsLinkService.getImages(UploadsLinkType.ProviderRequestItem, sourceIds)
+
+        const data = providerRequests.map(
+            providerRequest =>
+                new ProviderRequestDto({
+                    ...providerRequest,
+                    items: providerRequest.items.map(item => {
+                        return new ProviderRequestItemDto({
+                            ...item,
+                            images: (images[item.id] || []).map(image => image.image),
+                        })
+                    }),
+                    horecaRequest: new HorecaRequestDto(providerRequest.horecaRequest),
+                })
+        )
         return [data, total]
     }
 
@@ -195,6 +217,7 @@ export class ProviderRequestsService {
             items: providerRequest.items.map(item => {
                 return new ProviderRequestItemDto({ ...item, images: (images[id] || []).map(image => image.image) })
             }),
+            horecaRequest: new HorecaRequestDto(providerRequest.horecaRequest),
         })
     }
 }

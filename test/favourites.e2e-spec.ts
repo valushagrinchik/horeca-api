@@ -30,7 +30,8 @@ describe('FavouritesController (e2e)', () => {
             await addFavourites(app, horecaAuth.accessToken, { providerId: provider.id })
             const res = await addFavourites(app, horecaAuth.accessToken, { providerId: provider.id })
 
-            expect(res.status).toBe('ok')
+            expect(res).toHaveProperty('providerId')
+            expect(res.providerId).toBe(provider.id)
             return
         })
     })

@@ -26,6 +26,7 @@ export class ProviderRequestsDbService {
             where: { id },
             include: {
                 items: true,
+                horecaRequest: true,
             },
         })
     }
