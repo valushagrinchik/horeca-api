@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
 
 import { AuthInfoDto } from '../../users/dto/auth.info.dto'
-import { HorecaRequestStatus, ProviderRequestStatus, UploadsLinkType } from '@prisma/client'
+import { HorecaRequestStatus, Prisma, ProviderRequestStatus, UploadsLinkType } from '@prisma/client'
 import { ProviderRequestCreateDto } from '../dto/providerRequest.create.dto'
 import { ProviderRequestDto } from '../dto/providerRequest.dto'
 import { UploadsLinkService } from '../../uploads/uploads.link.service'
@@ -57,13 +57,13 @@ export class ProviderRequestsService {
 
         const categoriesFilter = category ? [category] : categories
 
-        const where = {
+        const where: Prisma.HorecaRequestWhereInput = {
             items: {
                 some: {
                     category: { in: categoriesFilter },
                 },
-                status: HorecaRequestStatus.Pending,
             },
+            status: HorecaRequestStatus.Pending,
             ...(includeHiddenAndViewed ? {} : { horecaRequestProviderStatus: { is: null } }),
             acceptUntill: {
                 // TODO: check date
