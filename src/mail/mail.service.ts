@@ -51,7 +51,7 @@ export class MailService {
         const templateFile: string = join(__dirname, 'templates', `${template}.hbs`)
 
         if (!fs.existsSync(templateFile)) {
-            throw new Error('Template not found')
+            throw new Error(`Template not found: ${templateFile}`, )
         }
 
         this.logger.log(`Send mail from ${this.configService.get(`SMTP_USER`)}`)
