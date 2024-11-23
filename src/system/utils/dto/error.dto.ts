@@ -21,9 +21,10 @@ export class ErrorDto {
     @ApiProperty({ example: 400 })
     statusCode: number
 
-    constructor(message: ErrorCodes) {
+    constructor(errorMessage: ErrorCodes, message: string[] = []) {
         this.statusCode = 400
         this.error = 'Bad Request'
-        this.errorMessage = message
+        this.errorMessage = errorMessage
+        this.message = message
     }
 }

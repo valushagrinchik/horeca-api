@@ -2,10 +2,18 @@ import * as process from 'node:process'
 import { HttpAdapterHost, NestFactory, Reflector } from '@nestjs/core'
 import { AppModule } from './app.module'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
-import { ClassSerializerInterceptor, Logger, ValidationPipe } from '@nestjs/common'
+import {
+    BadRequestException,
+    ClassSerializerInterceptor,
+    Logger,
+    ValidationError,
+    ValidationPipe,
+} from '@nestjs/common'
 import { PrismaClientExceptionFilter } from './prisma-client-exception.filter'
 import * as express from 'express'
 import { join } from 'node:path'
+import { ErrorDto } from './system/utils/dto/error.dto'
+import { ErrorCodes } from './system/utils/enums/errorCodes.enum'
 
 process.on('unhandledRejection', (reason, promise) => {
     console.log('Unhandled Rejection at:', promise, 'reason:', reason)
@@ -22,6 +30,12 @@ async function bootstrap() {
                 enableImplicitConversion: true,
             },
             whitelist: true,
+            exceptionFactory: (errors: ValidationError[]) => {
+                console.log(errors, 'errors')
+                return new BadRequestException(
+                    new ErrorDto(ErrorCodes.VALIDATION_ERROR, errors.map(e => Object.values(e.constraints)).flat())
+                )
+            },
         })
     )
     const { httpAdapter } = app.get(HttpAdapterHost)
