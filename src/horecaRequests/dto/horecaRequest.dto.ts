@@ -9,6 +9,7 @@ export class HorecaRequestDto extends SourceWithUploads implements HorecaRequest
     address: string
     deliveryTime: Date
     acceptUntill: Date
+    @ApiProperty({ enum: PaymentType, enumName: 'PaymentType' })
     paymentType: PaymentType
     name: string
     phone: string
