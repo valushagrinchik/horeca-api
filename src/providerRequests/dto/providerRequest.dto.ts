@@ -1,6 +1,6 @@
 import { ProviderRequest, ProviderRequestStatus } from '@prisma/client'
 import { ProviderRequestItemDto } from './providerRequestItem.dto'
-import { HorecaRequestDto } from 'src/horecaRequests/dto/horecaRequest.dto'
+import { HorecaRequestDto } from '../../horecaRequests/dto/horecaRequest.dto'
 
 export class ProviderRequestDto implements ProviderRequest {
     id: number

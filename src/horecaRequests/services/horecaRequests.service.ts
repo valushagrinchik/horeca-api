@@ -158,19 +158,21 @@ export class HorecaRequestsService {
         return request?.status == HorecaRequestStatus.Active
     }
 
-    async approveProviderRequest(dto: HorecaRequestSetStatusDto) {
+    async approveProviderRequest(dto: HorecaRequestSetStatusDto, notification: boolean = false) {
         await this.horecaRequestsRep.approveProviderRequest(dto)
-        this.notificationWsGateway.sendNotification(
-            dto.providerRequestId,
-            NotificationEvents.PROVIDER_REQUEST_STATUS_CHANGED,
-            {
-                data: {
-                    pRequestId: dto.providerRequestId,
-                    hRequestId: dto.horecaRequestId,
-                    status: ProviderRequestStatus.Active,
-                },
-            }
-        )
+        if (notification) {
+            this.notificationWsGateway.sendNotification(
+                dto.providerRequestId,
+                NotificationEvents.PROVIDER_REQUEST_STATUS_CHANGED,
+                {
+                    data: {
+                        pRequestId: dto.providerRequestId,
+                        hRequestId: dto.horecaRequestId,
+                        status: ProviderRequestStatus.Active,
+                    },
+                }
+            )
+        }
     }
 
     // Public method

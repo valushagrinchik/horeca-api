@@ -26,7 +26,7 @@ export class HorecaRequestsController {
     constructor(private readonly service: HorecaRequestsService) {}
 
     @Post()
-    @ApiOperation({ summary: 'Create products(categories) set proposal required for HoReCa' })
+    @ApiOperation({ summary: 'Create products(categories) set proposal needed for HoReCa' })
     @RequestDecorator(HorecaRequestDto, HorecaRequestCreateDto)
     async create(@AuthParamDecorator() auth: AuthInfoDto, @Body() dto: HorecaRequestCreateDto) {
         return this.service.create(auth, dto)
@@ -56,7 +56,7 @@ export class HorecaRequestsController {
     @ApiOperation({ summary: 'Approve one of providers request to be able to start chat with' })
     async approveProviderRequest(@AuthParamDecorator() auth: AuthInfoDto, @Body() dto: HorecaRequestSetStatusDto) {
         await this.service.validate(auth, dto.horecaRequestId)
-        const res = await this.service.approveProviderRequest(dto)
+        const res = await this.service.approveProviderRequest(dto, true)
         return new SuccessDto('ok')
     }
 

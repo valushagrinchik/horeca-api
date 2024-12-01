@@ -14,6 +14,7 @@ import { CronModule } from './system/cron/cron.module'
 import { ReviewsModule } from './reviews/reviews.module'
 import { NotificationModule } from './notifications/notification.module'
 import { SupportRequestsModule } from './supportRequests/supportRequests.module'
+import { HorecaPrivateRequestsModule } from './horecaPrivateRequests/horecaPrivateRequests.module'
 
 @Module({
     imports: [
@@ -37,6 +38,7 @@ import { SupportRequestsModule } from './supportRequests/supportRequests.module'
         ReviewsModule,
         NotificationModule,
         SupportRequestsModule,
+        HorecaPrivateRequestsModule,
     ],
     controllers: [],
     providers: [],

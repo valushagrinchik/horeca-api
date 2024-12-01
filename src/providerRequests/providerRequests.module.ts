@@ -13,5 +13,6 @@ import { ChatModule } from '../chat/chat.module'
     imports: [UsersModule, UploadsModule, HorecaRequestsModule, NotificationModule, ChatModule],
     controllers: [ProviderRequestsController],
     providers: [HorecaRequestProviderStatusDbService, ProviderRequestsDbService, ProviderRequestsService],
+    exports: [ProviderRequestsService],
 })
 export class ProviderRequestsModule {}

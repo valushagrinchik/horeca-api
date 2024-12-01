@@ -18,7 +18,7 @@ import { ChatCreateDto } from '../src/chat/dto/chat.create.dto'
 import { ChatDto } from '../src/chat/dto/chat.dto'
 import { HorecaRequestTemplateUpdateDto } from '../src/horecaRequests/dto/horecaRequest.template.update.dto'
 import { io, Socket } from 'socket.io-client'
-import { SupportRequestCreateDto } from 'src/supportRequests/dto/supportRequest.create.dto'
+import { SupportRequestCreateDto } from '../src/supportRequests/dto/supportRequest.create.dto'
 
 export const ioClient = (namespace: string, accessToken: string): Socket => {
     return io(process.env.WS_URL + namespace, {

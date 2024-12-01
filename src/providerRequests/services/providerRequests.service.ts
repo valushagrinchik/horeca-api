@@ -145,6 +145,20 @@ export class ProviderRequestsService {
         return this.get(providerRequest.id)
     }
 
+    async createByUser({ horecaRequestId, items, ...dto }: ProviderRequestCreateDto, userId: number) {
+        const providerRequest = await this.providerRequestsRep.create({
+            ...dto,
+            user: { connect: { id: userId } },
+            horecaRequest: { connect: { id: horecaRequestId } },
+            items: {
+                createMany: {
+                    data: items,
+                },
+            },
+        })
+        return providerRequest
+    }
+
     async cancel(id: number) {
         const pRequest = await this.providerRequestsRep.get(id)
         if (pRequest.status == ProviderRequestStatus.Active) {
