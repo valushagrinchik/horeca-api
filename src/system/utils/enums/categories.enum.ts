@@ -19,4 +19,7 @@ export enum Categories {
     cleaningProducts = 'cleaningProducts',
     bakeryProducts = 'bakeryProducts',
     teeAndCoffee = 'teeAndCoffee',
+    frozenVegetablesAndFruits = 'frozenVegetablesAndFruits',
+    textilesAndClothing = 'textilesAndClothing',
+    equipment = 'equipment',
 }
