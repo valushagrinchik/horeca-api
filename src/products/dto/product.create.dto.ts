@@ -3,6 +3,7 @@ import { Categories } from '../../system/utils/enums'
 import { ApiProperty } from '@nestjs/swagger'
 
 export class ProductCreateDto {
+    @ApiProperty({ enum: Categories, enumName: 'Categories' })
     category: Categories
 
     name: string
