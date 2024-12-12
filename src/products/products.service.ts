@@ -19,7 +19,6 @@ export class ProductsService {
     ) {}
 
     async create(auth: AuthInfoDto, { imageIds, ...dto }: ProductCreateDto) {
-        console.log(dto,'dto')
         const product = await this.prisma.product.create({
             data: {
                 ...dto,

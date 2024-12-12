@@ -38,9 +38,10 @@ export class FavouritesController {
         return new SuccessDto('ok')
     }
 
+    @AuthUser(UserRole.Horeca, UserRole.Provider)
     @Get()
     @RequestPaginatedDecorator(FavouritesDto)
-    @ApiOperation({ summary: 'Get all favourite providers' })
+    @ApiOperation({ summary: 'Get all favourite providers/horecas' })
     async findAll(
         @AuthParamDecorator() auth: AuthInfoDto,
         @RequestPaginatedValidateParamsDecorator() paginate: PaginateValidateType
