@@ -25,15 +25,6 @@ export class ProductsService {
                 user: {
                     connect: { id: auth.id },
                 },
-                ...(imageIds
-                    ? {
-                          productImage: {
-                              createMany: {
-                                  data: imageIds.map(imageId => ({ imageId })),
-                              },
-                          },
-                      }
-                    : {}),
             },
         })
 
