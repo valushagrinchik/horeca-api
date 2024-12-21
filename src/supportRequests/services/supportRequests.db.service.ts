@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common'
 import { DatabaseService } from '../../system/database/database.service'
 import { AuthInfoDto } from '../../users/dto/auth.info.dto'
 import { SupportRequestCreateDto } from '../dto/supportRequest.create.dto'
-import { SupportRequestStatus } from '@prisma/client'
+import { Prisma, SupportRequestStatus } from '@prisma/client'
 
 @Injectable()
 export class SupportRequestsDbService {
@@ -57,8 +57,18 @@ export class SupportRequestsDbService {
                 id,
             },
             data: {
+                status: SupportRequestStatus.Active,
                 adminId: auth.id,
             },
         })
     }
+
+    async findMany(args: Prisma.SupportRequestFindManyArgs) {
+        return this.db.supportRequest.findMany(args)
+    }
+
+    async count (args: Prisma.SupportRequestCountArgs) {
+        return this.db.supportRequest.count(args)
+    }
+
 }
