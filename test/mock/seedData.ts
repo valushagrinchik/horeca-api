@@ -1,4 +1,4 @@
-import { UserRole, ProfileType, ProductPackagingType, PaymentType } from '@prisma/client'
+import { UserRole, ProfileType, PaymentType } from '@prisma/client'
 import { generatePassword } from './../../src/system/crypto'
 import { generateAcceptUntil } from './../../src/system/utils/date'
 import { DeliveryMethods, Categories, Weekday } from './../../src/system/utils/enums'
@@ -25,7 +25,7 @@ export const productInput = {
     producer: 'OOO cool beer',
     cost: 5000,
     count: 200,
-    packagingType: ProductPackagingType.Bottle,
+    packagingType: 'Bottle',
 }
 
 export const horecaUserInput = {

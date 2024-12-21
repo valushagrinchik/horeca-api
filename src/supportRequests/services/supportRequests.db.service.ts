@@ -67,8 +67,7 @@ export class SupportRequestsDbService {
         return this.db.supportRequest.findMany(args)
     }
 
-    async count (args: Prisma.SupportRequestCountArgs) {
+    async count(args: Prisma.SupportRequestCountArgs) {
         return this.db.supportRequest.count(args)
     }
-
 }

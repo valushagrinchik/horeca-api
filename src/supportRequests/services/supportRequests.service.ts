@@ -35,11 +35,14 @@ export class SupportRequestsService {
         return request
     }
 
-    async findAllAndCount(auth: AuthInfoDto, paginate: PaginateValidateType<SupportRequestSearchDto>): Promise<[SupportRequestDto[], number]> {
+    async findAllAndCount(
+        auth: AuthInfoDto,
+        paginate: PaginateValidateType<SupportRequestSearchDto>
+    ): Promise<[SupportRequestDto[], number]> {
         const { status, isNew } = paginate.search
         const where: Prisma.SupportRequestWhereInput = {
             status,
-           ...( isNew ? {adminId: null} :{})
+            ...(isNew ? { adminId: null } : {}),
         }
         const data = await this.supportRequestsRep.findMany({
             where,
@@ -52,6 +55,6 @@ export class SupportRequestsService {
         const total = await this.supportRequestsRep.count({
             where,
         })
-        return [data.map(r=> new SupportRequestDto(r)), total]
+        return [data.map(r => new SupportRequestDto(r)), total]
     }
 }

@@ -30,12 +30,6 @@ enum UserRole {
   Provider
 }
 
-enum ProductPackagingType {
-  Bottle
-  Box
-  Pallet
-}
-
 enum CronStatus {
   Ready
   Work
@@ -191,7 +185,7 @@ model Product {
   producer      String
   cost          Float
   count         Int
-  packagingType ProductPackagingType @map("packaging_type")
+  packagingType String? @map("packaging_type") 
 
   // images - could be loaded on runtime from UploadsLink
 

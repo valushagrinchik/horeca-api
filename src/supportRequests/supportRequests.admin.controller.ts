@@ -3,7 +3,12 @@ import { SupportRequestsService } from './services/supportRequests.service'
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { AuthUser } from '../system/utils/auth/decorators/auth.decorator'
 import { UserRole } from '@prisma/client'
-import { PaginateValidateType, RequestDecorator, RequestPaginatedDecorator, RequestPaginatedValidateParamsDecorator } from '../system/utils/swagger/decorators'
+import {
+    PaginateValidateType,
+    RequestDecorator,
+    RequestPaginatedDecorator,
+    RequestPaginatedValidateParamsDecorator,
+} from '../system/utils/swagger/decorators'
 import { AuthParamDecorator } from '../system/utils/auth/decorators/auth.param.decorator'
 import { AuthInfoDto } from '../users/dto/auth.info.dto'
 import { SuccessDto } from '../system/utils/dto/success.dto'
@@ -28,10 +33,11 @@ export class SupportRequestsAdminController {
     @Get()
     @RequestPaginatedDecorator(SupportRequestDto, SupportRequestSearchDto)
     @ApiOperation({ summary: 'Admin get list of all support requests' })
-    async list(@AuthParamDecorator() auth: AuthInfoDto,  
-    @RequestPaginatedValidateParamsDecorator() paginate: PaginateValidateType<SupportRequestSearchDto>) {
+    async list(
+        @AuthParamDecorator() auth: AuthInfoDto,
+        @RequestPaginatedValidateParamsDecorator() paginate: PaginateValidateType<SupportRequestSearchDto>
+    ) {
         const [data, total] = await this.supportRequestService.findAllAndCount(auth, paginate)
         return new PaginatedDto<SupportRequestDto>(data, total)
     }
 }
-

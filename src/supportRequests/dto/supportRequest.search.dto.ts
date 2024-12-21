@@ -4,7 +4,7 @@ import { TypeValidate, Validate, ValidateEnum } from '../../system/utils/validat
 export class SupportRequestSearchDto {
     @ValidateEnum(SupportRequestStatus, { enum: SupportRequestStatus, enumName: 'SupportRequestStatus' })
     status: SupportRequestStatus
-    
-    @Validate(TypeValidate.BOOLEAN, {required: false})
+
+    @Validate(TypeValidate.BOOLEAN, { required: false })
     isNew?: boolean
 }

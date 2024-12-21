@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { Product, ProductPackagingType } from '@prisma/client'
+import { Product } from '@prisma/client'
 import { Categories } from '../../system/utils/enums'
 import { SourceWithUploads } from '../../uploads/dto/upload.dto'
 
@@ -12,8 +12,7 @@ export class ProductDto extends SourceWithUploads implements Product {
     producer: string
     cost: number
     count: number
-    @ApiProperty({ enum: ProductPackagingType, enumName: 'ProductPackagingType' })
-    packagingType: ProductPackagingType
+    packagingType: string | null
     createdAt: Date
     updatedAt: Date
 

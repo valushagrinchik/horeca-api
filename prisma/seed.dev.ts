@@ -1,4 +1,4 @@
-import { PaymentType, PrismaClient, ProductPackagingType, ProfileType, UserRole } from '@prisma/client'
+import { PaymentType, PrismaClient, ProfileType, UserRole } from '@prisma/client'
 import { generatePassword } from './../src/system/crypto'
 import { generateAcceptUntil } from './../src/system/utils/date'
 import { DeliveryMethods, Categories } from './../src/system/utils/enums'
@@ -109,7 +109,7 @@ export const runDevSeeds = async (prisma: PrismaClient) => {
             producer: 'OOO cool beer',
             cost: 5000,
             count: 200,
-            packagingType: ProductPackagingType.Bottle,
+            packagingType: "Bottle"
         },
     })
 
