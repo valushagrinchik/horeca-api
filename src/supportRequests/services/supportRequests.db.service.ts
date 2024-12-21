@@ -29,6 +29,14 @@ export class SupportRequestsDbService {
         })
     }
 
+    async getById(id: number) {
+        return this.db.supportRequest.findUnique({
+            where: {
+                id,
+            },
+        })
+    }
+
     // auth by Horeca or Provider
     async resolve(auth: AuthInfoDto, id: number) {
         return this.db.supportRequest.update({

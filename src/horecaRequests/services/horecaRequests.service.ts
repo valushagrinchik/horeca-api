@@ -155,7 +155,10 @@ export class HorecaRequestsService {
                 },
             },
         })
-        return request?.status == HorecaRequestStatus.Active
+        if (request?.status == HorecaRequestStatus.Active) {
+            return request.providerRequests[0]
+        }
+        return null
     }
 
     async approveProviderRequest(dto: HorecaRequestSetStatusDto, notification: boolean = false) {

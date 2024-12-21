@@ -37,16 +37,16 @@ export class FavouritesService {
     // Horeca creates Private chat, Admin creates Support chat, Horeca creates Order chat
     async isReadyForChat(auth: AuthInfoDto, { id, providerId }: { providerId: number; id: number }) {
         const request = await this.favsRep.find({ userId: auth.id, providerId, id })
-        return !!request
+        return request
     }
 
     async findAllAndCount(auth: AuthInfoDto, paginate: PaginateValidateType): Promise<[FavouritesDto[], number]> {
-        const where = auth.role == UserRole.Horeca ? { userId: auth.id } : {providerId: auth.id }
+        const where = auth.role == UserRole.Horeca ? { userId: auth.id } : { providerId: auth.id }
         const data = await this.favsRep.findAll({
             where,
             include: {
-                user: {select: {name: true}},
-                provider: {select: {name: true}},
+                user: { select: { name: true } },
+                provider: { select: { name: true } },
             },
             orderBy: {
                 createdAt: 'desc',
@@ -57,6 +57,16 @@ export class FavouritesService {
         })
         const total = await this.favsRep.count({ where })
 
-        return [data.map((f: any) => new FavouritesDto({...f, user: new FavouritesUserDto(f.user), provider: new FavouritesUserDto(f.provider), })), total]
+        return [
+            data.map(
+                (f: any) =>
+                    new FavouritesDto({
+                        ...f,
+                        user: new FavouritesUserDto(f.user),
+                        provider: new FavouritesUserDto(f.provider),
+                    })
+            ),
+            total,
+        ]
     }
 }

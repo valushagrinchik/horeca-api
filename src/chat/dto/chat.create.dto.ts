@@ -6,18 +6,18 @@ export class ChatCreateDto {
     @Validate(TypeValidate.NUMBER)
     opponentId: number
 
-    @Validate(TypeValidate.NUMBER, { required: false })
+    @Validate(TypeValidate.NUMBER, { description: 'Required when type Order' })
     @ValidateIf(o => o.type == ChatType.Order)
     providerRequestId?: number
-    @Validate(TypeValidate.NUMBER, { required: false })
+    @Validate(TypeValidate.NUMBER, { description: 'Required when type Order' })
     @ValidateIf(o => o.type == ChatType.Order)
     horecaRequestId?: number
 
-    @Validate(TypeValidate.NUMBER, { required: false })
+    @Validate(TypeValidate.NUMBER, { description: 'Required when type Private' })
     @ValidateIf(o => o.type == ChatType.Private)
     horecaFavouriteId?: number
 
-    @Validate(TypeValidate.NUMBER, { required: false })
+    @Validate(TypeValidate.NUMBER, { description: 'Required when type Support' })
     @ValidateIf(o => o.type == ChatType.Support)
     supportRequestId?: number
 

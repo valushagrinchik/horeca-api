@@ -1,7 +1,7 @@
 import { AuthInfoDto } from '../../users/dto/auth.info.dto'
 import { PaginateValidateType } from '../../system/utils/swagger/decorators'
 import { ChatCreateDto } from '../dto/chat.create.dto'
-import { ChatType } from '@prisma/client'
+import { ChatType, UserRole } from '@prisma/client'
 import { WsMessageCreateDto } from '../dto/ws.message.create.dto'
 import { ChatDto } from '../dto/chat.dto'
 import { ChatDbService } from './chat.db.service'
@@ -13,6 +13,7 @@ import { HorecaRequestsService } from '../../horecaRequests/services/horecaReque
 import { FavouritesService } from '../../favourites/services/favourites.service'
 import { ChatServerMessageCreateDto } from '../dto/chat.server.message.create.dto'
 import { SupportRequestsService } from '../../supportRequests/services/supportRequests.service'
+import { Roles } from 'src/system/utils/auth/decorators/roles.decorator'
 
 export class ChatService {
     constructor(
@@ -42,34 +43,50 @@ export class ChatService {
     }
 
     async validateChatCreation(auth: AuthInfoDto, dto: ChatCreateDto) {
+        let resourse: { chatId: number } = null
         switch (dto.type) {
             case ChatType.Order: {
-                return this.horecaRequestsService.isReadyForChat(auth, {
+                resourse = await this.horecaRequestsService.isReadyForChat(auth, {
                     pRequestId: dto.providerRequestId,
                     hRequestId: dto.horecaRequestId,
                 })
+                break
             }
             case ChatType.Private: {
-                return this.favouritesService.isReadyForChat(auth, {
+                resourse = await this.favouritesService.isReadyForChat(auth, {
                     id: dto.horecaFavouriteId,
                     providerId: dto.opponentId,
                 })
+                break
             }
             case ChatType.Support: {
-                return this.supportRequestsService.isReadyForChat(auth, dto.supportRequestId)
+                resourse = await this.supportRequestsService.isReadyForChat(auth, dto.supportRequestId)
+                break
             }
             default: {
-                throw new BadRequestException(new ErrorDto(ErrorCodes.FORBIDDEN_ACTION))
+                throw new BadRequestException(new ErrorDto(ErrorCodes.FORBIDDEN_ACTION, ['Type is not supported']))
             }
+        }
+        if (!resourse) {
+            throw new BadRequestException(
+                new ErrorDto(ErrorCodes.FORBIDDEN_ACTION, ['The necessary conditions for chat creation are not met!'])
+            )
+        }
+        if (resourse.chatId) {
+            throw new BadRequestException(new ErrorDto(ErrorCodes.FORBIDDEN_ACTION, ['Chat is already exists!']))
         }
     }
 
     /** Returns chat object and latest just created message */
     async createChat(auth: AuthInfoDto, dto: ChatCreateDto) {
-        const valid = await this.validateChatCreation(auth, dto)
-        if (!valid) {
-            throw new BadRequestException(new ErrorDto(ErrorCodes.FORBIDDEN_ACTION))
+        if (auth.role != UserRole.Admin && dto.type == ChatType.Support) {
+            throw new BadRequestException(
+                new ErrorDto(ErrorCodes.FORBIDDEN_ACTION, ['Support chat should be created from the Admin side'])
+            )
         }
+
+        await this.validateChatCreation(auth, dto)
+
         const chat = await this.chatRep.createChat(auth.id, dto)
         const messages = []
 
