@@ -23,6 +23,7 @@ import { NotificationEvents } from '../../system/utils/enums/websocketEvents.enu
 import { ProviderRequestSearchDto } from '../dto/providerRequest.search.dto'
 import { Categories } from '../../system/utils/enums'
 import { stat } from 'fs'
+import { omit } from 'lodash'
 
 @Injectable()
 export class ProviderRequestsService {
@@ -116,7 +117,7 @@ export class ProviderRequestsService {
             horecaRequest: { connect: horecaRequest },
             items: {
                 createMany: {
-                    data: items,
+                    data: items.map(item => omit(item, ['imageIds']))
                 },
             },
         })

@@ -19,11 +19,12 @@ import { HorecaRequestWithProviderRequestDto } from '../dto/horecaRequest.withPr
 import { ErrorDto } from '../../system/utils/dto/error.dto'
 import { ErrorCodes } from '../../system/utils/enums/errorCodes.enum'
 import { NotificationWsGateway } from '../../notifications/notification.ws.gateway'
-import dayjs from 'dayjs'
+import * as dayjs from 'dayjs'
 import { NotificationEvents } from '../../system/utils/enums/websocketEvents.enum'
 import { ChatWsGateway } from '../../chat/chat.ws.gateway'
 import { ChatServerMessages, DB_DATE_FORMAT } from '../../system/utils/constants'
 import { HorecaRequestSearchDto } from '../dto/horecaRequest.search.dto'
+import { ErrorValidationCodeEnum } from '../../system/utils/validation/error.validation.code.enum'
 
 @Injectable()
 export class HorecaRequestsService {
@@ -47,6 +48,30 @@ export class HorecaRequestsService {
     }
 
     async create(auth: AuthInfoDto, { imageIds, ...dto }: HorecaRequestCreateDto) {
+        const now = dayjs()
+
+        if (dto.acceptUntill < now.toDate() || dto.deliveryTime < now.toDate()) {
+            throw new BadRequestException(
+                new ErrorDto(
+                    ErrorCodes.VALIDATION_ERROR,
+                    [
+                        dto.acceptUntill < now.toDate() && `acceptUntill|${ErrorValidationCodeEnum.INVALID}`,
+                        dto.deliveryTime < now.toDate() && `deliveryTime|${ErrorValidationCodeEnum.INVALID}`,
+                    ].filter(m => !!m)
+                )
+            )
+        }
+        if (dto.acceptUntill >= dto.deliveryTime) {
+            throw new BadRequestException(
+                new ErrorDto(
+                    ErrorCodes.VALIDATION_ERROR,
+                    [
+                        `acceptUntill|${ErrorValidationCodeEnum.INVALID}`,
+                    ]
+                )
+            )
+        }
+
         const horecaRequest = await this.horecaRequestsRep.create({
             ...dto,
             user: {

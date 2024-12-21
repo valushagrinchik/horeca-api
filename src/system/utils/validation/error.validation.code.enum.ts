@@ -12,4 +12,5 @@ export enum ErrorValidationCodeEnum {
     IS_URL = 'IS_URL',
     IS_OBJECT = 'IS_OBJECT',
     DECIMAL = 'DECIMAL',
+    INVALID = 'INVALID',
 }
