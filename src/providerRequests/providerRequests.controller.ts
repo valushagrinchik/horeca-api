@@ -55,7 +55,15 @@ export class ProviderRequestsController {
         return this.service.create(auth, dto)
     }
 
-    @Put('id')
+    @Get(':id')
+    @RequestDecorator(ProviderRequestDto)
+    @ApiOperation({ summary: "Get provider request" })
+    async get(@AuthParamDecorator() auth: AuthInfoDto, @Param('id') id: number) {
+        await this.service.validate(auth, +id)
+        return this.service.get(+id)
+    }
+
+    @Put(':id')
     @RequestDecorator(ProviderRequestDto, ProviderRequestCreateDto)
     @ApiOperation({ summary: 'Cancel request' })
     async cancel(@AuthParamDecorator() auth: AuthInfoDto, @Param('id') id: number) {
