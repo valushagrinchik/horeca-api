@@ -8,8 +8,8 @@ services:
             - ~/docker-volumes/horeca_api-uploads:/app/uploads
         env_file: '.env'
         ports:
-            - '3001:3001'
-            - '4001:4001'
+            - '127.0.0.1:3001:3001'
+            - '127.0.0.1:4001:4001'
         depends_on:
             - horeca_ps
 
