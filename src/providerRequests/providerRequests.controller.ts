@@ -57,7 +57,7 @@ export class ProviderRequestsController {
 
     @Get(':id')
     @RequestDecorator(ProviderRequestDto)
-    @ApiOperation({ summary: "Get provider request" })
+    @ApiOperation({ summary: 'Get provider request' })
     async get(@AuthParamDecorator() auth: AuthInfoDto, @Param('id') id: number) {
         await this.service.validate(auth, +id)
         return this.service.get(+id)

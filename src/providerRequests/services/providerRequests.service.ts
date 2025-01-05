@@ -117,7 +117,7 @@ export class ProviderRequestsService {
             horecaRequest: { connect: horecaRequest },
             items: {
                 createMany: {
-                    data: items.map(item => omit(item, ['imageIds']))
+                    data: items.map(item => omit(item, ['imageIds'])),
                 },
             },
         })

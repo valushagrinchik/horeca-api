@@ -90,7 +90,7 @@ export class MailService {
             template: 'confirmation',
             context: {
                 username,
-                link: `${this.configService.get('BACKEND_URL')}/api/auth/activate/${link}`,
+                link: `${this.configService.get('BACKEND_URL')}/auth/activate/${link}`,
                 service: 'HoReCa',
             },
         })
@@ -107,7 +107,7 @@ export class MailService {
             subject: 'Reset your password',
             template: 'password_recovery',
             context: {
-                link: `${this.configService.get('BACKEND_URL')}/api/user/recoveryPassword/${link}`,
+                link: `${this.configService.get('BACKEND_URL')}/user/recoveryPassword/${link}`,
                 service: 'HoReCa',
             },
         })

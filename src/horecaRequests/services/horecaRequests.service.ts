@@ -63,12 +63,7 @@ export class HorecaRequestsService {
         }
         if (dto.acceptUntill >= dto.deliveryTime) {
             throw new BadRequestException(
-                new ErrorDto(
-                    ErrorCodes.VALIDATION_ERROR,
-                    [
-                        `acceptUntill|${ErrorValidationCodeEnum.INVALID}`,
-                    ]
-                )
+                new ErrorDto(ErrorCodes.VALIDATION_ERROR, [`acceptUntill|${ErrorValidationCodeEnum.INVALID}`])
             )
         }
 

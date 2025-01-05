@@ -6,7 +6,6 @@ import { PaginateValidateType } from '../../system/utils/swagger/decorators'
 import { FavouritesDto, FavouritesUserDto } from '../dto/favourites.dto'
 import { NotificationWsGateway } from '../../notifications/notification.ws.gateway'
 import { NotificationEvents } from '../../system/utils/enums/websocketEvents.enum'
-import { Roles } from 'src/system/utils/auth/decorators/roles.decorator'
 import { UserRole } from '@prisma/client'
 
 @Injectable()

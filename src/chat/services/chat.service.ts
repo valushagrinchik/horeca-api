@@ -13,7 +13,6 @@ import { HorecaRequestsService } from '../../horecaRequests/services/horecaReque
 import { FavouritesService } from '../../favourites/services/favourites.service'
 import { ChatServerMessageCreateDto } from '../dto/chat.server.message.create.dto'
 import { SupportRequestsService } from '../../supportRequests/services/supportRequests.service'
-import { Roles } from 'src/system/utils/auth/decorators/roles.decorator'
 
 export class ChatService {
     constructor(
