@@ -8,7 +8,7 @@ export class CronPrismaService {
     constructor(
         private readonly configService: ConfigService,
         private prisma: DatabaseService,
-        private readonly logger: Logger = new Logger()
+        private readonly logger: Logger = new Logger(CronPrismaService.name)
     ) {
         this.MAX_TRIES = this.configService.get('CRON_MAX_TRIES') || 3
     }

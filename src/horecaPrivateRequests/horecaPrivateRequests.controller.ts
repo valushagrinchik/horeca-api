@@ -15,7 +15,7 @@ import { HorecaPrivateRequestDto } from './dto/horecaPrivateRequests.dto'
 export class HorecaPrivateRequestsController {
     constructor(private readonly service: HorecaPrivateRequestsService) {}
 
-    @Post('private')
+    @Post()
     @ApiOperation({
         summary: 'Create products(categories) set proposal needed for HoReCa and send to the favourite provider',
     })
