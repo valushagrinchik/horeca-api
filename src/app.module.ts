@@ -70,7 +70,7 @@ import * as path from 'path';
                             appName: true,
                         })
                     ),
-                    dirname: path.join(__dirname, './../logs'),
+                    dirname: path.join(__dirname, './../../logs'),
                     filename: 'info.log',
                     level: 'info', //info, warn and error
                     datePattern: 'YYYY-MM-DD',
