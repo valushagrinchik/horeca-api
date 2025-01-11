@@ -24,7 +24,7 @@ export const ioClient = (namespace: string, accessToken: string): Socket => {
     return io(process.env.WS_URL + namespace, {
         autoConnect: false,
         transports: ['websocket'],
-        extraHeaders: { authorization: 'Bearer ' + accessToken },
+        auth: { authorization: 'Bearer ' + accessToken },
     })
 }
 

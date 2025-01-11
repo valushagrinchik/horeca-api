@@ -18,7 +18,7 @@ export class RolesGuard implements CanActivate {
     async canActivate(context: ExecutionContext) {
         const request = context.switchToHttp().getRequest()
 
-        const token = request.headers?.authorization || request.handshake?.headers?.authorization
+        const token = request.headers?.authorization || request.handshake?.auth?.authorization
         if (!token) {
             throw new UnauthorizedException({ code: 401 })
         }

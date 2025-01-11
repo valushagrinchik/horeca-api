@@ -9,7 +9,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
         super({
             jwtFromRequest: ExtractJwt.fromExtractors([
                 request => {
-                    const auth = request.headers?.authorization || request.handshake?.headers?.authorization || ''
+                    const auth = request.headers?.authorization || request.handshake?.auth?.authorization || ''
                     return auth.replace('Bearer ', '')
                 },
             ]),

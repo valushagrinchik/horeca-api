@@ -22,8 +22,8 @@ export class WsGateway<E, P> implements OnModuleInit, OnGatewayConnection, OnGat
 
     async handleConnection(client: Socket) {
         try {
-            if (typeof client.handshake.headers.authorization === 'string') {
-                const payload = this.jwtService.verify(client.handshake.headers.authorization.replace('Bearer ', ''), {
+            if (typeof client.handshake.auth.authorization === 'string') {
+                const payload = this.jwtService.verify(client.handshake.auth.authorization.replace('Bearer ', ''), {
                     secret: this.configService.get('JWT_ACCESS_TOKEN_SECRET'),
                 })
 
