@@ -54,9 +54,9 @@ export class MailService {
             throw new Error(`Template not found: ${templateFile}`)
         }
 
-        this.logger.log(`Send mail from ${this.configService.get(`SMTP_USER`)}`)
+        this.logger.log(`Send ${subject} mail to ${to} from ${this.configService.get(`SMTP_USER`)}`)
 
-        await this.mailerService.sendMail({
+        const res = await this.mailerService.sendMail({
             from: this.configService.get(`SMTP_USER`),
             to,
             subject,

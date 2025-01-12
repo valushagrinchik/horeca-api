@@ -16,7 +16,7 @@ import { CronModule } from '../system/cron/cron.module'
                 transport: {
                     host: configService.get(`SMTP_HOST`),
                     port: configService.get(`SMTP_PORT`),
-                    secure: false,
+                    secure: configService.get(`SMTP_SSL`),
                     auth: {
                         user: configService.get(`SMTP_USER`),
                         pass: configService.get(`SMTP_PASSWORD`),

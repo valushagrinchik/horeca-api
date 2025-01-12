@@ -305,6 +305,7 @@ export class HorecaRequestsService {
     }
 
     async validateRequestsOnReview() {
+        // TODO: Argument `where` of type HorecaRequestWhereUniqueInput needs at least one of `id` arguments.
         // 12 hours after second notification
         const hours84Ago = dayjs().add(-3, 'day').toDate()
         await this.horecaRequestsRep.update({

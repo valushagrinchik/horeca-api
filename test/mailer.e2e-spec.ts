@@ -34,7 +34,7 @@ describe('Sending email', () => {
         })
 
         expect(res).toHaveProperty('accepted')
-        expect(res.accepted).toBe([to])
+        expect(res.accepted[0]).toBe(to)
         return
     })
 })
