@@ -83,7 +83,7 @@
         "supertest": "7.0.0",
         "ts-jest": "^29.1.0",
         "ts-loader": "^9.4.3",
-        "ts-node": "^10.9.1",
+        "ts-node": "^10.9.2",
         "tsconfig-paths": "^4.2.0",
         "typescript": "5.5.4"
     },
@@ -105,6 +105,6 @@
         "testEnvironment": "node"
     },
     "prisma": {
-        "seed": "ts-node --transpile-only prisma/seed.ts"
+        "seed": "npx ts-node --transpile-only prisma/seed.ts"
     }
 }
