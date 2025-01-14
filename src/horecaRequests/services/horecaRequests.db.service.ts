@@ -113,12 +113,10 @@ export class HorecaRequestsDbService {
         })
     }
 
-    pastHorecaRequestsWithoutProviderOnes = async () => {
-        const now = dayjs().format(DB_DATE_FORMAT)
-
+    pastHorecaRequestsWithoutProviderOnes = async (now = dayjs().toISOString()) => {
         const withoutProviderRequests = await this.db.horecaRequest.findMany({
             where: {
-                acceptUntill: { lt: now },
+                acceptUntill: { lte: now },
                 providerRequests: {
                     none: {},
                 },
@@ -128,14 +126,14 @@ export class HorecaRequestsDbService {
             },
         })
 
-        const promises = withoutProviderRequests.map(record => {
+        const promises = withoutProviderRequests.map(record =>
             this.db.horecaRequest.update({
                 where: { id: record.id },
                 data: {
                     status: HorecaRequestStatus.CompletedUnsuccessfully,
                 },
             })
-        })
+        )
 
         await Promise.all(promises)
         return withoutProviderRequests
@@ -146,11 +144,11 @@ export class HorecaRequestsDbService {
         hrStatusTo: HorecaRequestStatus,
         prStatusFrom: ProviderRequestStatus,
         prStatusTo: ProviderRequestStatus,
-        now = dayjs().format(DB_DATE_FORMAT)
+        now = dayjs().toISOString()
     ) {
         const data = await this.db.horecaRequest.findMany({
             where: {
-                deliveryTime: { lt: now },
+                deliveryTime: { lte: now },
                 status: hrStatusFrom,
             },
             include: {

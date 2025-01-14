@@ -29,8 +29,8 @@ describe('Sending email', () => {
             context: {
                 link: '/',
                 service: 'HoReCa',
-                username: 'we'
-            }
+                username: 'we',
+            },
         })
 
         expect(res).toHaveProperty('accepted')

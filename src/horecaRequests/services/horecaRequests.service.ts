@@ -364,13 +364,11 @@ export class HorecaRequestsService {
     }
 
     // Cron
-    async pastRequests() {
-        const now = dayjs().format(DB_DATE_FORMAT)
-
+    async pastRequests(now = dayjs().toISOString()) {
         // CompletedUnsuccessfully
         // no provider requests untill acceptUntill passed
         // set horecaRequest.status to CompletedUnsuccessfully
-        await this.horecaRequestsRep.pastHorecaRequestsWithoutProviderOnes()
+        await this.horecaRequestsRep.pastHorecaRequestsWithoutProviderOnes(now)
 
         // No сhosen provider request until deliveryTime passed
         // set horecaRequest.status to CompletedUnsuccessfully

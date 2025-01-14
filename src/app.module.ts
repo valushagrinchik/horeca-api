@@ -17,9 +17,9 @@ import { SupportRequestsModule } from './supportRequests/supportRequests.module'
 import { HorecaPrivateRequestsModule } from './horecaPrivateRequests/horecaPrivateRequests.module'
 import { AppLoggerMiddleware } from './app.logger.middleware'
 import * as winston from 'winston'
-import 'winston-daily-rotate-file';
-import { utilities as nestWinstonModuleUtilities, WinstonModule } from 'nest-winston';
-import * as path from 'path';
+import 'winston-daily-rotate-file'
+import { utilities as nestWinstonModuleUtilities, WinstonModule } from 'nest-winston'
+import * as path from 'path'
 
 @Module({
     imports: [
@@ -76,7 +76,7 @@ import * as path from 'path';
                     datePattern: 'YYYY-MM-DD',
                     zippedArchive: true,
                     maxSize: '20m',
-                    maxFiles: '7d'
+                    maxFiles: '7d',
                 }),
             ],
         }),
