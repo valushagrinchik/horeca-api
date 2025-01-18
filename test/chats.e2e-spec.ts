@@ -263,6 +263,7 @@ describe('ChatWsGateway (e2e)', () => {
 
                 const chatDetails = await getChat(app, adminAuth.accessToken, chat.id)
 
+                expect(chatDetails.messages[0].message).toBe(supportRequest.content)
                 expect(chatDetails.supportRequest).not.toBeNull()
                 expect(chat).toHaveProperty('id')
                 expect(chat.opponents).toEqual([admin.id, provider.id])

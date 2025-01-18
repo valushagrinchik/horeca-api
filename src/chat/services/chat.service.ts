@@ -103,6 +103,17 @@ export class ChatService {
                 ]))
             )
         }
+        if (chat.type === ChatType.Support) {
+            const supportRequest = await this.supportRequestsService.getById(dto.supportRequestId)
+
+            const message = await this.createIncomeMessage({
+                chatId: supportRequest.chatId,
+                message: supportRequest.content,
+                authorId: supportRequest.userId,
+            })
+
+            messages.push(message)
+        }
 
         return new ChatDto({ ...chat, messages })
     }

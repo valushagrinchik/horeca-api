@@ -308,15 +308,28 @@ export const createSupportRequest = async (
     payload: SupportRequestCreateDto
 ): Promise<ChatDto | any> => {
     return request(app.getHttpServer())
-        .post(ENDPOINTS.SUPPORT)
+        .post(ENDPOINTS.SUPPORT_REQUESTS)
         .set('Authorization', 'Bearer ' + accessToken)
         .send(payload)
         .then(res => res.body)
 }
 
+export const getUsersSupportRequests = async (app: INestApplication, accessToken: string): Promise<ChatDto | any> => {
+    return request(app.getHttpServer())
+        .get(ENDPOINTS.SUPPORT_REQUESTS_USERS_LIST)
+        .set('Authorization', 'Bearer ' + accessToken)
+        .then(res => res.body)
+}
+export const getAdminSupportRequests = async (app: INestApplication, accessToken: string): Promise<ChatDto | any> => {
+    return request(app.getHttpServer())
+        .get(ENDPOINTS.SUPPORT_REQUESTS)
+        .set('Authorization', 'Bearer ' + accessToken)
+        .then(res => res.body)
+}
+
 export const assignAdminToSupportRequest = async (app: INestApplication, accessToken: string, id: number) => {
     return request(app.getHttpServer())
-        .post(ENDPOINTS.SUPPORT_ADMIN.replace(':id', id.toString()))
+        .post(ENDPOINTS.SUPPORT_REQUESTS_ADMIN.replace(':id', id.toString()))
         .set('Authorization', 'Bearer ' + accessToken)
         .then(res => res.body)
 }
