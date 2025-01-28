@@ -3,6 +3,7 @@ import { authUser, createSupportRequest, getAdminSupportRequests, getUsersSuppor
 import { ENDPOINTS } from './constants'
 import { AuthResultDto } from '../src/users/dto/auth.result.dto'
 import { adminUserInput, horecaUserInput, providerUserInput } from './mock/seedData'
+import { SupportRequestStatus } from '@prisma/client'
 
 let app: INestApplication
 let horecaAuth: AuthResultDto
@@ -30,7 +31,9 @@ describe('SupportRequestsController/SupportRequestsAdminController (e2e)', () =>
             await createSupportRequest(app, providerAuth.accessToken, { content: 'As a provider I need help!' })
         })
         it('should return horeca requests', async () => {
-            const providerSupportRequests = await getUsersSupportRequests(app, providerAuth.accessToken)
+            const providerSupportRequests = await getUsersSupportRequests(app, providerAuth.accessToken, {
+                status: SupportRequestStatus.Default,
+            })
             const horecaSupportRequests = await getUsersSupportRequests(app, horecaAuth.accessToken)
 
             const adminSupportRequests = await getAdminSupportRequests(app, adminAuth.accessToken)

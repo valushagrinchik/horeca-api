@@ -115,8 +115,10 @@ model User {
   // support requests
   supportRequest SupportRequest[]
 
+  // should't be used directly
+  chatMessages ChatMessage[]
+
   @@map("users")
-  
 }
 
 model Profile {
@@ -185,7 +187,7 @@ model Product {
   producer      String
   cost          Float
   count         Int
-  packagingType String? @map("packaging_type") 
+  packagingType String? @map("packaging_type")
 
   // images - could be loaded on runtime from UploadsLink
 
@@ -298,28 +300,26 @@ model HorecaFavourites {
 }
 
 model HorecaRequest {
-  id           Int                 @id @default(autoincrement())
-  user         User                @relation(fields: [userId], references: [id])
-  userId       Int                 @map("user_id")
-  items        HorecaRequestItem[]
-  address      String
+  id      Int                 @id @default(autoincrement())
+  user    User                @relation(fields: [userId], references: [id])
+  userId  Int                 @map("user_id")
+  items   HorecaRequestItem[]
+  address String
 
-  deliveryTime DateTime            @map("delivery_time")
-  acceptUntill DateTime            @map("accept_untill") @db.Date
+  deliveryTime DateTime @map("delivery_time")
+  acceptUntill DateTime @map("accept_untill") @db.Date
 
-  paymentType  PaymentType         @map("payment_type")
-  comment      String?
-  name         String
-  phone        String
+  paymentType PaymentType @map("payment_type")
+  comment     String?
+  name        String
+  phone       String
 
-  reviewNotificationSent Boolean @default(false)  @map("review_notification_sent")
+  reviewNotificationSent Boolean @default(false) @map("review_notification_sent")
 
   status HorecaRequestStatus @default(Pending)
 
+  providerRequests ProviderRequest[] @relation("allProviderRequests")
 
-  providerRequests            ProviderRequest[]            @relation("allProviderRequests")
-
-  
   // shouldn't be used
   horecaRequestProviderStatus HorecaRequestProviderStatus?
 
@@ -446,9 +446,9 @@ model Chat {
   opponents Int[]
   type      ChatType
 
-  providerRequest ProviderRequest?
+  providerRequest  ProviderRequest?
   horecaFavourites HorecaFavourites?
-  supportRequest SupportRequest?
+  supportRequest   SupportRequest?
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
@@ -469,6 +469,7 @@ model ChatMessage {
 
   // as it can be server message
   authorId Int?    @map("author_id")
+  author   User?   @relation(fields: [authorId], references: [id])
   // indicates that this is server message
   isServer Boolean @default(false) @map("is_server")
 
@@ -478,15 +479,14 @@ model ChatMessage {
   @@map("chat_messages")
 }
 
-
 model SupportRequest {
   id Int @id @default(autoincrement())
 
   user   User @relation(fields: [userId], references: [id])
   userId Int  @map("user_id")
-  
+
   content String?
-  status SupportRequestStatus @default(Default)
+  status  SupportRequestStatus @default(Default)
 
   adminId Int? @map("admin_id")
 

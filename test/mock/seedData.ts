@@ -1,6 +1,6 @@
 import { UserRole, ProfileType, PaymentType } from '@prisma/client'
 import { generatePassword } from './../../src/system/crypto'
-import { generateAcceptUntil } from './../../src/system/utils/date'
+import { generateFutureDate } from './../../src/system/utils/date'
 import { DeliveryMethods, Categories, Weekday } from './../../src/system/utils/enums'
 
 export const providerUserInput = {
@@ -61,7 +61,9 @@ export const horecaUserInput = {
     },
 }
 
-export const futureDate = generateAcceptUntil()
+export const acceptUntill = generateFutureDate()
+export const deliveryTime = generateFutureDate(14)
+
 export const horecaRequestInput = {
     items: [
         {
@@ -85,8 +87,8 @@ export const horecaRequestInput = {
     ],
 
     address: 'address string',
-    deliveryTime: futureDate,
-    acceptUntill: futureDate,
+    deliveryTime,
+    acceptUntill,
     paymentType: PaymentType.Deferment,
     comment: '',
     name: 'OOO smth',

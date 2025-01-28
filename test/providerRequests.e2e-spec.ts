@@ -13,7 +13,7 @@ import {
 import { ENDPOINTS } from './constants'
 import { AuthResultDto } from '../src/users/dto/auth.result.dto'
 import { horecaRequestInput, horecaUserInput, providerUserInput } from './mock/seedData'
-import { generateAcceptUntil } from '../src/system/utils/date'
+import { generateFutureDate } from '../src/system/utils/date'
 import { Categories } from '../src/system/utils/enums'
 
 let app: INestApplication
@@ -99,7 +99,8 @@ describe('ProviderRequestsController (e2e)', () => {
     })
     describe('POST ' + ENDPOINTS.PROVIDER_REQUESTS, () => {
         it('should return just created request data', async () => {
-            const validAcceptUntill = generateAcceptUntil()
+            const acceptUntill = generateFutureDate()
+            const deliveryTime = generateFutureDate(14)
 
             const horecaCreateRequestRes = await createHorecaRequest(app, horecaAuth.accessToken, {
                 items: [
@@ -111,8 +112,8 @@ describe('ProviderRequestsController (e2e)', () => {
                     },
                 ],
                 address: 'string',
-                deliveryTime: validAcceptUntill,
-                acceptUntill: validAcceptUntill,
+                deliveryTime,
+                acceptUntill,
                 paymentType: 'Prepayment',
                 name: 'string',
                 phone: 'string',

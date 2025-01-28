@@ -19,6 +19,7 @@ import { ChatDto } from '../src/chat/dto/chat.dto'
 import { HorecaRequestTemplateUpdateDto } from '../src/horecaRequests/dto/horecaRequest.template.update.dto'
 import { io, Socket } from 'socket.io-client'
 import { SupportRequestCreateDto } from '../src/supportRequests/dto/supportRequest.create.dto'
+import { SupportRequestSearchDto } from 'src/supportRequests/dto/supportRequest.search.dto'
 
 export const ioClient = (namespace: string, accessToken: string): Socket => {
     return io(process.env.WS_URL + namespace, {
@@ -314,9 +315,25 @@ export const createSupportRequest = async (
         .then(res => res.body)
 }
 
-export const getUsersSupportRequests = async (app: INestApplication, accessToken: string): Promise<ChatDto | any> => {
+export const resolveSupportRequest = async (
+    app: INestApplication,
+    accessToken: string,
+    id: number
+): Promise<ChatDto | any> => {
+    return request(app.getHttpServer())
+        .post(ENDPOINTS.SUPPORT_REQUESTS_RESOLVE.replace(':id', id.toString()))
+        .set('Authorization', 'Bearer ' + accessToken)
+        .then(res => res.body)
+}
+
+export const getUsersSupportRequests = async (
+    app: INestApplication,
+    accessToken: string,
+    search?: SupportRequestSearchDto
+): Promise<ChatDto | any> => {
     return request(app.getHttpServer())
         .get(ENDPOINTS.SUPPORT_REQUESTS_USERS_LIST)
+        .query({ search: JSON.stringify(search) })
         .set('Authorization', 'Bearer ' + accessToken)
         .then(res => res.body)
 }

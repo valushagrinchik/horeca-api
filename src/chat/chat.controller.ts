@@ -23,6 +23,8 @@ import {
     ChatHorecaFavouritesDto,
     ChatSupportRequestDto,
 } from './dto/chat.full.dto'
+import { ChatMessageDto } from './dto/chat.message.dto'
+import { UserDto } from '../users/dto/user.dto'
 
 @AuthUser(UserRole.Provider, UserRole.Horeca, UserRole.Admin)
 @Controller('chats')
@@ -63,6 +65,13 @@ export class ChatsController {
         const chat = await this.service.getChat(+id)
         return new ChatFullDto({
             ...chat,
+            messages: chat.messages.map(
+                message =>
+                    new ChatMessageDto({
+                        ...message,
+                        ...(message.author ? { author: new UserDto(message.author) } : {}),
+                    })
+            ),
             ...(chat.providerRequest
                 ? {
                       providerRequest: new ChatProviderRequestDto({

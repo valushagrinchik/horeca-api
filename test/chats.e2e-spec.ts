@@ -17,18 +17,20 @@ import {
     getProfile,
     initApp,
     ioClient,
+    resolveSupportRequest,
 } from './helpers'
 import { AuthResultDto } from '../src/users/dto/auth.result.dto'
 import { adminUserInput, horecaUserInput, providerUserInput } from './mock/seedData'
 import { ChatType } from '@prisma/client'
 import { ENDPOINTS } from './constants'
-import { generateAcceptUntil } from '../src/system/utils/date'
+import { generateFutureDate } from '../src/system/utils/date'
 import { Categories } from '../src/system/utils/enums'
 import { HorecaRequestDto } from '../src/horecaRequests/dto/horecaRequest.dto'
 import { ProviderRequestDto } from '../src/providerRequests/dto/providerRequest.dto'
 import { UserDto } from '../src/users/dto/user.dto'
 import { ChatDto } from '../src/chat/dto/chat.dto'
 import { ErrorCodes } from '../src/system/utils/enums/errorCodes.enum'
+import { SupportRequestDto } from 'src/supportRequests/dto/supportRequest.dto'
 
 let app: INestApplication
 let gateway: ChatWsGateway
@@ -69,7 +71,9 @@ describe('ChatWsGateway (e2e)', () => {
             let chat: ChatDto
 
             beforeAll(async () => {
-                const validAcceptUntill = generateAcceptUntil()
+                const acceptUntill = generateFutureDate()
+                const deliveryTime = generateFutureDate(14)
+
                 horecaRequest = await createHorecaRequest(app, horecaAuth.accessToken, {
                     items: [
                         {
@@ -80,13 +84,14 @@ describe('ChatWsGateway (e2e)', () => {
                         },
                     ],
                     address: 'string',
-                    deliveryTime: validAcceptUntill,
-                    acceptUntill: validAcceptUntill,
+                    deliveryTime,
+                    acceptUntill,
                     paymentType: 'Prepayment',
                     name: 'string',
                     phone: 'string',
                     comment: 'string',
                 })
+
                 providerRequest = await createProviderRequest(app, providerAuth.accessToken, {
                     horecaRequestId: horecaRequest.id,
                     comment: 'string',
@@ -100,6 +105,12 @@ describe('ChatWsGateway (e2e)', () => {
                     ],
                 })
             })
+
+            it('horeca and provider requests exists', async () => {
+                expect(horecaRequest).toHaveProperty('id')
+                expect(providerRequest).toHaveProperty('id')
+            })
+
             it('should thow an error in case chat is not allowed', async () => {
                 const res = await createChat(app, horecaAuth.accessToken, {
                     opponentId: provider.id,
@@ -235,6 +246,17 @@ describe('ChatWsGateway (e2e)', () => {
         })
         describe(`with type=${ChatType.Support}`, () => {
             let chat: ChatDto
+            let supportRequest: SupportRequestDto
+
+            beforeAll(async () => {
+                supportRequest = await createSupportRequest(app, providerAuth.accessToken, {
+                    content: 'I need help!',
+                })
+            })
+
+            afterAll(async () => {
+                await resolveSupportRequest(app, providerAuth.accessToken, supportRequest.id)
+            })
 
             it('should thow an error in case chat is not allowed', async () => {
                 const res = await createChat(app, adminAuth.accessToken, {
@@ -249,10 +271,6 @@ describe('ChatWsGateway (e2e)', () => {
             })
 
             it('should return chat', async () => {
-                const supportRequest = await createSupportRequest(app, providerAuth.accessToken, {
-                    content: 'I need help!',
-                })
-
                 await assignAdminToSupportRequest(app, adminAuth.accessToken, supportRequest.id)
 
                 chat = await createChat(app, adminAuth.accessToken, {

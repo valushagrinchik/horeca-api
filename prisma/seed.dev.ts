@@ -1,6 +1,6 @@
 import { PaymentType, PrismaClient, ProfileType, UserRole } from '@prisma/client'
 import { generatePassword } from './../src/system/crypto'
-import { generateAcceptUntil } from './../src/system/utils/date'
+import { generateFutureDate } from './../src/system/utils/date'
 import { DeliveryMethods, Categories } from './../src/system/utils/enums'
 
 import * as dotenv from 'dotenv'
@@ -113,7 +113,7 @@ export const runDevSeeds = async (prisma: PrismaClient) => {
         },
     })
 
-    const futureDate = generateAcceptUntil()
+    const futureDate = generateFutureDate()
 
     const horecaRequest = await prisma.horecaRequest.upsert({
         where: { id: 123 },

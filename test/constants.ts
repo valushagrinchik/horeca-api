@@ -17,4 +17,5 @@ export const ENDPOINTS = {
     SUPPORT_REQUESTS: '/support/requests',
     SUPPORT_REQUESTS_USERS_LIST: '/support/requests/mine',
     SUPPORT_REQUESTS_ADMIN: '/support/requests/:id/assign',
+    SUPPORT_REQUESTS_RESOLVE: '/support/requests/:id/resolve',
 }

@@ -66,6 +66,9 @@ export class ChatDbService {
             },
             include: {
                 messages: {
+                    include: {
+                        author: true,
+                    },
                     orderBy: {
                         createdAt: 'desc',
                     },
@@ -84,10 +87,28 @@ export class ChatDbService {
         return chat
     }
 
-    async createMessage({ chatId, ...data }: Omit<Prisma.ChatMessageCreateInput, 'chat'> & { chatId: number }) {
+    async createMessage({
+        chatId,
+        authorId,
+        message,
+        isServer = false,
+    }: {
+        chatId: number
+        authorId?: number
+        message: string
+        isServer?: boolean
+    }) {
         return this.db.chatMessage.create({
             data: {
-                ...data,
+                message,
+                isServer,
+                ...(authorId
+                    ? {
+                          author: {
+                              connect: { id: authorId },
+                          },
+                      }
+                    : {}),
                 chat: {
                     connect: { id: chatId },
                 },

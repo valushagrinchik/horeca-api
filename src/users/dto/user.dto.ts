@@ -31,12 +31,18 @@ export class UserDto implements User {
     isActivated: boolean
 
     @ApiProperty({ oneOf: [{ $ref: getSchemaPath(HorecaProfileDto) }, { $ref: getSchemaPath(ProviderProfileDto) }] })
-    @Type(({ object }) => (object.profile.profileType == ProfileType.Horeca ? HorecaProfileDto : ProviderProfileDto))
+    @Type(({ object }) =>
+        object.profile?.profileType == ProfileType.Horeca
+            ? HorecaProfileDto
+            : object.profile?.profileType == ProfileType.Provider
+              ? ProviderProfileDto
+              : null
+    )
     @Transform(({ value }) => {
-        if (value.profileType == ProfileType.Horeca) {
+        if (value?.profileType == ProfileType.Horeca) {
             return new HorecaProfileDto(value)
         }
-        if (value.profileType == ProfileType.Provider) {
+        if (value?.profileType == ProfileType.Provider) {
             return new ProviderProfileDto(value)
         }
         return null

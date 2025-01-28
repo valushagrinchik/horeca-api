@@ -1,4 +1,4 @@
-export const generateAcceptUntil = (days: number = 7) => {
+export const generateFutureDate = (days: number = 7) => {
     const now = new Date()
     const validAcceptUntill = new Date()
     validAcceptUntill.setDate(now.getDate() + days)
