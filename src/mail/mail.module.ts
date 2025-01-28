@@ -22,6 +22,8 @@ import { CronModule } from '../system/cron/cron.module'
                         pass: configService.get(`SMTP_PASSWORD`),
                     },
                     tls: { rejectUnauthorized: false },
+                    logger: true,
+                    debug: true
                 },
                 defaults: {
                     from: '"nest-modules" <modules@nestjs.com>',
@@ -33,6 +35,7 @@ import { CronModule } from '../system/cron/cron.module'
                         strict: true,
                     },
                 },
+
             }),
         }),
         CronModule,
