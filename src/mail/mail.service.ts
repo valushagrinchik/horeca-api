@@ -64,7 +64,9 @@ export class MailService {
             context: context as Record<string, any>,
         })
 
-        console.log(res,'res')
+        this.logger.log(JSON.stringify(res))
+
+    
 
         //get mail text and save message to log
         const templateText: string = fs.readFileSync(templateFile, 'utf8').toString()
