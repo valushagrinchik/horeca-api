@@ -8,7 +8,8 @@ export function RequestPaginatedDecorator<DTO, SearchDto, ItemExtraDTO>(
     dto: Type<DTO>, // type of response array item
     searchDto?: Type<SearchDto>,
     argDtos?: Record<string, any>, // additional properties to response except 'data' and 'total'
-    itemExtraDto?: Type<ItemExtraDTO> // additional properties to response array item
+    itemExtraDto?: Type<ItemExtraDTO>, // additional properties to response array item
+    sortDescription = 'fieldName(numeric)|ASC/DESC'
 ) {
     const extraModels = argDtos ? Object.values(argDtos) : []
     const requiredKeys = argDtos ? Object.keys(argDtos) : []
@@ -42,7 +43,7 @@ export function RequestPaginatedDecorator<DTO, SearchDto, ItemExtraDTO>(
                   }
                 : {}),
         }),
-        ApiQuery({ name: 'sort', required: false, type: () => String, description: 'fieldName(numeric)|ASC/DESC' }),
+        ApiQuery({ name: 'sort', required: false, type: () => String, description: sortDescription }),
         ApiExtraModels(PaginatedDto, dto, ...extraModels),
         searchDto ? ApiExtraModels(searchDto) : null,
         itemExtraDto ? ApiExtraModels(itemExtraDto) : null,

@@ -41,6 +41,7 @@ export class ChatHorecaRequestDto implements HorecaRequest {
     name: string
     phone: string
     reviewNotificationSent: boolean
+    categories: string[]
     @ApiProperty({ enum: HorecaRequestStatus, enumName: 'HorecaRequestStatus' })
     status: HorecaRequestStatus
     createdAt: Date

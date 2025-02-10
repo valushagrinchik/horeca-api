@@ -23,7 +23,7 @@ import { CronModule } from '../system/cron/cron.module'
                     },
                     tls: { rejectUnauthorized: false },
                     logger: true,
-                    debug: true
+                    debug: true,
                 },
                 defaults: {
                     from: '"nest-modules" <modules@nestjs.com>',
@@ -35,7 +35,6 @@ import { CronModule } from '../system/cron/cron.module'
                         strict: true,
                     },
                 },
-
             }),
         }),
         CronModule,

@@ -8,15 +8,17 @@ import { ErrorCodes } from '../../system/utils/enums/errorCodes.enum'
 import { UpdateUserDto } from '../dto/update-user.dto'
 import { UserDto } from '../dto/user.dto'
 import { MailService } from '../../mail/mail.service'
-import { User } from '@prisma/client'
+import { ProfileType, User } from '@prisma/client'
 import { validPassword } from '../../system/crypto'
 import { UsersDbService } from './users.db.service'
+import { RequestsMatcherDbService } from '../../system/shared/requestsMatcher/requestsMatcher.db.service'
 
 @Injectable()
 export class UsersService {
     constructor(
         private usersRep: UsersDbService,
         private authService: AuthorizationService,
+        private requestsMatcherService: RequestsMatcherDbService,
         private mailService?: MailService
     ) {}
 
@@ -33,6 +35,10 @@ export class UsersService {
             email: user.email,
             link: user.activationLink,
         })
+
+        if (dto.profile.profileType == ProfileType.Provider) {
+            this.requestsMatcherService.updateView()
+        }
 
         return new UserDto(user)
     }

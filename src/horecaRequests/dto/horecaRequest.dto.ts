@@ -13,6 +13,7 @@ export class HorecaRequestDto extends SourceWithUploads implements HorecaRequest
     paymentType: PaymentType
     name: string
     phone: string
+    categories: string[]
     items: HorecaRequestItemDto[]
     comment: string
     @ApiProperty({ enum: HorecaRequestStatus, enumName: 'HorecaRequestStatus' })
@@ -22,6 +23,8 @@ export class HorecaRequestDto extends SourceWithUploads implements HorecaRequest
 
     createdAt: Date
     updatedAt: Date
+
+    cover?: number
 
     constructor(partial: Partial<HorecaRequest & { items?: HorecaRequestItem[] } & SourceWithUploads>) {
         super()

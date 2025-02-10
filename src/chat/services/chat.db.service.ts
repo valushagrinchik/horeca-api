@@ -5,7 +5,6 @@ import { forwardRef, Inject } from '@nestjs/common'
 import { ChatSearchDto } from '../dto/chat.search.dto'
 import { ChatCreateDto } from '../dto/chat.create.dto'
 import { ChatDto } from '../dto/chat.dto'
-import { uniq } from 'lodash'
 
 export class ChatDbService {
     constructor(
@@ -17,7 +16,7 @@ export class ChatDbService {
         userId: number,
         { opponentId, providerRequestId, horecaRequestId, horecaFavouriteId, supportRequestId, ...dto }: ChatCreateDto
     ) {
-        const opponents = uniq([userId, opponentId].filter(o => !!o))
+        const opponents = [...new Set([userId, opponentId].filter(o => !!o))]
 
         return this.db.chat.create({
             data: {

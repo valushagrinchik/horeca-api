@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common'
-import { ApiOperation, ApiTags } from '@nestjs/swagger'
+import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger'
 import { AuthUser } from '../system/utils/auth/decorators/auth.decorator'
 import { UserRole } from '@prisma/client'
 import { AuthInfoDto } from '../users/dto/auth.info.dto'
@@ -27,7 +27,7 @@ export class ProviderRequestsController {
     constructor(private readonly service: ProviderRequestsService) {}
 
     @Get('income')
-    @RequestPaginatedDecorator(HorecaRequestDto, ProviderHorecaRequestSearchDto)
+    @RequestPaginatedDecorator(HorecaRequestDto, ProviderHorecaRequestSearchDto, null, null, 'createdAt/cover|ASC/DESC')
     @ApiOperation({ summary: "List of HoReCa proposals that matches with provider's offers" })
     async incomeHorecaRequests(
         @AuthParamDecorator() auth: AuthInfoDto,

@@ -27,7 +27,8 @@ export class UsersDbService {
                 profile: {
                     create: {
                         profileType: dto.profile.profileType as ProfileType,
-                        ...(dto.profile as Omit<RegistrateUserDto['profile'], 'addresses'>),
+                        ...(dto.profile as Omit<RegistrateUserDto['profile'], 'addresses' | 'categories'>),
+                        ...('categories' in dto.profile ? { categories: [...new Set(dto.profile.categories)] } : {}),
                         ...('addresses' in dto.profile
                             ? {
                                   addresses: {

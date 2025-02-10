@@ -12,12 +12,11 @@ export const RequestPaginatedValidateParamsDecorator = createParamDecorator((dat
         order: 'desc',
     })
     if (sort) {
-        //TODO Сделать проверку на валидность поля order
         const [field, order] = sort.toString().split('|')
-        if (order !== 'asc' && order !== 'desc') {
+        if (order.toLowerCase() !== 'asc' && order.toLowerCase() !== 'desc') {
             throw new BadRequestException(new ErrorDto(ErrorCodes.INVALID_QUERY_STRING))
         }
-        sortType = new PaginateValidateSortType({ field, order: order })
+        sortType = new PaginateValidateSortType({ field, order: order.toLowerCase() as "desc" | "asc" })
     }
 
     if (searchInput) {

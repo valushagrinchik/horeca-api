@@ -12,7 +12,7 @@ import {
 } from './helpers'
 import { ENDPOINTS } from './constants'
 import { AuthResultDto } from '../src/users/dto/auth.result.dto'
-import { horecaRequestInput, horecaUserInput, providerUserInput } from './mock/seedData'
+import { horecaRequestInput, horecaRequestInput2, horecaUserInput, providerUserInput } from './mock/seedData'
 import { generateFutureDate } from '../src/system/utils/date'
 import { Categories } from '../src/system/utils/enums'
 
@@ -38,6 +38,7 @@ describe('ProviderRequestsController (e2e)', () => {
     describe('GET ' + ENDPOINTS.HOREKA_REQUESTS_FOR_PROVIDER, () => {
         beforeAll(async () => {
             await createHorecaRequest(app, horecaAuth.accessToken, horecaRequestInput)
+            await createHorecaRequest(app, horecaAuth.accessToken, horecaRequestInput2)
         })
         it('should return paginated data and total', async () => {
             const res = await findAllHorecaRequestForProvider(app, providerAuth.accessToken)
@@ -51,10 +52,35 @@ describe('ProviderRequestsController (e2e)', () => {
             return
         })
 
-        describe('without search filter (that means "active") ', () => {
-            it('should return array of active horeca requests that matche with providers categories', async () => {
-                const res = await findAllHorecaRequestForProvider(app, providerAuth.accessToken)
+        it('should return data sorted by cover desc', async () => {
+            const res = await findAllHorecaRequestForProvider(app, providerAuth.accessToken, { sort: 'cover|desc' })
 
+            expect(res).toHaveProperty('data')
+            expect(res).toHaveProperty('total')
+
+            expect(res.data.length).toBe(2)
+            expect(res.data[0].cover).toBeGreaterThan(res.data[1].cover)
+
+            return
+        })
+
+        it('should return data sorted by cover asc', async () => {
+            const res = await findAllHorecaRequestForProvider(app, providerAuth.accessToken, { sort: 'cover|asc' })
+
+            expect(res).toHaveProperty('data')
+            expect(res).toHaveProperty('total')
+
+            expect(res.data.length).toBe(2)
+            expect(res.data[0].cover).toBeLessThan(res.data[1].cover)
+
+            return
+        })
+
+        describe('get active horeca requests for provider', () => {
+            it('should return array of active horeca requests that matche with providers categories', async () => {
+                const res = await findAllHorecaRequestForProvider(app, providerAuth.accessToken, {
+                    sort: 'createdAt|asc',
+                })
                 const user = await getProfile(app, providerAuth.accessToken)
 
                 const crossedCategoryItemsLength = horecaRequestInput.items.filter(item =>
@@ -67,13 +93,14 @@ describe('ProviderRequestsController (e2e)', () => {
                 return
             })
         })
-        describe('with search filter {includeHiddenAndViewed: true}', () => {
+
+        describe('get all (active and hidden or viewed) horeca requests for provider', () => {
             it('should return array of inactive horeca requests that match with providers categories', async () => {
                 const res = await findAllHorecaRequestForProvider(app, providerAuth.accessToken, {
                     search: JSON.stringify({ includeHiddenAndViewed: true }),
                 })
 
-                expect(res.data.length).toBe(1)
+                expect(res.data.length).toBe(2)
 
                 return
             })
@@ -83,7 +110,7 @@ describe('ProviderRequestsController (e2e)', () => {
         it('should apply "viewed" status to one of horeca request and delete it from active requests list', async () => {
             expect.assertions(3)
             const horecaRequestsRes = await findAllHorecaRequestForProvider(app, providerAuth.accessToken)
-            expect(horecaRequestsRes.data.length).toBeGreaterThan(0)
+            expect(horecaRequestsRes.data.length).toBe(2)
 
             const res = await setHorecaRequestStatus(app, providerAuth.accessToken, {
                 horecaRequestId: horecaRequestsRes.data[0].id,

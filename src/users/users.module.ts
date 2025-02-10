@@ -9,6 +9,7 @@ import { AuthorizationController } from './authorization.controller'
 import { MailService } from '../mail/mail.service'
 import { MailModule } from '../mail/mail.module'
 import { UsersDbService } from './services/users.db.service'
+import { RequestsMatcherModule } from '../system/shared/requestsMatcher/requestsMatcher.module'
 
 @Module({
     imports: [
@@ -20,6 +21,7 @@ import { UsersDbService } from './services/users.db.service'
             inject: [ConfigService],
         }),
         MailModule,
+        RequestsMatcherModule,
     ],
     controllers: [UsersController, AuthorizationController],
     providers: [UsersDbService, UsersService, MailService, AuthorizationService, JwtStrategy, Logger],

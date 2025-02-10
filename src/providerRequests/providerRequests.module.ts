@@ -8,9 +8,10 @@ import { HorecaRequestsModule } from '../horecaRequests/horecaRequests.module'
 import { HorecaRequestProviderStatusDbService } from './services/horecaRequest.providerStatus.db.service'
 import { NotificationModule } from '../notifications/notification.module'
 import { ChatModule } from '../chat/chat.module'
+import { RequestsMatcherModule } from '../system/shared/requestsMatcher/requestsMatcher.module'
 
 @Module({
-    imports: [UsersModule, UploadsModule, HorecaRequestsModule, NotificationModule, ChatModule],
+    imports: [UsersModule, UploadsModule, HorecaRequestsModule, NotificationModule, ChatModule, RequestsMatcherModule],
     controllers: [ProviderRequestsController],
     providers: [HorecaRequestProviderStatusDbService, ProviderRequestsDbService, ProviderRequestsService],
     exports: [ProviderRequestsService],

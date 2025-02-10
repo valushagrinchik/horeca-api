@@ -4,7 +4,6 @@ import { generateFutureDate } from './../src/system/utils/date'
 import { DeliveryMethods, Categories } from './../src/system/utils/enums'
 
 import * as dotenv from 'dotenv'
-import { includes } from 'lodash'
 dotenv.config()
 
 export const runDevSeeds = async (prisma: PrismaClient) => {
@@ -136,7 +135,7 @@ export const runDevSeeds = async (prisma: PrismaClient) => {
                     ],
                 },
             },
-
+            categories: [Categories.alcoholicDrinks],
             address: 'address string',
             deliveryTime: futureDate,
             acceptUntill: futureDate,

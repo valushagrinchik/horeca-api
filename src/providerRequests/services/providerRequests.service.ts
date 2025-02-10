@@ -22,8 +22,8 @@ import { NotificationWsGateway } from '../../notifications/notification.ws.gatew
 import { NotificationEvents } from '../../system/utils/enums/websocketEvents.enum'
 import { ProviderRequestSearchDto } from '../dto/providerRequest.search.dto'
 import { Categories } from '../../system/utils/enums'
-import { stat } from 'fs'
-import { omit } from 'lodash'
+import { isNil, omit } from 'lodash'
+import { RequestsMatcherDbService } from '../../system/shared/requestsMatcher/requestsMatcher.db.service'
 
 @Injectable()
 export class ProviderRequestsService {
@@ -33,7 +33,8 @@ export class ProviderRequestsService {
         private usersService: UsersService,
         private horecaRequestService: HorecaRequestsService,
         private horecaRequestProviderStatusRep: HorecaRequestProviderStatusDbService,
-        private notificationWsGateway: NotificationWsGateway
+        private notificationWsGateway: NotificationWsGateway,
+        private requestsMatcherService: RequestsMatcherDbService
     ) {}
 
     async validate(auth: AuthInfoDto, id: number) {
@@ -50,7 +51,7 @@ export class ProviderRequestsService {
         const now = dayjs().format(DB_DATE_FORMAT)
         const provider = await this.usersService.get(auth)
         const categories = provider.profile.categories as Categories[]
-        const { includeHiddenAndViewed, category } = paginate.search
+        const { includeHiddenAndViewed = false, category } = paginate.search
 
         if (category && !categories.includes(category)) {
             throw new BadRequestException(new ErrorDto(ErrorCodes.FORBIDDEN_ACTION))
@@ -58,31 +59,36 @@ export class ProviderRequestsService {
 
         const categoriesFilter = category ? [category] : categories
 
-        const where: Prisma.HorecaRequestWhereInput = {
-            items: {
-                some: {
-                    category: { in: categoriesFilter },
+        const where = {
+            providerId: auth.id,
+            horecaRequest: {
+                categories: {
+                    hasSome: categoriesFilter,
                 },
-            },
-            status: HorecaRequestStatus.Pending,
-            ...(includeHiddenAndViewed ? {} : { horecaRequestProviderStatus: { is: null } }),
-            acceptUntill: {
-                // TODO: check date
-                gte: new Date(now),
+                status: HorecaRequestStatus.Pending,
+                ...(includeHiddenAndViewed ? {} : { horecaRequestProviderStatus: { is: null } }),
+                acceptUntill: {
+                    // TODO: check date
+                    gte: new Date(now),
+                },
             },
         }
 
-        const data = await this.horecaRequestService.findByCondition({
+        const data = await this.requestsMatcherService.findHorecaRequests({
             where,
             include: {
-                items: {
-                    where: {
-                        category: { in: categories },
-                    },
-                },
-                horecaRequestProviderStatus: {
-                    where: {
-                        providerId: auth.id,
+                horecaRequest: {
+                    include: {
+                        items: {
+                            where: {
+                                category: { in: categories },
+                            },
+                        },
+                        horecaRequestProviderStatus: {
+                            where: {
+                                providerId: auth.id,
+                            },
+                        },
                     },
                 },
             },
@@ -92,9 +98,9 @@ export class ProviderRequestsService {
             take: paginate.limit,
             skip: paginate.offset,
         })
-        const total = await this.horecaRequestService.countByCondition({ where })
 
-        return [data, total]
+        const total = await this.requestsMatcherService.countHorecaRequests(where)
+        return [data.map(item => ({ ...item.horecaRequest, cover: item.cover })), total]
     }
 
     async setStatusForIncomeHorecaRequest(auth: AuthInfoDto, dto: HorecaRequestProviderStatusDto) {
@@ -114,7 +120,7 @@ export class ProviderRequestsService {
         const providerRequest = await this.providerRequestsRep.create({
             ...dto,
             user: { connect: { id: auth.id } },
-            horecaRequest: { connect: horecaRequest },
+            horecaRequest: { connect: { id: horecaRequest.id } },
             items: {
                 createMany: {
                     data: items.map(item => omit(item, ['imageIds'])),

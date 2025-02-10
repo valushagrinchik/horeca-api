@@ -11,8 +11,16 @@ import { CronModule } from '../system/cron/cron.module'
 import { HorecaRequestsCronService } from './cron/horecaRequests.cron.service'
 import { NotificationModule } from '../notifications/notification.module'
 import { ChatModule } from '../chat/chat.module'
+import { RequestsMatcherModule } from '../system/shared/requestsMatcher/requestsMatcher.module'
 @Module({
-    imports: [UsersModule, UploadsModule, CronModule, NotificationModule, forwardRef(() => ChatModule)],
+    imports: [
+        UsersModule,
+        UploadsModule,
+        CronModule,
+        NotificationModule,
+        forwardRef(() => ChatModule),
+        RequestsMatcherModule,
+    ],
     controllers: [HorecaRequestsTemplateController, HorecaRequestsController],
     providers: [
         HorecaRequestsTemplateDbService,

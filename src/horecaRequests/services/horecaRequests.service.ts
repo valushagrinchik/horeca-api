@@ -22,9 +22,10 @@ import { NotificationWsGateway } from '../../notifications/notification.ws.gatew
 import * as dayjs from 'dayjs'
 import { NotificationEvents } from '../../system/utils/enums/websocketEvents.enum'
 import { ChatWsGateway } from '../../chat/chat.ws.gateway'
-import { ChatServerMessages, DB_DATE_FORMAT } from '../../system/utils/constants'
+import { ChatServerMessages } from '../../system/utils/constants'
 import { HorecaRequestSearchDto } from '../dto/horecaRequest.search.dto'
 import { ErrorValidationCodeEnum } from '../../system/utils/validation/error.validation.code.enum'
+import { RequestsMatcherDbService } from '../../system/shared/requestsMatcher/requestsMatcher.db.service'
 
 @Injectable()
 export class HorecaRequestsService {
@@ -32,6 +33,7 @@ export class HorecaRequestsService {
         private horecaRequestsRep: HorecaRequestsDbService,
         private uploadsLinkService: UploadsLinkService,
         private notificationWsGateway: NotificationWsGateway,
+        private requestsMatcherService: RequestsMatcherDbService,
         @Inject(forwardRef(() => ChatWsGateway))
         private chatWsGateway: ChatWsGateway
     ) {}
@@ -77,11 +79,15 @@ export class HorecaRequestsService {
             items: {
                 createMany: { data: dto.items },
             },
+            categories: [...new Set(dto.items.map(item => item.category))],
         })
 
         if (imageIds) {
             await this.uploadsLinkService.createMany(UploadsLinkType.HorecaRequest, horecaRequest.id, imageIds)
         }
+
+        // TO update provider - horeca requests covering view
+        this.requestsMatcherService.updateView()
 
         return this.get(horecaRequest.id)
     }

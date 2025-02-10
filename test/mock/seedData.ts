@@ -85,7 +85,7 @@ export const horecaRequestInput = {
             category: Categories.cannedFoods,
         },
     ],
-
+    categories: [Categories.alcoholicDrinks, Categories.dishes, Categories.cannedFoods],
     address: 'address string',
     deliveryTime,
     acceptUntill,
@@ -93,6 +93,25 @@ export const horecaRequestInput = {
     comment: '',
     name: 'OOO smth',
     phone: '123123124',
+}
+
+export const horecaRequestInput2 = {
+    items: [
+        {
+            name: 'B',
+            amount: 200,
+            unit: 'df',
+            category: Categories.alcoholicDrinks,
+        },
+    ],
+    categories: [Categories.alcoholicDrinks],
+    address: 'address string2',
+    deliveryTime,
+    acceptUntill,
+    paymentType: PaymentType.Deferment,
+    comment: '',
+    name: 'OOO smth2',
+    phone: '1231231242',
 }
 
 // export const providerRequestsInput = [
