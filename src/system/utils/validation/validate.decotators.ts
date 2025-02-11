@@ -74,7 +74,7 @@ const validateMap = {
                 message: value => errorMessage(value, ErrorValidationCodeEnum.IS_BOOLEAN),
             }),
             Transform(({ value }) => {
-                return value === 'true'
+                return value === 'true' || value === true
             }),
         ],
         propType: Boolean,
