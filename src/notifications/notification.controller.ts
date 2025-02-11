@@ -1,5 +1,5 @@
 import { Controller, Get } from '@nestjs/common'
-import { ApiExtraModels, ApiTags } from '@nestjs/swagger'
+import { ApiExtraModels, ApiOperation, ApiTags } from '@nestjs/swagger'
 import {
     NotificationPayload,
     ProviderAddedToFavouritesNotificationPayload,
@@ -29,6 +29,7 @@ import { SuccessDto } from '../system/utils/dto/success.dto'
 export class NotificationController {
     @Get()
     @RequestDecorator(SuccessDto)
+    @ApiOperation({ summary: 'Пометить список нотификаций. Роль пользователя: Админ' })
     async get(@AuthParamDecorator() auth: AuthInfoDto) {
         return new SuccessDto('ok')
     }

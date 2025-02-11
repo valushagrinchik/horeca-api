@@ -17,7 +17,7 @@ export class ReviewsController {
 
     @Post()
     @RequestDecorator(ReviewDto, ReviewCreateDto)
-    @ApiOperation({ summary: 'Create review on succesfully finished provider request' })
+    @ApiOperation({ summary: 'Создать отзыв на успешно завершенную сделку с поставщиком. Роль пользователя: Хорека' })
     async create(@AuthParamDecorator() auth: AuthInfoDto, @Body() dto: ReviewCreateDto) {
         return this.service.create(auth, dto)
     }

@@ -23,7 +23,7 @@ export class FavouritesController {
     constructor(private readonly service: FavouritesService) {}
 
     @Post()
-    @ApiOperation({ summary: 'Add provider in favourites to be able to chat' })
+    @ApiOperation({ summary: 'Добавить поставщика в избранное. Роль пользователя: Хорека' })
     @RequestDecorator(FavouritesDto, FavouritesCreateDto)
     async create(@AuthParamDecorator() auth: AuthInfoDto, @Body() dto: FavouritesCreateDto) {
         const fav = await this.service.create(auth, dto)
@@ -32,7 +32,7 @@ export class FavouritesController {
 
     @Delete(':providerId')
     @RequestDecorator(SuccessDto)
-    @ApiOperation({ summary: 'Delete provider from favourites' })
+    @ApiOperation({ summary: 'Удалить поставщика из избранного. Роль пользователя: Хорека' })
     async delete(@AuthParamDecorator() auth: AuthInfoDto, @Param('providerId') providerId: number) {
         await this.service.delete(auth, +providerId)
         return new SuccessDto('ok')
@@ -41,7 +41,7 @@ export class FavouritesController {
     @AuthUser(UserRole.Horeca, UserRole.Provider)
     @Get()
     @RequestPaginatedDecorator(FavouritesDto)
-    @ApiOperation({ summary: 'Get all favourite providers/horecas' })
+    @ApiOperation({ summary: 'Получить список избранных. Роль пользователя: Поставщик/Хорека' })
     async findAll(
         @AuthParamDecorator() auth: AuthInfoDto,
         @RequestPaginatedValidateParamsDecorator() paginate: PaginateValidateType<Object>

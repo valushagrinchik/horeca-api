@@ -17,7 +17,7 @@ import { ChatMessageService } from './services/chat.message.service'
 import { SuccessDto } from '../system/utils/dto/success.dto'
 import { WsMessageCreateDto } from './dto/ws.message.create.dto'
 
-@AuthUser(UserRole.Provider, UserRole.Horeca)
+@AuthUser(UserRole.Provider, UserRole.Horeca, UserRole.Admin)
 @Controller('messages')
 @ApiTags('Chats')
 @ApiExtraModels(WsMessageCreateDto)
@@ -26,7 +26,7 @@ export class ChatsMessageController {
 
     @Get()
     @RequestPaginatedDecorator(ChatMessageDto)
-    @ApiOperation({ summary: 'Get chat messages' })
+    @ApiOperation({ summary: 'Получить список сообщений чата. Роль пользователя: Поставщик/Хорека/Админ' })
     async getChatMessages(
         @AuthParamDecorator() auth: AuthInfoDto,
         @RequestPaginatedValidateParamsDecorator() paginate: PaginateValidateType<ChatMessageSearchDto>
@@ -37,7 +37,7 @@ export class ChatsMessageController {
 
     @Put(':id/view')
     @RequestDecorator()
-    @ApiOperation({ summary: 'Mark message viewed' })
+    @ApiOperation({ summary: 'Пометить сообщение как прочитанное. Роль пользователя: Поставщик/Хорека/Админ' })
     async viewMessage(@AuthParamDecorator() auth: AuthInfoDto, @Param('id') messageId: number) {
         await this.service.viewMessage(auth, +messageId)
         return new SuccessDto('ok')

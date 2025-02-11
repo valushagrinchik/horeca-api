@@ -25,14 +25,14 @@ export class ProductsController {
 
     @Post()
     @RequestDecorator(ProductDto, ProductCreateDto)
-    @ApiOperation({ summary: "Create product from provider's offer" })
+    @ApiOperation({ summary: 'Создать продукт. Роль пользователя: Поставщик' })
     async create(@AuthParamDecorator() auth: AuthInfoDto, @Body() dto: ProductCreateDto) {
         return this.service.create(auth, dto)
     }
 
     @Get()
     @RequestPaginatedDecorator(ProductDto, ProductSearchDto)
-    @ApiOperation({ summary: "Gat all products from provider's offer" })
+    @ApiOperation({ summary: 'Получить все продукты. Роль пользователя: Поставщик' })
     async findAll(
         @AuthParamDecorator() auth: AuthInfoDto,
         @RequestPaginatedValidateParamsDecorator() paginate: PaginateValidateType<ProductSearchDto>
@@ -43,20 +43,20 @@ export class ProductsController {
 
     @Get(':id')
     @RequestDecorator(ProductDto)
-    @ApiOperation({ summary: 'Get the specific product' })
+    @ApiOperation({ summary: 'Получить продукт по id. Роль пользователя: Поставщик' })
     async get(@AuthParamDecorator() auth: AuthInfoDto, @Param('id') id: number) {
         return this.service.get(auth, id)
     }
 
     @Put(':id')
     @RequestDecorator(ProductDto, ProductUpdateDto)
-    @ApiOperation({ summary: 'Update the specific product' })
+    @ApiOperation({ summary: 'Обновить продукт. Роль пользователя: Поставщик' })
     async update(@AuthParamDecorator() auth: AuthInfoDto, @Param('id') id: number, @Body() dto: ProductUpdateDto) {
         return this.service.update(auth, id, dto)
     }
 
     @Delete(':id')
-    @ApiOperation({ summary: 'Delete the specific product' })
+    @ApiOperation({ summary: 'Удалить продукт. Роль пользователя: Поставщик' })
     async delete(@AuthParamDecorator() auth: AuthInfoDto, @Param('id') id: number) {
         return this.service.delete(auth, id)
     }

@@ -18,14 +18,14 @@ export class UsersController {
     constructor(private readonly usersService: UsersService) {}
 
     @Put('me')
-    @ApiOperation({ summary: 'Update users profile' })
+    @ApiOperation({ summary: 'Обновить профиль. Роль пользователя: Поставщик/Хорека/Админ' })
     @RequestDecorator(UserDto, UpdateUserDto)
     async update(@AuthParamDecorator() auth: AuthInfoDto, @Body() dto: UpdateUserDto) {
         return this.usersService.update(auth, dto)
     }
 
     @Get('me')
-    @ApiOperation({ summary: 'Get users profile' })
+    @ApiOperation({ summary: 'Получить профиль. Роль пользователя: Поставщик/Хорека/Админ' })
     @RequestDecorator(UserDto)
     @ApiExtraModels(HorecaProfileDto, ProviderProfileDto)
     async get(@AuthParamDecorator() auth: AuthInfoDto) {

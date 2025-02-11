@@ -24,21 +24,21 @@ export class HorecaRequestsTemplateController {
     constructor(private readonly service: HorecaRequestsTemplateService) {}
 
     @Post()
-    @ApiOperation({ summary: 'Create template of products(categories) set proposal required for HoReCa to use later' })
+    @ApiOperation({ summary: 'Создать темплейт заявки. Роль пользователя: Хорека' })
     @RequestDecorator(HorecaRequestTemplateDto, HorecaRequestTemplateCreateDto)
     async create(@AuthParamDecorator() auth: AuthInfoDto, @Body() dto: HorecaRequestTemplateCreateDto) {
         return this.service.create(auth, dto)
     }
 
     @Get(':id')
-    @ApiOperation({ summary: 'Get template of products(categories) set proposal required for HoReCa' })
+    @ApiOperation({ summary: 'Получить темплейт заявки. Роль пользователя: Хорека' })
     @RequestDecorator(HorecaRequestTemplateDto)
     async find(@AuthParamDecorator() auth: AuthInfoDto, @Param('id') id: number) {
         return this.service.find(auth, +id)
     }
 
     @Put(':id')
-    @ApiOperation({ summary: 'Update template' })
+    @ApiOperation({ summary: 'Обновить темплейт заявки. Роль пользователя: Хорека' })
     @RequestDecorator(HorecaRequestTemplateDto)
     async update(
         @AuthParamDecorator() auth: AuthInfoDto,
@@ -49,7 +49,7 @@ export class HorecaRequestsTemplateController {
     }
 
     @Get()
-    @ApiOperation({ summary: 'Get all templates' })
+    @ApiOperation({ summary: 'Получить все темплейты заявок. Роль пользователя: Хорека' })
     @RequestPaginatedDecorator(HorecaRequestTemplateDto)
     async findAll(
         @AuthParamDecorator() auth: AuthInfoDto,
@@ -60,7 +60,7 @@ export class HorecaRequestsTemplateController {
     }
 
     @Delete(':id')
-    @ApiOperation({ summary: 'Delete template' })
+    @ApiOperation({ summary: 'Удалить темплейт заявки. Роль пользователя: Хорека' })
     @RequestDecorator(SuccessDto)
     async delete(@AuthParamDecorator() auth: AuthInfoDto, @Param('id') id: number) {
         await this.service.delete(auth, +id)

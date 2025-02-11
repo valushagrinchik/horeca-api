@@ -27,7 +27,7 @@ export class SupportRequestsController {
 
     @Post()
     @RequestDecorator(SupportRequestDto, SupportRequestCreateDto)
-    @ApiOperation({ summary: 'Creates request to support' })
+    @ApiOperation({ summary: 'Создать запрос на поддержку. Роль пользователя: Поставщик/Хорека' })
     async create(@AuthParamDecorator() auth: AuthInfoDto, @Body() dto: SupportRequestCreateDto) {
         const response = await this.supportRequestService.create(auth, dto)
         return new SupportRequestDto(response)
@@ -35,7 +35,7 @@ export class SupportRequestsController {
 
     @Post(':id/resolve')
     @RequestDecorator(SuccessDto)
-    @ApiOperation({ summary: 'Marks request to support as resolved' })
+    @ApiOperation({ summary: 'Пометить запрос на поддержку как выполненный. Роль пользователя: Поставщик/Хорека' })
     async resolve(@AuthParamDecorator() auth: AuthInfoDto, @Param('id') id: number) {
         await this.supportRequestService.resolve(auth, +id)
         return new SuccessDto('ok')
@@ -43,7 +43,7 @@ export class SupportRequestsController {
 
     @Get('mine')
     @RequestPaginatedDecorator(SupportRequestDto, SupportRequestSearchDto)
-    @ApiOperation({ summary: "List of users's support requests" })
+    @ApiOperation({ summary: 'Получить список запросов на поддержку. Роль пользователя: Поставщик/Хорека' })
     async list(
         @AuthParamDecorator() auth: AuthInfoDto,
         @RequestPaginatedValidateParamsDecorator() paginate: PaginateValidateType<SupportRequestSearchDto>

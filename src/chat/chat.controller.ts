@@ -34,14 +34,14 @@ export class ChatsController {
 
     @Post()
     @RequestDecorator(ChatDto, ChatCreateDto)
-    @ApiOperation({ summary: 'Creates chat' })
+    @ApiOperation({ summary: 'Создать чат. Роль пользователя: Поставщик/Хорека/Админ' })
     async createChat(@AuthParamDecorator() auth: AuthInfoDto, @Body() dto: ChatCreateDto) {
         return this.service.createChat(auth, dto)
     }
 
     @Get()
     @RequestPaginatedDecorator(ChatDto)
-    @ApiOperation({ summary: 'Get all chats' })
+    @ApiOperation({ summary: 'Получить список чатов. Роль пользователя: Поставщик/Хорека/Админ' })
     async findAll(
         @AuthParamDecorator() auth: AuthInfoDto,
         @RequestPaginatedValidateParamsDecorator() paginate: PaginateValidateType<ChatSearchDto>
@@ -59,7 +59,7 @@ export class ChatsController {
         ChatHorecaFavouritesDto,
         ChatSupportRequestDto
     )
-    @ApiOperation({ summary: 'Get chat' })
+    @ApiOperation({ summary: 'Получить чат по id. Роль пользователя: Поставщик/Хорека/Админ' })
     async getChat(@AuthParamDecorator() auth: AuthInfoDto, @Param('id') id: number) {
         await this.service.validate(auth, +id)
         const chat = await this.service.getChat(+id)

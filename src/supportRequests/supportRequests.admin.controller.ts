@@ -24,7 +24,7 @@ export class SupportRequestsAdminController {
 
     @Post(':id/assign')
     @RequestDecorator(SuccessDto)
-    @ApiOperation({ summary: 'Admin assigns himself to customer support request' })
+    @ApiOperation({ summary: 'Назначить админа на запрос на поддержку от Поставщик/Хорека. Роль пользователя: Админ' })
     async assignAdmin(@AuthParamDecorator() auth: AuthInfoDto, @Param('id') id: number) {
         await this.supportRequestService.assignAdmin(auth, +id)
         return new SuccessDto('ok')
@@ -32,7 +32,9 @@ export class SupportRequestsAdminController {
 
     @Get()
     @RequestPaginatedDecorator(SupportRequestDto, SupportRequestSearchDto)
-    @ApiOperation({ summary: 'Admin get list of all support requests' })
+    @ApiOperation({
+        summary: 'Получить список всех запросов на поддержку от Поставщик/Хорека. Роль пользователя: Админ',
+    })
     async list(
         @AuthParamDecorator() auth: AuthInfoDto,
         @RequestPaginatedValidateParamsDecorator() paginate: PaginateValidateType<SupportRequestSearchDto>

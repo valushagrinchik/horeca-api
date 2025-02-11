@@ -17,7 +17,8 @@ export class HorecaPrivateRequestsController {
 
     @Post()
     @ApiOperation({
-        summary: 'Create products(categories) set proposal needed for HoReCa and send to the favourite provider',
+        summary:
+            'Создать список необходимых продуктов(категорий), чтобы отправить поставщику, добавленному в фавориты. Роль пользователя: Хорека',
     })
     @RequestDecorator(HorecaPrivateRequestDto, HorecaRequestCreatePrivateDto)
     async createPrivate(@AuthParamDecorator() auth: AuthInfoDto, @Body() dto: HorecaRequestCreatePrivateDto) {

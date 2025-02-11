@@ -21,7 +21,7 @@ export class AuthorizationController {
     ) {}
 
     @Post('registration')
-    @ApiOperation({ summary: 'Registrate user' })
+    @ApiOperation({ summary: 'Регистрация пользователя' })
     @RequestDecorator(UserDto, RegistrateUserDto)
     @ApiExtraModels(CreateHorecaProfileDto, CreateProviderProfileDto)
     async registrate(@Body() dto: RegistrateUserDto) {
@@ -29,14 +29,14 @@ export class AuthorizationController {
     }
 
     @Post('login')
-    @ApiOperation({ summary: 'Authenticate user' })
+    @ApiOperation({ summary: 'Авторизация пользователя' })
     @RequestDecorator(AuthResultDto, LoginUserDto)
     async login(@Body() loginDto: LoginUserDto) {
         return this.usersService.login(loginDto)
     }
 
     @Get('activate/:uuid')
-    @ApiOperation({ summary: 'Activate profile by link in the confirmation email' })
+    @ApiOperation({ summary: 'Ссылка для активации пользователя ( отправляется в письме при регистрации)' })
     @RequestDecorator(SuccessDto)
     async activateAccount(@Res() res: Response, @Param('uuid') uuid: string) {
         await this.usersService.activateAccount(uuid)

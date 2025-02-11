@@ -30,7 +30,7 @@ export class ProviderRequestsController {
     @RequestPaginatedDecorator(HorecaRequestDto, ProviderHorecaRequestSearchDto, null, null, 'createdAt/cover|ASC/DESC')
     @ApiOperation({
         summary:
-            'Список запросов хореки, соответствующих выбранным категориям профиля поставщика. Запрос доступен для роли: Поставщик',
+            'Список запросов хореки, соответствующих выбранным категориям профиля поставщика. Роль пользователя: Поставщик',
     })
     async incomeHorecaRequests(
         @AuthParamDecorator() auth: AuthInfoDto,
@@ -45,7 +45,10 @@ export class ProviderRequestsController {
 
     @Post('income/status')
     @RequestDecorator(SuccessDto, HorecaRequestProviderStatusDto)
-    @ApiOperation({ summary: 'Hide or view income request' })
+    @ApiOperation({
+        summary:
+            'Пометить запрос хореки как просмотренный или не интересующий пользователя. Роль пользователя: Поставщик',
+    })
     async setStatusForIncomeHorecaRequest(
         @AuthParamDecorator() auth: AuthInfoDto,
         @Body() dto: HorecaRequestProviderStatusDto
@@ -56,14 +59,14 @@ export class ProviderRequestsController {
 
     @Post()
     @RequestDecorator(ProviderRequestDto, ProviderRequestCreateDto)
-    @ApiOperation({ summary: "Create provider request on horeca's one" })
+    @ApiOperation({ summary: 'Создать запрос на запрос хореки. Роль пользователя: Поставщик' })
     async create(@AuthParamDecorator() auth: AuthInfoDto, @Body() dto: ProviderRequestCreateDto) {
         return this.service.create(auth, dto)
     }
 
     @Get(':id')
     @RequestDecorator(ProviderRequestDto)
-    @ApiOperation({ summary: 'Get provider request' })
+    @ApiOperation({ summary: 'Получить запрос поставщика по id. Роль пользователя: Поставщик' })
     async get(@AuthParamDecorator() auth: AuthInfoDto, @Param('id') id: number) {
         await this.service.validate(auth, +id)
         return this.service.get(+id)
@@ -71,7 +74,7 @@ export class ProviderRequestsController {
 
     @Put(':id')
     @RequestDecorator(ProviderRequestDto, ProviderRequestCreateDto)
-    @ApiOperation({ summary: 'Cancel request' })
+    @ApiOperation({ summary: 'Отменить запрос поставщика. Роль пользователя: Поставщик' })
     async cancel(@AuthParamDecorator() auth: AuthInfoDto, @Param('id') id: number) {
         await this.service.validate(auth, +id)
         return this.service.cancel(+id)
@@ -79,7 +82,7 @@ export class ProviderRequestsController {
 
     @Get()
     @RequestPaginatedDecorator(ProviderRequestDto, ProviderRequestSearchDto)
-    @ApiOperation({ summary: 'Get all provider requests' })
+    @ApiOperation({ summary: 'Получить все запросы поставщика. Роль пользователя: Поставщик' })
     async findAll(
         @AuthParamDecorator() auth: AuthInfoDto,
         @RequestPaginatedValidateParamsDecorator() paginate: PaginateValidateType<ProviderRequestSearchDto>

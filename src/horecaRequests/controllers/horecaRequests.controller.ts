@@ -26,7 +26,7 @@ export class HorecaRequestsController {
     constructor(private readonly service: HorecaRequestsService) {}
 
     @Post()
-    @ApiOperation({ summary: 'Create products(categories) set proposal needed for HoReCa' })
+    @ApiOperation({ summary: 'Создать заявку. Роль пользователя: Хорека' })
     @RequestDecorator(HorecaRequestDto, HorecaRequestCreateDto)
     async create(@AuthParamDecorator() auth: AuthInfoDto, @Body() dto: HorecaRequestCreateDto) {
         return this.service.create(auth, dto)
@@ -34,7 +34,9 @@ export class HorecaRequestsController {
 
     @Get(':id')
     @RequestDecorator(HorecaRequestWithProviderRequestDto)
-    @ApiOperation({ summary: "Get Horeca request with Provider's requests to compare" })
+    @ApiOperation({
+        summary: 'Получить заявку хореки включая все отклики от поставщиков для сравнения. Роль пользователя: Хорека',
+    })
     async get(@AuthParamDecorator() auth: AuthInfoDto, @Param('id') id: number) {
         await this.service.validate(auth, +id)
         return this.service.get(+id)
@@ -42,7 +44,7 @@ export class HorecaRequestsController {
 
     @Get()
     @RequestPaginatedDecorator(HorecaRequestDto, HorecaRequestSearchDto)
-    @ApiOperation({ summary: 'All Horeca requests' })
+    @ApiOperation({ summary: 'Получить все свои заявки. Роль пользователя: Хорека' })
     async findAll(
         @AuthParamDecorator() auth: AuthInfoDto,
         @RequestPaginatedValidateParamsDecorator() paginate: PaginateValidateType<HorecaRequestSearchDto>
@@ -53,7 +55,7 @@ export class HorecaRequestsController {
 
     @Post('approve')
     @RequestDecorator(SuccessDto, HorecaRequestSetStatusDto)
-    @ApiOperation({ summary: 'Approve one of providers request to be able to start chat with' })
+    @ApiOperation({ summary: 'Подтвердить одну из заявок поставщика. Роль пользователя: Хорека' })
     async approveProviderRequest(@AuthParamDecorator() auth: AuthInfoDto, @Body() dto: HorecaRequestSetStatusDto) {
         await this.service.validate(auth, dto.horecaRequestId)
         const res = await this.service.approveProviderRequest(dto, true)
@@ -62,7 +64,7 @@ export class HorecaRequestsController {
 
     @Post('cancelProviderRequest')
     @RequestDecorator(SuccessDto, HorecaRequestSetStatusDto)
-    @ApiOperation({ summary: 'Cancel earlier chosen provider request' })
+    @ApiOperation({ summary: 'Отменить раннее выбранную заявку поставщика. Роль пользователя: Хорека' })
     async cancelProviderRequest(@AuthParamDecorator() auth: AuthInfoDto, @Body() dto: HorecaRequestSetStatusDto) {
         await this.service.validate(auth, dto.horecaRequestId)
         const res = await this.service.cancelProviderRequest(dto)
@@ -71,7 +73,7 @@ export class HorecaRequestsController {
 
     @Get(':id/cancel')
     @RequestDecorator(SuccessDto)
-    @ApiOperation({ summary: 'Cancel horeca request' })
+    @ApiOperation({ summary: 'Отменить свою заявку. Роль пользователя: Хорека' })
     async cancel(@AuthParamDecorator() auth: AuthInfoDto, @Param('id') id: number) {
         await this.service.validate(auth, +id)
         const res = await this.service.cancel(+id)
