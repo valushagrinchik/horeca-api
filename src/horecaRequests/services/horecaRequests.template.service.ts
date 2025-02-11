@@ -33,7 +33,7 @@ export class HorecaRequestsTemplateService {
 
     async findAllAndCount(
         auth: AuthInfoDto,
-        paginate: PaginateValidateType
+        paginate: PaginateValidateType<Object>
     ): Promise<[HorecaRequestTemplateDto[], number]> {
         const where = {
             userId: auth.id,

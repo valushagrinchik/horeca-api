@@ -176,7 +176,7 @@ export const getHorecaRequestTemplates = async (app: INestApplication, accessTok
 export const findAllHorecaRequest = async (
     app: INestApplication,
     accessToken: string,
-    paginate: Partial<PaginateValidateType> = {}
+    paginate: Partial<PaginateValidateType<Object>> = {}
 ) => {
     return request(app.getHttpServer())
         .get(ENDPOINTS.HOREKA_REQUESTS)
@@ -231,7 +231,7 @@ export const createProviderRequest = async (
 export const findAllProviderRequests = async (
     app: INestApplication,
     accessToken: string,
-    paginate: Partial<PaginateValidateType> = {}
+    paginate: Partial<PaginateValidateType<Object>> = {}
 ) => {
     return request(app.getHttpServer())
         .get(ENDPOINTS.PROVIDER_REQUESTS)
@@ -334,7 +334,7 @@ export const getUsersSupportRequests = async (
 ): Promise<ChatDto | any> => {
     return request(app.getHttpServer())
         .get(ENDPOINTS.SUPPORT_REQUESTS_USERS_LIST)
-        .query({ search: JSON.stringify(search) })
+        .query({ search })
         .set('Authorization', 'Bearer ' + accessToken)
         .then(res => res.body)
 }

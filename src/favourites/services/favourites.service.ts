@@ -39,7 +39,10 @@ export class FavouritesService {
         return request
     }
 
-    async findAllAndCount(auth: AuthInfoDto, paginate: PaginateValidateType): Promise<[FavouritesDto[], number]> {
+    async findAllAndCount(
+        auth: AuthInfoDto,
+        paginate: PaginateValidateType<Object>
+    ): Promise<[FavouritesDto[], number]> {
         const where = auth.role == UserRole.Horeca ? { userId: auth.id } : { providerId: auth.id }
         const data = await this.favsRep.findAll({
             where,

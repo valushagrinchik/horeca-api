@@ -44,7 +44,7 @@ export class FavouritesController {
     @ApiOperation({ summary: 'Get all favourite providers/horecas' })
     async findAll(
         @AuthParamDecorator() auth: AuthInfoDto,
-        @RequestPaginatedValidateParamsDecorator() paginate: PaginateValidateType
+        @RequestPaginatedValidateParamsDecorator() paginate: PaginateValidateType<Object>
     ) {
         const [data, total] = await this.service.findAllAndCount(auth, paginate)
         return new PaginatedDto(data, total)

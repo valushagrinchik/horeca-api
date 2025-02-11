@@ -51,7 +51,7 @@ export class ProviderRequestsService {
         const now = dayjs().format(DB_DATE_FORMAT)
         const provider = await this.usersService.get(auth)
         const categories = provider.profile.categories as Categories[]
-        const { includeHiddenAndViewed = false, category } = paginate.search
+        const { hiddenAndViewed, category } = paginate.search
 
         if (category && !categories.includes(category)) {
             throw new BadRequestException(new ErrorDto(ErrorCodes.FORBIDDEN_ACTION))
@@ -59,17 +59,23 @@ export class ProviderRequestsService {
 
         const categoriesFilter = category ? [category] : categories
 
-        const where = {
+        const where: Prisma.ProviderHorecaRequestsCoverViewWhereInput = {
             providerId: auth.id,
             horecaRequest: {
-                categories: {
-                    hasSome: categoriesFilter,
-                },
-                status: HorecaRequestStatus.Pending,
-                ...(includeHiddenAndViewed ? {} : { horecaRequestProviderStatus: { is: null } }),
-                acceptUntill: {
-                    // TODO: check date
-                    gte: new Date(now),
+                is: {
+                    categories: {
+                        hasSome: categoriesFilter,
+                    },
+                    status: HorecaRequestStatus.Pending,
+                    ...(hiddenAndViewed === true
+                        ? { horecaRequestProviderStatus: { isNot: null } }
+                        : hiddenAndViewed === false
+                          ? { horecaRequestProviderStatus: { is: null } }
+                          : {}),
+                    acceptUntill: {
+                        // TODO: check date
+                        gte: new Date(now),
+                    },
                 },
             },
         }

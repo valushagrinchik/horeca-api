@@ -21,6 +21,7 @@ import {
 
 import { ErrorValidationCodeEnum } from './error.validation.code.enum'
 import { errorMessage } from './error.message'
+import { Transform } from 'class-transformer'
 
 export enum TypeValidate {
     PHONE,
@@ -68,9 +69,14 @@ const validateMap = {
         propType: String,
     },
     [TypeValidate.BOOLEAN]: {
-        fn: IsBoolean({
-            message: value => errorMessage(value, ErrorValidationCodeEnum.IS_BOOLEAN),
-        }),
+        fn: [
+            IsBoolean({
+                message: value => errorMessage(value, ErrorValidationCodeEnum.IS_BOOLEAN),
+            }),
+            Transform(({ value }) => {
+                return value === 'true'
+            }),
+        ],
         propType: Boolean,
     },
     [TypeValidate.DATE]: {
@@ -101,9 +107,8 @@ const validateMap = {
 
 export function Validate(type: TypeValidate, options?: ApiPropertyOptions) {
     const { fn } = validateMap[type]
-
     const arr = [
-        fn,
+        ...(Array.isArray(fn) ? fn : [fn]),
         options?.required === false
             ? IsOptional({
                   message: value => errorMessage(value, ErrorValidationCodeEnum.IS_OPTIONAL),
@@ -120,8 +125,6 @@ export function Validate(type: TypeValidate, options?: ApiPropertyOptions) {
     if (options?.maxLength) {
         arr.push(MaxLength(options.maxLength))
     }
-
-    console
 
     return applyDecorators(...arr)
 }

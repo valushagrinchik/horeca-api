@@ -36,12 +36,9 @@ export function RequestPaginatedDecorator<DTO, SearchDto, ItemExtraDTO>(
         ApiQuery({
             name: 'search',
             required: false,
-            type: () => String,
-            ...(searchDto
-                ? {
-                      schema: { $ref: getSchemaPath(searchDto) },
-                  }
-                : {}),
+            style: 'deepObject',
+            explode: false,
+            schema: { $ref: getSchemaPath(searchDto) },
         }),
         ApiQuery({ name: 'sort', required: false, type: () => String, description: sortDescription }),
         ApiExtraModels(PaginatedDto, dto, ...extraModels),

@@ -53,7 +53,7 @@ export class HorecaRequestsTemplateController {
     @RequestPaginatedDecorator(HorecaRequestTemplateDto)
     async findAll(
         @AuthParamDecorator() auth: AuthInfoDto,
-        @RequestPaginatedValidateParamsDecorator() paginate: PaginateValidateType
+        @RequestPaginatedValidateParamsDecorator() paginate: PaginateValidateType<Object>
     ) {
         const [data, total] = await this.service.findAllAndCount(auth, paginate)
         return new PaginatedDto(data, total)

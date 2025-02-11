@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common'
+import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common'
 import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger'
 import { AuthUser } from '../system/utils/auth/decorators/auth.decorator'
 import { UserRole } from '@prisma/client'
@@ -28,10 +28,16 @@ export class ProviderRequestsController {
 
     @Get('income')
     @RequestPaginatedDecorator(HorecaRequestDto, ProviderHorecaRequestSearchDto, null, null, 'createdAt/cover|ASC/DESC')
-    @ApiOperation({ summary: "List of HoReCa proposals that matches with provider's offers" })
+    @ApiOperation({
+        summary:
+            'Список запросов хореки, соответствующих выбранным категориям профиля поставщика. Запрос доступен для роли: Поставщик',
+    })
     async incomeHorecaRequests(
         @AuthParamDecorator() auth: AuthInfoDto,
-        @RequestPaginatedValidateParamsDecorator() paginate: PaginateValidateType<ProviderHorecaRequestSearchDto>
+        @RequestPaginatedValidateParamsDecorator<ProviderHorecaRequestSearchDto>({
+            search: ProviderHorecaRequestSearchDto,
+        })
+        paginate: PaginateValidateType<ProviderHorecaRequestSearchDto>
     ) {
         const [data, total] = await this.service.findHorecaRequests(auth, paginate)
         return new PaginatedDto<HorecaRequestDto>(data, total)
