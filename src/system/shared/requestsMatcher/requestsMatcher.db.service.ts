@@ -7,7 +7,7 @@ export class RequestsMatcherDbService {
     constructor(private db: DatabaseService) {}
 
     updateView = async () => {
-        await this.db.$queryRaw`REFRESH MATERIALIZED VIEW provider_horeca_requests_cover_view;`
+        await this.db.$queryRaw`REFRESH MATERIALIZED VIEW CONCURRENTLY provider_horeca_requests_cover_view;`
     }
 
     findHorecaRequests = async (args: Prisma.ProviderHorecaRequestsCoverViewFindManyArgs): Promise<any> => {

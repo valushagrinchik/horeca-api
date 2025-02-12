@@ -20,4 +20,4 @@ FROM public.profiles p
 CROSS JOIN public.horeca_requests hr
 WHERE p.profile_type = 'Provider' AND p.categories && hr.categories;
 
-CREATE INDEX idx_provider_id ON provider_horeca_requests_cover_view (provider_id);
+CREATE UNIQUE INDEX idx_provider_id_horeca_request_id ON provider_horeca_requests_cover_view (provider_id, horeca_request_id)

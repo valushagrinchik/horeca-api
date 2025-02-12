@@ -513,7 +513,6 @@ view ProviderHorecaRequestsCoverView {
   cover         Float
   horecaRequest HorecaRequest @relation(fields: [hrId], references: [id])
 
-  @@id([providerId, hrId])
-  @@index([providerId])
+  @@unique([providerId, hrId])
   @@map("provider_horeca_requests_cover_view")
 }
