@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { FavouritesDbService } from './favourites.db.service'
-import { AuthInfoDto } from '../../users/dto/auth.info.dto'
+import { AuthInfoDto } from '../../auth/dto/auth.info.dto'
 import { FavouritesCreateDto } from '../dto/favourites.create.dto'
 import { PaginateValidateType } from '../../system/utils/swagger/decorators'
 import { FavouritesDto, FavouritesUserDto } from '../dto/favourites.dto'

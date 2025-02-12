@@ -1,5 +1,5 @@
 import { PaginateValidateType } from '../../system/utils/swagger/decorators'
-import { AuthInfoDto } from '../../users/dto/auth.info.dto'
+import { AuthInfoDto } from '../../auth/dto/auth.info.dto'
 import { ChatMessageDto } from '../dto/chat.message.dto'
 import { ChatMessageSearchDto } from '../dto/chat.message.search.dto'
 import { ChatMessageDbService } from './chat.message.db.service'

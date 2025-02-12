@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common'
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
-import { AuthUser } from '../../system/utils/auth/decorators/auth.decorator'
+import { AuthUser, AuthParamDecorator } from '../../auth/decorators'
 import { UserRole } from '@prisma/client'
 import { HorecaRequestTemplateDto } from '../dto/horecaRequest.template.dto'
 import {
@@ -11,8 +11,7 @@ import {
 } from '../../system/utils/swagger/decorators'
 import { HorecaRequestTemplateCreateDto } from '../dto/horecaRequest.template.create.dto'
 import { HorecaRequestsTemplateService } from '../services/horecaRequests.template.service'
-import { AuthParamDecorator } from '../../system/utils/auth/decorators/auth.param.decorator'
-import { AuthInfoDto } from '../../users/dto/auth.info.dto'
+import { AuthInfoDto } from '../../auth/dto/auth.info.dto'
 import { PaginatedDto } from '../../system/utils/dto/paginated.dto'
 import { SuccessDto } from '../../system/utils/dto/success.dto'
 import { HorecaRequestTemplateUpdateDto } from '../dto/horecaRequest.template.update.dto'

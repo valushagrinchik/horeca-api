@@ -2,7 +2,7 @@ import { Controller, Post, Body, Param, Get } from '@nestjs/common'
 import { SupportRequestsService } from './services/supportRequests.service'
 
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
-import { AuthUser } from '../system/utils/auth/decorators/auth.decorator'
+import { AuthUser, AuthParamDecorator } from '../auth/decorators'
 import { UserRole } from '@prisma/client'
 import {
     PaginateValidateType,
@@ -11,8 +11,7 @@ import {
     RequestPaginatedValidateParamsDecorator,
 } from '../system/utils/swagger/decorators'
 
-import { AuthParamDecorator } from '../system/utils/auth/decorators/auth.param.decorator'
-import { AuthInfoDto } from '../users/dto/auth.info.dto'
+import { AuthInfoDto } from '../auth/dto/auth.info.dto'
 import { SuccessDto } from '../system/utils/dto/success.dto'
 import { SupportRequestCreateDto } from './dto/supportRequest.create.dto'
 import { SupportRequestDto } from './dto/supportRequest.dto'

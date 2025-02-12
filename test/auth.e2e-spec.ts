@@ -1,13 +1,15 @@
 import { INestApplication } from '@nestjs/common'
 import { horecaUsers, providerUsers } from './mock/authData'
 import { ErrorCodes } from './../src/system/utils/enums/errorCodes.enum'
-import { UsersDbService } from './../src/users/services/users.db.service'
+import { UsersDbService } from '../src/users/users.db.service'
 import { DatabaseService } from './../src/system/database/database.service'
 import { activateUser, authUser, initApp, registrateUser } from './helpers'
 import { ENDPOINTS } from './constants'
+import { MailerService } from '@nestjs-modules/mailer'
+import { MailService } from '../src/mail/mail.service'
 
 let app: INestApplication
-
+let mailer: MailerService
 let users = []
 
 beforeAll(async () => {
@@ -21,9 +23,17 @@ beforeAll(async () => {
         },
     })
 
-    app = await initApp(mb => {
-        mb.overrideProvider(UsersDbService).useValue(usersDbServiceMocked)
-    })
+    const mailServiceMocked = { sendMail: jest.fn(), sendActivationMail: jest.fn() }
+
+    app = await initApp(
+        mb => {
+            mb.overrideProvider(UsersDbService).useValue(usersDbServiceMocked)
+            mb.overrideProvider(MailService).useValue(mailServiceMocked)
+        },
+        tm => {
+            mailer = tm.get<MailerService>(MailerService)
+        }
+    )
 })
 
 afterAll(async () => {

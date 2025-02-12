@@ -23,6 +23,7 @@ enum UploadsLinkType {
   ProviderRequestItem
   HorecaRequest
   Product
+  Profile
 }
 
 enum UserRole {

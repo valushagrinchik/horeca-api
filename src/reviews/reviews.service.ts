@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import { AuthInfoDto } from '../users/dto/auth.info.dto'
+import { AuthInfoDto } from '../auth/dto/auth.info.dto'
 import { ReviewCreateDto } from './dto/review.create.dto'
 import { DatabaseService } from '../system/database/database.service'
 import { ReviewDto } from './dto/review.dto'

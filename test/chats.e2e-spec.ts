@@ -19,7 +19,7 @@ import {
     ioClient,
     resolveSupportRequest,
 } from './helpers'
-import { AuthResultDto } from '../src/users/dto/auth.result.dto'
+import { AuthResultDto } from '../src/auth/dto/auth.result.dto'
 import { adminUserInput, horecaUserInput, providerUserInput } from './mock/seedData'
 import { ChatType } from '@prisma/client'
 import { ENDPOINTS } from './constants'
@@ -30,7 +30,7 @@ import { ProviderRequestDto } from '../src/providerRequests/dto/providerRequest.
 import { UserDto } from '../src/users/dto/user.dto'
 import { ChatDto } from '../src/chat/dto/chat.dto'
 import { ErrorCodes } from '../src/system/utils/enums/errorCodes.enum'
-import { SupportRequestDto } from 'src/supportRequests/dto/supportRequest.dto'
+import { SupportRequestDto } from '../src/supportRequests/dto/supportRequest.dto'
 
 let app: INestApplication
 let gateway: ChatWsGateway

@@ -1,9 +1,9 @@
 import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common'
 import { ApiExtraModels, ApiOperation, ApiTags } from '@nestjs/swagger'
-import { AuthUser } from '../system/utils/auth/decorators/auth.decorator'
+import { AuthUser } from '../auth/decorators/auth.decorator'
 import { UserRole } from '@prisma/client'
-import { AuthInfoDto } from '../users/dto/auth.info.dto'
-import { AuthParamDecorator } from '../system/utils/auth/decorators/auth.param.decorator'
+import { AuthInfoDto } from '../auth/dto/auth.info.dto'
+import { AuthParamDecorator } from '../auth/decorators/auth.param.decorator'
 import {
     PaginateValidateType,
     RequestDecorator,

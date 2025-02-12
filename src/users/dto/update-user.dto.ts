@@ -5,7 +5,7 @@ import { ValidateIf, ValidateNested } from 'class-validator'
 import { Type } from 'class-transformer'
 import { CreateHorecaProfileDto } from './horeca/create-horeca-profile.dto'
 import { CreateProviderProfileDto } from './provider/create-provider-profile.dto'
-import { Match } from '../../system/utils/auth/decorators/match.decorator'
+import { Match } from '../../auth/decorators'
 
 export class UpdateUserDto {
     @Validate(TypeValidate.STRING, { required: false })
@@ -34,4 +34,7 @@ export class UpdateUserDto {
         object.profile.profileType == ProfileType.Horeca ? CreateHorecaProfileDto : CreateProviderProfileDto
     )
     profile: Partial<CreateHorecaProfileDto | CreateProviderProfileDto>
+
+    @Validate(TypeValidate.NUMBER, { required: false })
+    avatar?: number
 }

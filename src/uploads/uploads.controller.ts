@@ -2,7 +2,7 @@ import { Controller, Param, Post, Delete, UploadedFile, UseInterceptors } from '
 import { UploadsService } from './uploads.service'
 import { FileInterceptor } from '@nestjs/platform-express/multer'
 import { ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger'
-import { AuthUser } from '../system/utils/auth/decorators/auth.decorator'
+import { AuthUser } from '../auth/decorators'
 import { UserRole } from '@prisma/client'
 import { UploadDto } from './dto/upload.dto'
 

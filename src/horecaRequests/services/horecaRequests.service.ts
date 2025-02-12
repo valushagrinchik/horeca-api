@@ -1,7 +1,7 @@
 import { BadRequestException, forwardRef, Inject, Injectable } from '@nestjs/common'
 import { HorecaRequestCreateDto } from '../dto/horecaRequest.create.dto'
 import { HorecaRequestDto } from '../dto/horecaRequest.dto'
-import { AuthInfoDto } from '../../users/dto/auth.info.dto'
+import { AuthInfoDto } from '../../auth/dto/auth.info.dto'
 import {
     HorecaRequestStatus,
     Prisma,

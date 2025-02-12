@@ -1,23 +1,23 @@
 import { Controller, Post, Body, Get, Param, Res } from '@nestjs/common'
-import { UsersService } from './services/users.service'
 import { RegistrateUserDto } from './dto/registrate-user.dto'
 import { ApiExtraModels, ApiOperation, ApiTags } from '@nestjs/swagger'
 import { LoginUserDto } from './dto/login-user.dto'
-import { AuthResultDto } from './dto/auth.result.dto'
-import { CreateHorecaProfileDto } from './dto/horeca/create-horeca-profile.dto'
-import { CreateProviderProfileDto } from './dto/provider/create-provider-profile.dto'
+import { AuthResultDto } from '../auth/dto/auth.result.dto'
+import { CreateHorecaProfileDto } from '../users/dto/horeca/create-horeca-profile.dto'
+import { CreateProviderProfileDto } from '../users/dto/provider/create-provider-profile.dto'
 import { SuccessDto } from '../system/utils/dto/success.dto'
 import { Response } from 'express'
 import { ConfigService } from '@nestjs/config'
 import { RequestDecorator } from '../system/utils/swagger/decorators'
-import { UserDto } from './dto/user.dto'
+import { UserDto } from '../users/dto/user.dto'
+import { AuthorizationService } from './authorization.service'
 
 @Controller('auth')
 @ApiTags('Authorization')
 export class AuthorizationController {
     constructor(
         private readonly configService: ConfigService,
-        private readonly usersService: UsersService
+        private readonly authService: AuthorizationService
     ) {}
 
     @Post('registration')
@@ -25,21 +25,21 @@ export class AuthorizationController {
     @RequestDecorator(UserDto, RegistrateUserDto)
     @ApiExtraModels(CreateHorecaProfileDto, CreateProviderProfileDto)
     async registrate(@Body() dto: RegistrateUserDto) {
-        return this.usersService.registrate(dto)
+        return this.authService.registrate(dto)
     }
 
     @Post('login')
     @ApiOperation({ summary: 'Авторизация пользователя' })
     @RequestDecorator(AuthResultDto, LoginUserDto)
     async login(@Body() loginDto: LoginUserDto) {
-        return this.usersService.login(loginDto)
+        return this.authService.login(loginDto)
     }
 
     @Get('activate/:uuid')
     @ApiOperation({ summary: 'Ссылка для активации пользователя ( отправляется в письме при регистрации)' })
     @RequestDecorator(SuccessDto)
     async activateAccount(@Res() res: Response, @Param('uuid') uuid: string) {
-        await this.usersService.activateAccount(uuid)
+        await this.authService.activateAccount(uuid)
         res.redirect(this.configService.get('FRONTEND_URL'))
     }
 

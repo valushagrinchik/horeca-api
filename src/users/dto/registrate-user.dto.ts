@@ -5,7 +5,7 @@ import { ValidateIf, ValidateNested } from 'class-validator'
 import { Type } from 'class-transformer'
 import { CreateProviderProfileDto } from './provider/create-provider-profile.dto'
 import { CreateHorecaProfileDto } from './horeca/create-horeca-profile.dto'
-import { Match } from '../../system/utils/auth/decorators/match.decorator'
+import { Match } from '../../auth/decorators/match.decorator'
 
 export class RegistrateUserDto {
     @Validate(TypeValidate.STRING)

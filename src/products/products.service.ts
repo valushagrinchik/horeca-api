@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { ErrorDto } from '../system/utils/dto/error.dto'
 import { ErrorCodes } from '../system/utils/enums/errorCodes.enum'
-import { AuthInfoDto } from '../users/dto/auth.info.dto'
+import { AuthInfoDto } from '../auth/dto/auth.info.dto'
 import { ProductDto } from './dto/product.dto'
 import { PaginateValidateType } from '../system/utils/swagger/decorators'
 import { ProductSearchDto } from './dto/product.search.dto'

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 
 import { DatabaseService } from '../../system/database/database.service'
-import { AuthInfoDto } from '../../users/dto/auth.info.dto'
+import { AuthInfoDto } from '../../auth/dto/auth.info.dto'
 import { SupportRequestCreateDto } from '../dto/supportRequest.create.dto'
 import { Prisma, SupportRequestStatus } from '@prisma/client'
 

@@ -9,7 +9,7 @@ import {
     updateHorecaRequestTemplate,
 } from './helpers'
 import { ENDPOINTS } from './constants'
-import { AuthResultDto } from '../src/users/dto/auth.result.dto'
+import { AuthResultDto } from '../src/auth/dto/auth.result.dto'
 import { horecaRequestInput, horecaUserInput, providerUserInput } from './mock/seedData'
 import { ErrorCodes } from '../src/system/utils/enums/errorCodes.enum'
 import { Categories } from '../src/system/utils/enums'

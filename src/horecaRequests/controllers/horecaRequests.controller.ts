@@ -1,11 +1,10 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common'
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { HorecaRequestCreateDto } from '../dto/horecaRequest.create.dto'
-import { AuthUser } from '../../system/utils/auth/decorators/auth.decorator'
+import { AuthUser, AuthParamDecorator } from '../../auth/decorators'
 import { UserRole } from '@prisma/client'
 import { HorecaRequestDto } from '../dto/horecaRequest.dto'
-import { AuthParamDecorator } from '../../system/utils/auth/decorators/auth.param.decorator'
-import { AuthInfoDto } from '../../users/dto/auth.info.dto'
+import { AuthInfoDto } from '../../auth/dto/auth.info.dto'
 import {
     PaginateValidateType,
     RequestDecorator,

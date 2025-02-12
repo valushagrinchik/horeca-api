@@ -28,4 +28,13 @@ export class UploadsLinkService {
             })),
         })
     }
+
+    async deleteAllForSourceId(sourceType: UploadsLinkType, sourceId: number) {
+        await this.prisma.uploadsLink.deleteMany({
+            where: {
+                sourceType,
+                sourceId,
+            },
+        })
+    }
 }

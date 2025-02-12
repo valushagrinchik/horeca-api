@@ -3,6 +3,7 @@ import { Profile, ProfileType, User, UserRole } from '@prisma/client'
 import { Exclude, Transform, Type } from 'class-transformer'
 import { HorecaProfileDto } from './horeca/horeca-profile.dto'
 import { ProviderProfileDto } from './provider/provider-profile.dto'
+import { UploadDto } from '../../uploads/dto/upload.dto'
 
 export class UserDto implements User {
     id: number
@@ -49,7 +50,9 @@ export class UserDto implements User {
     })
     profile: HorecaProfileDto | ProviderProfileDto | null
 
-    constructor(partial: Partial<User & { profile: Profile }>) {
+    avatar?: UploadDto
+
+    constructor(partial: Partial<User & { profile: Profile; avatar?: UploadDto }>) {
         Object.assign(this, partial)
     }
 }

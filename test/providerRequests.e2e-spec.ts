@@ -11,7 +11,7 @@ import {
     setHorecaRequestStatus,
 } from './helpers'
 import { ENDPOINTS } from './constants'
-import { AuthResultDto } from '../src/users/dto/auth.result.dto'
+import { AuthResultDto } from '../src/auth/dto/auth.result.dto'
 import { horecaRequestInput, horecaRequestInput2, horecaUserInput, providerUserInput } from './mock/seedData'
 import { generateFutureDate } from '../src/system/utils/date'
 import { Categories } from '../src/system/utils/enums'

@@ -2,7 +2,7 @@ import { forwardRef, Inject, Injectable } from '@nestjs/common'
 import { ChatWsGateway } from '../chat/chat.ws.gateway'
 import { HorecaRequestsService } from '../horecaRequests/services/horecaRequests.service'
 import { ProviderRequestsService } from '../providerRequests/services/providerRequests.service'
-import { AuthInfoDto } from '../users/dto/auth.info.dto'
+import { AuthInfoDto } from '../auth/dto/auth.info.dto'
 import { HorecaRequestCreatePrivateDto } from './dto/horecaRequest.create.private.dto'
 import { HorecaPrivateRequestDto } from './dto/horecaPrivateRequests.dto'
 

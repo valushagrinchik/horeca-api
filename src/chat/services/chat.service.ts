@@ -1,4 +1,4 @@
-import { AuthInfoDto } from '../../users/dto/auth.info.dto'
+import { AuthInfoDto } from '../../auth/dto/auth.info.dto'
 import { PaginateValidateType } from '../../system/utils/swagger/decorators'
 import { ChatCreateDto } from '../dto/chat.create.dto'
 import { ChatType, UserRole } from '@prisma/client'

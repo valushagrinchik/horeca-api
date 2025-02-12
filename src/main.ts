@@ -15,6 +15,7 @@ import { join } from 'node:path'
 import { ErrorDto } from './system/utils/dto/error.dto'
 import { ErrorCodes } from './system/utils/enums/errorCodes.enum'
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston'
+import { RolesGuard } from './auth/guards/roles.guard'
 
 process.on('unhandledRejection', (reason, promise) => {
     console.log('Unhandled Rejection at:', promise, 'reason:', reason)
@@ -22,6 +23,7 @@ process.on('unhandledRejection', (reason, promise) => {
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule)
+
     // app.useLogger(app.get(Logger))
     app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER))
     app.setGlobalPrefix('api')

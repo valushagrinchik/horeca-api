@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common'
 import { addFavourites, authUser, deleteFavourites, getFavourites, getProfile, initApp } from './helpers'
 import { ENDPOINTS } from './constants'
-import { AuthResultDto } from '../src/users/dto/auth.result.dto'
+import { AuthResultDto } from '../src/auth/dto/auth.result.dto'
 import { horecaUserInput, providerUserInput } from './mock/seedData'
 import { UserDto } from '../src/users/dto/user.dto'
 

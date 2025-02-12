@@ -9,10 +9,9 @@ import {
     ReviewNotificationPayload,
 } from './dto/notification.payload.dto'
 import { RequestDecorator } from '../system/utils/swagger/decorators'
-import { AuthParamDecorator } from '../system/utils/auth/decorators/auth.param.decorator'
-import { AuthInfoDto } from '../users/dto/auth.info.dto'
+import { AuthUser, AuthParamDecorator } from '../auth/decorators'
+import { AuthInfoDto } from '../auth/dto/auth.info.dto'
 import { UserRole } from '@prisma/client'
-import { AuthUser } from '../system/utils/auth/decorators/auth.decorator'
 import { SuccessDto } from '../system/utils/dto/success.dto'
 
 @AuthUser(UserRole.Admin)

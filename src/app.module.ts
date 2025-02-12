@@ -20,6 +20,9 @@ import * as winston from 'winston'
 import 'winston-daily-rotate-file'
 import { utilities as nestWinstonModuleUtilities, WinstonModule } from 'nest-winston'
 import * as path from 'path'
+import { RolesGuard } from './auth/guards/roles.guard'
+import { APP_GUARD } from '@nestjs/core'
+import { AuthModule } from './auth/auth.module'
 
 @Module({
     imports: [
@@ -30,11 +33,12 @@ import * as path from 'path'
         DatabaseModule,
         CronModule,
         ScheduleModule.forRoot(),
+        AuthModule,
 
         // Services
+        // UsersModule,
         MailModule,
         UploadsModule,
-        UsersModule,
         HorecaRequestsModule,
         ProviderRequestsModule,
         ProductsModule,

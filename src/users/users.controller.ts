@@ -1,14 +1,13 @@
 import { Controller, Body, Put, Get } from '@nestjs/common'
-import { UsersService } from './services/users.service'
+import { UsersService } from './users.service'
 import { UpdateUserDto } from './dto/update-user.dto'
 import { ApiExtraModels, ApiOperation, ApiTags } from '@nestjs/swagger'
 import { HorecaProfileDto } from './dto/horeca/horeca-profile.dto'
 import { ProviderProfileDto } from './dto/provider/provider-profile.dto'
 import { UserDto } from './dto/user.dto'
-import { AuthUser } from '../system/utils/auth/decorators/auth.decorator'
+import { AuthUser, AuthParamDecorator } from '../auth/decorators'
 import { UserRole } from '@prisma/client'
-import { AuthInfoDto } from './dto/auth.info.dto'
-import { AuthParamDecorator } from '../system/utils/auth/decorators/auth.param.decorator'
+import { AuthInfoDto } from '../auth/dto/auth.info.dto'
 import { RequestDecorator } from '../system/utils/swagger/decorators'
 
 @Controller('users')

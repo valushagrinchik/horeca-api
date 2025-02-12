@@ -8,7 +8,7 @@ import { HorecaRequestCreateDto } from '../src/horecaRequests/dto/horecaRequest.
 import { PaginateValidateType } from '../src/system/utils/swagger/decorators'
 import { Test, TestingModule, TestingModuleBuilder } from '@nestjs/testing'
 import { AppModule } from '../src/app.module'
-import { AuthResultDto } from '../src/users/dto/auth.result.dto'
+import { AuthResultDto } from '../src/auth/dto/auth.result.dto'
 import { ProviderRequestCreateDto } from '../src/providerRequests/dto/providerRequest.create.dto'
 import { HorecaRequestProviderStatusDto } from '../src/providerRequests/dto/horecaRequest.providerStatus.dto'
 import { HorecaRequestTemplateCreateDto } from '../src/horecaRequests/dto/horecaRequest.template.create.dto'

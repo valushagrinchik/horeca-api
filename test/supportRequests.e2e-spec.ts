@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common'
 import { authUser, createSupportRequest, getAdminSupportRequests, getUsersSupportRequests, initApp } from './helpers'
 import { ENDPOINTS } from './constants'
-import { AuthResultDto } from '../src/users/dto/auth.result.dto'
+import { AuthResultDto } from '../src/auth/dto/auth.result.dto'
 import { adminUserInput, horecaUserInput, providerUserInput } from './mock/seedData'
 import { SupportRequestStatus } from '@prisma/client'
 
