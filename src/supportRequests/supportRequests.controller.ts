@@ -45,7 +45,10 @@ export class SupportRequestsController {
     @ApiOperation({ summary: 'Получить список запросов на поддержку. Роль пользователя: Поставщик/Хорека' })
     async list(
         @AuthParamDecorator() auth: AuthInfoDto,
-        @RequestPaginatedValidateParamsDecorator() paginate: PaginateValidateType<SupportRequestSearchDto>
+        @RequestPaginatedValidateParamsDecorator<SupportRequestSearchDto>({
+            search: SupportRequestSearchDto,
+        })
+        paginate: PaginateValidateType<SupportRequestSearchDto>
     ) {
         const [data, total] = await this.supportRequestService.findAllAndCount(auth, paginate, true)
         return new PaginatedDto<SupportRequestDto>(data, total)

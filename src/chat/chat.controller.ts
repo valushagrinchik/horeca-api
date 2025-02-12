@@ -44,7 +44,8 @@ export class ChatsController {
     @ApiOperation({ summary: 'Получить список чатов. Роль пользователя: Поставщик/Хорека/Админ' })
     async findAll(
         @AuthParamDecorator() auth: AuthInfoDto,
-        @RequestPaginatedValidateParamsDecorator() paginate: PaginateValidateType<ChatSearchDto>
+        @RequestPaginatedValidateParamsDecorator<ChatSearchDto>({ search: ChatSearchDto })
+        paginate: PaginateValidateType<ChatSearchDto>
     ) {
         const [data, total] = await this.service.findAllAndCount(auth, paginate)
         return new PaginatedDto<ChatDto>(data, total)

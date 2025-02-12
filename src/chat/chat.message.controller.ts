@@ -28,7 +28,8 @@ export class ChatsMessageController {
     @ApiOperation({ summary: 'Получить список сообщений чата. Роль пользователя: Поставщик/Хорека/Админ' })
     async getChatMessages(
         @AuthParamDecorator() auth: AuthInfoDto,
-        @RequestPaginatedValidateParamsDecorator() paginate: PaginateValidateType<ChatMessageSearchDto>
+        @RequestPaginatedValidateParamsDecorator<ChatMessageSearchDto>({ search: ChatMessageSearchDto })
+        paginate: PaginateValidateType<ChatMessageSearchDto>
     ) {
         const [data, total] = await this.service.getChatMessages(auth, paginate)
         return new PaginatedDto<ChatMessageDto>(data, total)

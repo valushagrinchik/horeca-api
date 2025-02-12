@@ -36,7 +36,8 @@ export class SupportRequestsAdminController {
     })
     async list(
         @AuthParamDecorator() auth: AuthInfoDto,
-        @RequestPaginatedValidateParamsDecorator() paginate: PaginateValidateType<SupportRequestSearchDto>
+        @RequestPaginatedValidateParamsDecorator<SupportRequestSearchDto>({ search: SupportRequestSearchDto })
+        paginate: PaginateValidateType<SupportRequestSearchDto>
     ) {
         const [data, total] = await this.supportRequestService.findAllAndCount(auth, paginate)
         return new PaginatedDto<SupportRequestDto>(data, total)

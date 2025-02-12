@@ -34,6 +34,7 @@ describe('SupportRequestsController/SupportRequestsAdminController (e2e)', () =>
             const providerSupportRequests = await getUsersSupportRequests(app, providerAuth.accessToken, {
                 status: SupportRequestStatus.Default,
             })
+
             const horecaSupportRequests = await getUsersSupportRequests(app, horecaAuth.accessToken)
 
             const adminSupportRequests = await getAdminSupportRequests(app, adminAuth.accessToken)

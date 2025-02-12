@@ -84,7 +84,8 @@ export class ProviderRequestsController {
     @ApiOperation({ summary: 'Получить все запросы поставщика. Роль пользователя: Поставщик' })
     async findAll(
         @AuthParamDecorator() auth: AuthInfoDto,
-        @RequestPaginatedValidateParamsDecorator() paginate: PaginateValidateType<ProviderRequestSearchDto>
+        @RequestPaginatedValidateParamsDecorator<ProviderRequestSearchDto>({ search: ProviderRequestSearchDto })
+        paginate: PaginateValidateType<ProviderRequestSearchDto>
     ) {
         const [data, total] = await this.service.findAllAndCount(auth, paginate)
         return new PaginatedDto<ProviderRequestDto>(data, total)

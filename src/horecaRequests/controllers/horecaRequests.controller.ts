@@ -46,7 +46,8 @@ export class HorecaRequestsController {
     @ApiOperation({ summary: 'Получить все свои заявки. Роль пользователя: Хорека' })
     async findAll(
         @AuthParamDecorator() auth: AuthInfoDto,
-        @RequestPaginatedValidateParamsDecorator() paginate: PaginateValidateType<HorecaRequestSearchDto>
+        @RequestPaginatedValidateParamsDecorator<HorecaRequestSearchDto>({ search: HorecaRequestSearchDto })
+        paginate: PaginateValidateType<HorecaRequestSearchDto>
     ) {
         const [data, total] = await this.service.findAllAndCount(auth, paginate)
         return new PaginatedDto<HorecaRequestDto>(data, total)

@@ -34,7 +34,8 @@ export class ProductsController {
     @ApiOperation({ summary: 'Получить все продукты. Роль пользователя: Поставщик' })
     async findAll(
         @AuthParamDecorator() auth: AuthInfoDto,
-        @RequestPaginatedValidateParamsDecorator() paginate: PaginateValidateType<ProductSearchDto>
+        @RequestPaginatedValidateParamsDecorator<ProductSearchDto>({ search: ProductSearchDto })
+        paginate: PaginateValidateType<ProductSearchDto>
     ) {
         const [data, total] = await this.service.findAllAndCount(auth, paginate)
         return new PaginatedDto<ProductDto>(data, total)

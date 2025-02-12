@@ -36,7 +36,7 @@ import { AuthModule } from './auth/auth.module'
         AuthModule,
 
         // Services
-        // UsersModule,
+        UsersModule,
         MailModule,
         UploadsModule,
         HorecaRequestsModule,
