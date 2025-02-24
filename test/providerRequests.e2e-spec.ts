@@ -6,6 +6,7 @@ import {
     createProviderRequest,
     findAllHorecaRequestForProvider,
     findAllProviderRequests,
+    getHorecaRequestForProvider,
     getProfile,
     initApp,
     setHorecaRequestStatus,
@@ -103,6 +104,25 @@ describe('ProviderRequestsController (e2e)', () => {
             })
         })
     })
+
+    describe('GET ' + ENDPOINTS.HOREKA_REQUEST_FOR_PROVIDER, () => {
+        beforeAll(async () => {
+            await createHorecaRequest(app, horecaAuth.accessToken, horecaRequestInput)
+        })
+
+        describe('get horeca request by id', () => {
+            it('should return horeca request with only matched items by categories', async () => {
+                const all = await findAllHorecaRequestForProvider(app, providerAuth.accessToken)
+                const res = await getHorecaRequestForProvider(app, providerAuth.accessToken, all.data[0].id)
+                const user = await getProfile(app, providerAuth.accessToken)
+                const crossedCategoryItemsLength = horecaRequestInput.items.filter(item =>
+                    user.profile.categories.includes(item.category)
+                ).length
+                expect(res.items.length).toBe(crossedCategoryItemsLength)
+            })
+        })
+    })
+
     describe('POST ' + ENDPOINTS.HOREKA_REQUESTS_FOR_PROVIDER_STATUS, () => {
         it('should apply "viewed" status to one of horeca request and delete it from active requests list', async () => {
             expect.assertions(7)

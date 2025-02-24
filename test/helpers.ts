@@ -200,6 +200,15 @@ export const findAllHorecaRequestForProvider = async (
             return res.body
         })
 }
+
+export const getHorecaRequestForProvider = async (app: INestApplication, accessToken: string, id: number) => {
+    return request(app.getHttpServer())
+        .get(ENDPOINTS.HOREKA_REQUEST_FOR_PROVIDER.replace(':id', id.toString()))
+        .set('Authorization', 'Bearer ' + accessToken)
+        .then(res => {
+            return res.body
+        })
+}
 export const setHorecaRequestStatus = async (
     app: INestApplication,
     accessToken: string,

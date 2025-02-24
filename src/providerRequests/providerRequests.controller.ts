@@ -42,6 +42,17 @@ export class ProviderRequestsController {
         return new PaginatedDto<HorecaRequestDto>(data, total)
     }
 
+    @Get('income/:id')
+    @RequestDecorator(HorecaRequestDto)
+    @ApiOperation({
+        summary:
+            'Конкретный запрос хореки, соответствующий выбранным категориям профиля поставщика. Роль пользователя: Поставщик',
+    })
+    async getIncomeHorecaRequest(@AuthParamDecorator() auth: AuthInfoDto, @Param('id') id: number) {
+        const data = await this.service.getHorecaRequest(auth, +id)
+        return new HorecaRequestDto(data)
+    }
+
     @Post('income/status')
     @RequestDecorator(SuccessDto, HorecaRequestProviderStatusDto)
     @ApiOperation({

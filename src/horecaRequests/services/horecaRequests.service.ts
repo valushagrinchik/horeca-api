@@ -89,10 +89,21 @@ export class HorecaRequestsService {
         // TO update provider - horeca requests covering view
         this.requestsMatcherService.updateView()
 
-        return this.get(horecaRequest.id)
+        return this.getWithProviderRequests(horecaRequest.id)
     }
 
-    async get(id: number) {
+    async get(id: number, include: Prisma.HorecaRequestInclude) {
+        const horecaRequest = await this.horecaRequestsRep.get(id, include)
+        const images = await this.uploadsLinkService.getImages(UploadsLinkType.HorecaRequest, [horecaRequest.id])
+
+        return new HorecaRequestDto({
+            ...horecaRequest,
+            items: horecaRequest.items.map(item => new HorecaRequestItemDto(item)),
+            images: (images[id] || []).map(image => image.image),
+        })
+    }
+
+    async getWithProviderRequests(id: number) {
         const horecaRequest = await this.horecaRequestsRep.get(id)
         const images = await this.uploadsLinkService.getImages(UploadsLinkType.HorecaRequest, [horecaRequest.id])
 

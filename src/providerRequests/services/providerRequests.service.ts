@@ -44,6 +44,27 @@ export class ProviderRequestsService {
         }
     }
 
+    async getHorecaRequest(auth: AuthInfoDto, id: number): Promise<HorecaRequestDto> {
+        const now = dayjs().format(DB_DATE_FORMAT)
+        const provider = await this.usersService.get(auth)
+        const categories = provider.profile.categories as Categories[]
+        const horecaRequest = await this.horecaRequestService.get(id, {
+            items: {
+                where: {
+                    category: { in: categories },
+                },
+            },
+        })
+        if (horecaRequest.items.length == 0) {
+            throw new BadRequestException(new ErrorDto(ErrorCodes.FORBIDDEN_ACTION))
+        }
+        if (horecaRequest.acceptUntill < new Date(now)) {
+            throw new BadRequestException(new ErrorDto(ErrorCodes.FORBIDDEN_ACTION))
+        }
+
+        return horecaRequest
+    }
+
     async findHorecaRequests(
         auth: AuthInfoDto,
         paginate: Partial<PaginateValidateType<ProviderHorecaRequestSearchDto>> = {}

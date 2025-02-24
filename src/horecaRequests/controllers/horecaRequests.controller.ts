@@ -38,7 +38,7 @@ export class HorecaRequestsController {
     })
     async get(@AuthParamDecorator() auth: AuthInfoDto, @Param('id') id: number) {
         await this.service.validate(auth, +id)
-        return this.service.get(+id)
+        return this.service.getWithProviderRequests(+id)
     }
 
     @Get()
