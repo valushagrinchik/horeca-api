@@ -5,10 +5,12 @@ import { ErrorDto } from '../system/utils/dto/error.dto'
 import { ErrorCodes } from '../system/utils/enums/errorCodes.enum'
 import { UpdateUserDto } from './dto/update-user.dto'
 import { UserDto } from './dto/user.dto'
-import { ProfileType, UploadsLinkType } from '@prisma/client'
+import { Prisma, ProfileType, UploadsLinkType } from '@prisma/client'
 import { UsersDbService } from './users.db.service'
 import { RequestsMatcherDbService } from '../system/shared/requestsMatcher/requestsMatcher.db.service'
 import { UploadsLinkService } from '../uploads/uploads.link.service'
+import { PaginateValidateType } from '../system/utils/swagger/decorators'
+import { UsersSearchAdminDto } from './dto/usersSearch.admin.dto'
 
 @Injectable()
 export class UsersService {
@@ -61,6 +63,32 @@ export class UsersService {
         const images = await this.uploadsLinkService.getImages(UploadsLinkType.Profile, [user.id])
 
         return new UserDto({ ...user, avatar: (images[user.id] || [])[0]?.image })
+    }
+
+    async findAllAndCount(
+        auth: AuthInfoDto,
+        paginate: PaginateValidateType<UsersSearchAdminDto>
+    ): Promise<[UserDto[], number]> {
+        const { email, role } = paginate.search
+        const where: Prisma.UserWhereInput = {
+            email,
+            role,
+        }
+        const data = await this.usersRep.findMany({
+            where,
+            orderBy: {
+                [paginate.sort.field]: paginate.sort.order,
+            },
+            take: paginate.limit,
+            skip: paginate.offset,
+            include: {
+                profile: true,
+            },
+        })
+        const total = await this.usersRep.count({
+            where,
+        })
+        return [data.map(r => new UserDto(r)), total]
     }
 
     getUserByEmail(email: string) {

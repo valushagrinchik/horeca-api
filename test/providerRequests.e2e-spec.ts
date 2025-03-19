@@ -36,11 +36,11 @@ afterAll(async () => {
 })
 
 describe('ProviderRequestsController (e2e)', () => {
+    beforeAll(async () => {
+        await createHorecaRequest(app, horecaAuth.accessToken, horecaRequestInput)
+        await createHorecaRequest(app, horecaAuth.accessToken, horecaRequestInput2)
+    })
     describe('GET ' + ENDPOINTS.HOREKA_REQUESTS_FOR_PROVIDER, () => {
-        beforeAll(async () => {
-            await createHorecaRequest(app, horecaAuth.accessToken, horecaRequestInput)
-            await createHorecaRequest(app, horecaAuth.accessToken, horecaRequestInput2)
-        })
         it('should return paginated data and total', async () => {
             const res = await findAllHorecaRequestForProvider(app, providerAuth.accessToken)
 
@@ -106,14 +106,14 @@ describe('ProviderRequestsController (e2e)', () => {
     })
 
     describe('GET ' + ENDPOINTS.HOREKA_REQUEST_FOR_PROVIDER, () => {
-        beforeAll(async () => {
-            await createHorecaRequest(app, horecaAuth.accessToken, horecaRequestInput)
-        })
-
         describe('get horeca request by id', () => {
             it('should return horeca request with only matched items by categories', async () => {
                 const all = await findAllHorecaRequestForProvider(app, providerAuth.accessToken)
-                const res = await getHorecaRequestForProvider(app, providerAuth.accessToken, all.data[0].id)
+                const res = await getHorecaRequestForProvider(
+                    app,
+                    providerAuth.accessToken,
+                    all.data.find(hr => hr.name == horecaRequestInput.name).id
+                )
                 const user = await getProfile(app, providerAuth.accessToken)
                 const crossedCategoryItemsLength = horecaRequestInput.items.filter(item =>
                     user.profile.categories.includes(item.category)

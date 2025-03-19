@@ -10,6 +10,7 @@ import { AuthorizationController } from './authorization.controller'
 import { AuthorizationService } from './authorization.service'
 import { JwtModule } from '@nestjs/jwt'
 import { ConfigService } from '@nestjs/config'
+import { UsersAdminController } from './users.admin.controller'
 
 @Module({
     imports: [
@@ -24,7 +25,7 @@ import { ConfigService } from '@nestjs/config'
         RequestsMatcherModule,
         UploadsModule,
     ],
-    controllers: [UsersController, AuthorizationController],
+    controllers: [UsersController, AuthorizationController, UsersAdminController],
     providers: [UsersDbService, AuthorizationService, UsersService, MailService, Logger],
     exports: [UsersService, JwtModule],
 })

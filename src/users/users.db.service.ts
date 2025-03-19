@@ -171,4 +171,12 @@ export class UsersDbService {
             },
         })
     }
+
+    async findMany(args: Prisma.UserFindManyArgs) {
+        return this.db.user.findMany(args)
+    }
+
+    async count(args: Prisma.UserCountArgs) {
+        return this.db.user.count(args)
+    }
 }

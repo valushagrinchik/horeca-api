@@ -37,7 +37,9 @@ describe('SupportRequestsController/SupportRequestsAdminController (e2e)', () =>
 
             const horecaSupportRequests = await getUsersSupportRequests(app, horecaAuth.accessToken)
 
-            const adminSupportRequests = await getAdminSupportRequests(app, adminAuth.accessToken)
+            const adminSupportRequests = await getAdminSupportRequests(app, adminAuth.accessToken, {
+                status: SupportRequestStatus.Default,
+            })
 
             expect(providerSupportRequests).toHaveProperty('data')
             expect(providerSupportRequests).toHaveProperty('total')

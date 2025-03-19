@@ -347,9 +347,14 @@ export const getUsersSupportRequests = async (
         .set('Authorization', 'Bearer ' + accessToken)
         .then(res => res.body)
 }
-export const getAdminSupportRequests = async (app: INestApplication, accessToken: string): Promise<ChatDto | any> => {
+export const getAdminSupportRequests = async (
+    app: INestApplication,
+    accessToken: string,
+    search?: SupportRequestSearchDto
+): Promise<ChatDto | any> => {
     return request(app.getHttpServer())
         .get(ENDPOINTS.SUPPORT_REQUESTS)
+        .query({ search })
         .set('Authorization', 'Bearer ' + accessToken)
         .then(res => res.body)
 }
