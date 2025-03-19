@@ -81,7 +81,11 @@ export class UsersService {
             take: paginate.limit,
             skip: paginate.offset,
             include: {
-                profile: true,
+                profile: {
+                    include: {
+                        addresses: true,
+                    }
+                },
             },
         })
         const total = await this.usersRep.count({
