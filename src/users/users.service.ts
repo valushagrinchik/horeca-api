@@ -69,9 +69,8 @@ export class UsersService {
         auth: AuthInfoDto,
         paginate: PaginateValidateType<UsersSearchAdminDto>
     ): Promise<[UserDto[], number]> {
-        const { email, role } = paginate.search
+        const { role } = paginate.search
         const where: Prisma.UserWhereInput = {
-            email,
             role,
         }
         const data = await this.usersRep.findMany({
