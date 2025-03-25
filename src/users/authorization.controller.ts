@@ -40,7 +40,7 @@ export class AuthorizationController {
     @RequestDecorator(SuccessDto)
     async activateAccount(@Res() res: Response, @Param('uuid') uuid: string) {
         await this.authService.activateAccount(uuid)
-        res.redirect(this.configService.get('FRONTEND_URL'))
+        res.redirect(this.configService.get('FRONTEND_URL')+'/sign-in')
     }
 
     // @Get('password-recovery')
