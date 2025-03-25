@@ -86,7 +86,7 @@ export class MailService {
         return await this.create(userId, {
             userId,
             to: email,
-            subject: 'Confirm your email address',
+            subject: 'Подтверждение адреса электронной почты Сфера HoReCa',
             template: 'confirmation',
             context: {
                 username,
