@@ -14,6 +14,8 @@ services:
         restart: always
         depends_on:
             - horeca_ps
+        networks:
+            - horeca_api_network
 
     horeca_ps:
         container_name: horeca_ps
@@ -28,11 +30,15 @@ services:
             - POSTGRES_USER=horeca
             - POSTGRES_PASSWORD=horeca
             - POSTGRES_DB=horeca
+        networks:
+            - horeca_api_network
+        
 volumes:
     horeca_api-uploads:
     horeca_postgres-data:
+
 networks:
-  default:
+  horeca_api_network:
     driver: bridge
     driver_opts:
       com.docker.network.driver.mtu: 1450
