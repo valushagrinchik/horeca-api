@@ -57,7 +57,7 @@ export class MailService {
         this.logger.log(`Send ${subject} mail to ${to} from ${this.configService.get(`SMTP_USER`)}`)
 
         const res = await this.mailerService.sendMail({
-            from: this.configService.get(`SMTP_USER`),
+            from: `HoReCa ${this.configService.get(`SMTP_USER`)}`,
             to,
             subject,
             template,
@@ -90,7 +90,7 @@ export class MailService {
             template: 'confirmation',
             context: {
                 username,
-                link: `${this.configService.get('BACKEND_URL')}/auth/activate/${link}`,
+                link: `${this.configService.get('FRONTEND_URL')}/account/activation/${link}`,
                 service: 'HoReCa',
             },
         })

@@ -31,7 +31,7 @@ export class UsersService {
     async activate(uuid: string) {
         const user = await this.usersRep.getUserByActivationLink(uuid)
         if (!user) {
-            throw new ErrorDto(ErrorCodes.ACTIVATION_LINK_ERROR)
+            throw new BadRequestException(new ErrorDto(ErrorCodes.ACTIVATION_LINK_ERROR))
         }
         await this.usersRep.updateUser(user.id, { isActivated: true })
     }

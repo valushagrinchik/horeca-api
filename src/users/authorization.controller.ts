@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Param, Res } from '@nestjs/common'
+import { Controller, Post, Body, Get, Param } from '@nestjs/common'
 import { RegistrateUserDto } from './dto/registrate-user.dto'
 import { ApiExtraModels, ApiOperation, ApiTags } from '@nestjs/swagger'
 import { LoginUserDto } from './dto/login-user.dto'
@@ -6,7 +6,6 @@ import { AuthResultDto } from '../auth/dto/auth.result.dto'
 import { CreateHorecaProfileDto } from '../users/dto/horeca/create-horeca-profile.dto'
 import { CreateProviderProfileDto } from '../users/dto/provider/create-provider-profile.dto'
 import { SuccessDto } from '../system/utils/dto/success.dto'
-import { Response } from 'express'
 import { ConfigService } from '@nestjs/config'
 import { RequestDecorator } from '../system/utils/swagger/decorators'
 import { UserDto } from '../users/dto/user.dto'
@@ -38,9 +37,9 @@ export class AuthorizationController {
     @Get('activate/:uuid')
     @ApiOperation({ summary: 'Ссылка для активации пользователя ( отправляется в письме при регистрации)' })
     @RequestDecorator(SuccessDto)
-    async activateAccount(@Res() res: Response, @Param('uuid') uuid: string) {
+    async activateAccount(@Param('uuid') uuid: string) {
         await this.authService.activateAccount(uuid)
-        res.redirect(this.configService.get('FRONTEND_URL')+'/sign-in')
+        return new SuccessDto('ok')
     }
 
     // @Get('password-recovery')
