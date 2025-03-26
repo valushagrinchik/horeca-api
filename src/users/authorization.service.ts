@@ -9,6 +9,7 @@ import { MailService } from '../mail/mail.service'
 import { AuthInfoDto } from '../auth/dto/auth.info.dto'
 import { LoginUserDto } from './dto/login-user.dto'
 import { validPassword } from '../system/crypto'
+import { ChangePasswordDto } from './dto/change-password.dto'
 
 @Injectable()
 export class AuthorizationService {
@@ -25,7 +26,6 @@ export class AuthorizationService {
         }
         const user = await this.userService.create(dto)
 
-        // send activation link
         await this.mailService?.sendActivationMail({
             userId: user.id,
             username: user.name,
@@ -40,6 +40,27 @@ export class AuthorizationService {
         await this.userService.activate(uuid)
     }
 
+    async passwordRecovery(email: string) {
+        const user = await this.userService.getUserByEmail(email)
+        if (!user) {
+            throw new BadRequestException(new ErrorDto(ErrorCodes.USER_DOES_NOT_EXISTS))
+        }
+        await this.mailService?.sendRecoveryPass({
+            userId: user.id,
+            email: user.email,
+            link: user.activationLink,
+        })
+    }
+
+    async passwordChange(uuid: string, dto: ChangePasswordDto) {
+        const user = await this.userService.passwordChange(uuid, dto)
+
+        await this.mailService?.sendPassChanged({
+            userId: user.id,
+            email: user.email,
+        })
+    }
+    
     async login(dto: LoginUserDto) {
         const user = await this.userService.getUserByEmail(dto.email)
 
@@ -97,29 +118,4 @@ export class AuthorizationService {
     //     }
     // }
 
-    /**
-     * Get token for password recovery
-     * @param user
-     * @returns
-     */
-    getRecoveryToken(user: AuthInfoDto) {
-        const payload = { id: user.id, role: user.role } as AuthInfoDto
-        const token = this.jwtService.sign(payload, {
-            secret: this.configService.get('JWT_ACCESS_TOKEN_SECRET'),
-            expiresIn: '15m',
-        })
-
-        return token
-    }
-
-    /**
-     * Verify token
-     * @param token
-     * @returns
-     */
-    verifyRecoveryToken(token: string) {
-        return this.jwtService.verify(token, {
-            secret: this.configService.get('JWT_ACCESS_TOKEN_SECRET'),
-        })
-    }
 }

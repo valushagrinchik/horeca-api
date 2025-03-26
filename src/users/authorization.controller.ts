@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Param } from '@nestjs/common'
+import { Controller, Post, Body, Get, Param, Query } from '@nestjs/common'
 import { RegistrateUserDto } from './dto/registrate-user.dto'
 import { ApiExtraModels, ApiOperation, ApiTags } from '@nestjs/swagger'
 import { LoginUserDto } from './dto/login-user.dto'
@@ -10,6 +10,7 @@ import { ConfigService } from '@nestjs/config'
 import { RequestDecorator } from '../system/utils/swagger/decorators'
 import { UserDto } from '../users/dto/user.dto'
 import { AuthorizationService } from './authorization.service'
+import { ChangePasswordDto } from './dto/change-password.dto'
 
 @Controller('auth')
 @ApiTags('Authorization')
@@ -42,12 +43,20 @@ export class AuthorizationController {
         return new SuccessDto('ok')
     }
 
-    // @Get('password-recovery')
-    // @RequestDecorator(SuccessDto)
-    // async passwordRecovery(@Query('email') email: string) {
-    //     await this.usersService.passwordRecovery(email)
-    //     return new SuccessDto('ok')
-    // }
+    @Get('password/recovery')
+    @RequestDecorator(SuccessDto)
+    async passwordRecovery(@Query('email') email: string) {
+        console.log(email,'email')
+        await this.authService.passwordRecovery(email)
+        return new SuccessDto('ok')
+    }
+
+    @Post('password/change/:uuid')
+    @RequestDecorator(SuccessDto)
+    async passwordChange(@Param('uuid') uuid: string, @Body() dto: ChangePasswordDto) {
+        await this.authService.passwordChange(uuid, dto)
+        return new SuccessDto('ok')
+    }
 
     // @Put('recover-password')
     // @RequestDecorator(SuccessDto)

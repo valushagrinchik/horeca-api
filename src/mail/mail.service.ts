@@ -57,7 +57,7 @@ export class MailService {
         this.logger.log(`Send ${subject} mail to ${to} from ${this.configService.get(`SMTP_USER`)}`)
 
         const res = await this.mailerService.sendMail({
-            from: `HoReCa ${this.configService.get(`SMTP_USER`)}`,
+            from: `Сфера HoReCa ${this.configService.get(`SMTP_USER`)}`,
             to,
             subject,
             template,
@@ -86,7 +86,7 @@ export class MailService {
         return await this.create(userId, {
             userId,
             to: email,
-            subject: 'Подтверждение адреса электронной почты Сфера HoReCa',
+            subject: 'Подтверждение адреса электронной почты',
             template: 'confirmation',
             context: {
                 username,
@@ -104,12 +104,32 @@ export class MailService {
         return await this.create(userId, {
             userId,
             to: email,
-            subject: 'Reset your password',
+            subject: 'Запрос на восстановление пароля',
             template: 'password_recovery',
             context: {
-                link: `${this.configService.get('BACKEND_URL')}/user/recoveryPassword/${link}`,
+                link: `${this.configService.get('FRONTEND_URL')}/account/password_recovery/${link}`,
+                service: 'HoReCa',
+            },
+        })
+    }
+
+
+    /**
+     * Send password changed
+     * @returns
+     */
+    async sendPassChanged({ userId, email }: MailParamsDto) {
+        return await this.create(userId, {
+            userId,
+            to: email,
+            subject: 'Ваш пароль успешно изменён',
+            template: 'password_changed',
+            context: {
+                link: `${this.configService.get('FRONTEND_URL')}/sign-in`,
                 service: 'HoReCa',
             },
         })
     }
 }
+
+

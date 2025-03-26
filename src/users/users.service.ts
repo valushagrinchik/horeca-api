@@ -11,6 +11,7 @@ import { RequestsMatcherDbService } from '../system/shared/requestsMatcher/reque
 import { UploadsLinkService } from '../uploads/uploads.link.service'
 import { PaginateValidateType } from '../system/utils/swagger/decorators'
 import { UsersSearchAdminDto } from './dto/usersSearch.admin.dto'
+import { ChangePasswordDto } from './dto/change-password.dto'
 
 @Injectable()
 export class UsersService {
@@ -26,6 +27,15 @@ export class UsersService {
             this.requestsMatcherService.updateView()
         }
         return new UserDto(user)
+    }
+
+    async passwordChange(uuid: string, dto: ChangePasswordDto) {
+        let user = await this.usersRep.getUserByActivationLink(uuid)
+        if (!user) {
+            throw new BadRequestException(new ErrorDto(ErrorCodes.ACTIVATION_LINK_ERROR))
+        }
+        user = await this.usersRep.updateUser(user.id, {password: dto.password})
+        return user
     }
 
     async activate(uuid: string) {
