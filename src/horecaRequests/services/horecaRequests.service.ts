@@ -94,6 +94,11 @@ export class HorecaRequestsService {
 
     async get(id: number, include: Prisma.HorecaRequestInclude) {
         const horecaRequest = await this.horecaRequestsRep.get(id, include)
+        if(!horecaRequest){
+            throw new BadRequestException(
+                new ErrorDto(ErrorCodes.ITEM_NOT_FOUND)
+            )
+        }
         const images = await this.uploadsLinkService.getImages(UploadsLinkType.HorecaRequest, [horecaRequest.id])
 
         return new HorecaRequestDto({
