@@ -36,7 +36,7 @@ export class HorecaRequestsService {
         private requestsMatcherService: RequestsMatcherDbService,
         @Inject(forwardRef(() => ChatWsGateway))
         private chatWsGateway: ChatWsGateway
-    ) {}
+    ) { }
 
     async validate(auth: AuthInfoDto, id: number) {
         const horecaRequest = await this.horecaRequestsRep.getRawById(id)
@@ -94,7 +94,7 @@ export class HorecaRequestsService {
 
     async get(id: number, include: Prisma.HorecaRequestInclude) {
         const horecaRequest = await this.horecaRequestsRep.get(id, include)
-        if(!horecaRequest){
+        if (!horecaRequest) {
             throw new BadRequestException(
                 new ErrorDto(ErrorCodes.ITEM_NOT_FOUND)
             )
@@ -111,6 +111,7 @@ export class HorecaRequestsService {
     async getWithProviderRequests(id: number) {
         const horecaRequest = await this.horecaRequestsRep.get(id)
         const images = await this.uploadsLinkService.getImages(UploadsLinkType.HorecaRequest, [horecaRequest.id])
+        const prImages = await this.uploadsLinkService.getImages(UploadsLinkType.ProviderRequestItem, horecaRequest.providerRequests.map(p=>p.id))
 
         return new HorecaRequestWithProviderRequestDto({
             ...horecaRequest,
@@ -118,6 +119,7 @@ export class HorecaRequestsService {
             providerRequests: horecaRequest.providerRequests.map(
                 (pR: ProviderRequest & { items: ProviderRequestItem[] }) => ({
                     ...pR,
+                    images: (prImages[pR.id] || []).map(image => image.image),
                     cover: pR.items.length / horecaRequest.items.length,
                 })
             ),
@@ -152,7 +154,7 @@ export class HorecaRequestsService {
 
         const images = await this.uploadsLinkService.getImages(
             UploadsLinkType.HorecaRequest,
-            horecaRequests.map(p => p.id)
+            horecaRequests.map(h => h.id)
         )
 
         const data = horecaRequests.map(
