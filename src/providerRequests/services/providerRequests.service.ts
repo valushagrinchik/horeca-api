@@ -56,10 +56,10 @@ export class ProviderRequestsService {
             },
         })
         if (horecaRequest.items.length == 0) {
-            throw new BadRequestException(new ErrorDto(ErrorCodes.FORBIDDEN_ACTION))
+            throw new BadRequestException(new ErrorDto(ErrorCodes.FORBIDDEN_ACTION, ['No matched your categories items']))
         }
         if (horecaRequest.acceptUntill < new Date(now)) {
-            throw new BadRequestException(new ErrorDto(ErrorCodes.FORBIDDEN_ACTION))
+            throw new BadRequestException(new ErrorDto(ErrorCodes.FORBIDDEN_ACTION, ['Accept untill date is expired']))
         }
 
         return horecaRequest
