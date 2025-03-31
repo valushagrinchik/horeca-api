@@ -6,17 +6,10 @@ import { CreateProfileDto } from '../create-profile.dto'
 
 export class CreateHorecaProfileDto extends CreateProfileDto {
     @Validate(TypeValidate.STRING, { required: false })
-    @ValidateIf(o => o.profileType)
     info: string
 
     @Validate(TypeValidate.ARRAY, { minItems: 1 })
-    @ValidateIf(o => o.profileType)
     @ValidateNested()
     @Type(() => Address)
     addresses: Address[]
-
-    constructor(partial: Partial<CreateHorecaProfileDto>) {
-        super(partial)
-        Object.assign(this, partial)
-    }
 }

@@ -2,14 +2,16 @@ import { INestApplication } from '@nestjs/common'
 import { authUser, getProfile, initApp, updateProfile } from './helpers'
 import { AuthResultDto } from '../src/auth/dto/auth.result.dto'
 import { ENDPOINTS } from './constants'
-import { horecaUserInput } from './mock/seedData'
+import { horecaUserInput, providerUserInput } from './mock/seedData'
 
 let app: INestApplication
 let horecaAuth: AuthResultDto
+let providerAuth: AuthResultDto
 
 beforeAll(async () => {
     app = await initApp()
-    horecaAuth = await authUser(app, horecaUserInput)
+    horecaAuth = await authUser(app, horecaUserInput)   
+    providerAuth = await authUser(app, providerUserInput)
 })
 
 afterAll(async () => {
@@ -28,7 +30,7 @@ describe('UsersController (e2e)', () => {
     })
 
     describe('PUT ' + ENDPOINTS.PROFILE, () => {
-        it('update profile should be success', async () => {
+        it('update horeca profile should be success', async () => {
             const res = await updateProfile(app, horecaAuth.accessToken, {
                 phone: '123123',
                 profile: {
@@ -39,6 +41,19 @@ describe('UsersController (e2e)', () => {
             expect(res).toHaveProperty('id')
             expect(res.phone).toBe('123123')
             expect(res.profile.info).toBe('updated')
+            return
+        })
+
+        it('update provider profile should be success', async () => {
+            const res = await updateProfile(app, providerAuth.accessToken, {
+                phone: '123123',
+                profile: {
+                   deliveryMethods: [],
+                },
+            })
+            expect(res.email).toBe(providerUserInput.email)
+            expect(res).toHaveProperty('id')
+            expect(res.phone).toBe('123123')
             return
         })
     })

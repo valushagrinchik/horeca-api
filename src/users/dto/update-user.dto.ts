@@ -1,7 +1,7 @@
 import { getSchemaPath } from '@nestjs/swagger'
 import { ProfileType } from '@prisma/client'
 import { TypeValidate, Validate } from '../../system/utils/validation/validate.decotators'
-import { ValidateIf, ValidateNested } from 'class-validator'
+import { IsObject, ValidateIf, ValidateNested } from 'class-validator'
 import { Type } from 'class-transformer'
 import { CreateHorecaProfileDto } from './horeca/create-horeca-profile.dto'
 import { CreateProviderProfileDto } from './provider/create-provider-profile.dto'
@@ -29,10 +29,11 @@ export class UpdateUserDto {
         oneOf: [{ $ref: getSchemaPath(CreateHorecaProfileDto) }, { $ref: getSchemaPath(CreateProviderProfileDto) }],
         required: false,
     })
+    @Type(({ object }) => {
+        if (!object?.profile?.profileType) return Object;
+        return object.profile.profileType == ProfileType.Horeca ? CreateHorecaProfileDto : CreateProviderProfileDto
+    })
     @ValidateNested()
-    @Type(({ object }) =>
-        object.profile.profileType == ProfileType.Horeca ? CreateHorecaProfileDto : CreateProviderProfileDto
-    )
     profile: Partial<CreateHorecaProfileDto | CreateProviderProfileDto>
 
     @Validate(TypeValidate.NUMBER, { required: false })

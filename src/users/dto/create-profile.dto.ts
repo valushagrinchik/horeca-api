@@ -5,7 +5,7 @@ export class CreateProfileDto {
     @ValidateEnum(ProfileType, { enum: ProfileType, enumName: 'ProfileType' })
     profileType: ProfileType
 
-    constructor(partial: Partial<CreateProfileDto>) {
-        Object.assign(this, partial)
-    }
+    // constructor(partial: Partial<CreateProfileDto>) {
+    //     Object.assign(this, partial)
+    // }
 }
