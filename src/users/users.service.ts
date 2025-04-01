@@ -70,7 +70,7 @@ export class UsersService {
             throw new BadRequestException(new ErrorDto(ErrorCodes.AUTH_FAIL))
         }
 
-        const images = await this.uploadsLinkService.getImages(UploadsLinkType.Profile, [user.id])
+        const images = await this.uploadsLinkService.getImages(UploadsLinkType.Profile, [user.profile.id])
 
         return new UserDto({ ...user, avatar: (images[user.profile.id] || [])[0]?.image })
     }
