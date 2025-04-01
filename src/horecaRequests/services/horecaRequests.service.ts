@@ -111,7 +111,7 @@ export class HorecaRequestsService {
     async getWithProviderRequests(id: number) {
         const horecaRequest = await this.horecaRequestsRep.get(id)
         const images = await this.uploadsLinkService.getImages(UploadsLinkType.HorecaRequest, [horecaRequest.id])
-        const prImages = await this.uploadsLinkService.getImages(UploadsLinkType.ProviderRequestItem, horecaRequest.providerRequests.map(p=>p.id))
+        const prImages = await this.uploadsLinkService.getImages(UploadsLinkType.ProviderRequestItem, horecaRequest.providerRequests.map(p=>(p as any).items.map((i:any)=>i.id)).flat())
 
         return new HorecaRequestWithProviderRequestDto({
             ...horecaRequest,
@@ -119,7 +119,10 @@ export class HorecaRequestsService {
             providerRequests: horecaRequest.providerRequests.map(
                 (pR: ProviderRequest & { items: ProviderRequestItem[] }) => ({
                     ...pR,
-                    images: (prImages[pR.id] || []).map(image => image.image),
+                    items: pR.items.map(item => ({
+                        ...item,
+                        images: (prImages[item.id] || []).map(image => image.image),
+                    })),
                     cover: pR.items.length / horecaRequest.items.length,
                 })
             ),

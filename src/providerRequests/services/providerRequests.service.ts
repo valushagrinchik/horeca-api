@@ -157,13 +157,13 @@ export class ProviderRequestsService {
 
         const itemIdsMap = new Map(providerRequest.items.map(item => [item.horecaRequestItemId, item.id]))
 
-        Promise.all(
+        await Promise.all(
             items
                 .filter(item => item.imageIds)
                 .map(item =>
                     this.uploadsLinkService.createMany(
                         UploadsLinkType.ProviderRequestItem,
-                        itemIdsMap[item.horecaRequestItemId],
+                        itemIdsMap.get(item.horecaRequestItemId),
                         item.imageIds
                     )
                 )
@@ -263,7 +263,7 @@ export class ProviderRequestsService {
         return new ProviderRequestDto({
             ...providerRequest,
             items: providerRequest.items.map(item => {
-                return new ProviderRequestItemDto({ ...item, images: (images[id] || []).map(image => image.image) })
+                return new ProviderRequestItemDto({ ...item, images: (images[item.id] || []).map(image => image.image) })
             }),
             horecaRequest: new HorecaRequestDto(providerRequest.horecaRequest),
         })
