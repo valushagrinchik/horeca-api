@@ -72,7 +72,7 @@ export class UsersService {
 
         const images = await this.uploadsLinkService.getImages(UploadsLinkType.Profile, [user.id])
 
-        return new UserDto({ ...user, avatar: (images[user.id] || [])[0]?.image })
+        return new UserDto({ ...user, avatar: (images[user.profile.id] || [])[0]?.image })
     }
 
     async findAllAndCount(
