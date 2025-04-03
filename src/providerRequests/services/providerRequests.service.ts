@@ -159,7 +159,7 @@ export class ProviderRequestsService {
 
         await Promise.all(
             items
-                .filter(item => item.imageIds)
+                .filter(item => item.imageIds?.length)
                 .map(item =>
                     this.uploadsLinkService.createMany(
                         UploadsLinkType.ProviderRequestItem,

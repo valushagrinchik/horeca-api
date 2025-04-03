@@ -63,16 +63,26 @@ export class UsersService {
         return new UserDto({ ...updated, avatar: (images[user.id] || [])[0]?.image })
     }
 
-    async get(auth: AuthInfoDto): Promise<UserDto> {
+    async getProfile(auth: AuthInfoDto): Promise<UserDto> {
         const user = await this.usersRep.getUserWithProfile(auth.id)
 
         if (!user) {
             throw new BadRequestException(new ErrorDto(ErrorCodes.AUTH_FAIL))
         }
 
-        const images = await this.uploadsLinkService.getImages(UploadsLinkType.Profile, [user.profile.id])
+        const images = user.profile ? await this.uploadsLinkService.getImages(UploadsLinkType.Profile, [user.profile?.id]) : []
 
-        return new UserDto({ ...user, avatar: (images[user.profile.id] || [])[0]?.image })
+        return new UserDto({ ...user, avatar: (images[user.profile?.id] || [])[0]?.image })
+    }
+
+    async get(auth: AuthInfoDto): Promise<UserDto> {
+        const user = await this.usersRep.getUserWithProfile(auth.id)
+
+        if (!user) {
+            throw new BadRequestException(new ErrorDto(ErrorCodes.AUTH_FAIL))
+        }
+  
+        return new UserDto(user)
     }
 
     async findAllAndCount(

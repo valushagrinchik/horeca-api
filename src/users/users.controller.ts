@@ -28,6 +28,6 @@ export class UsersController {
     @RequestDecorator(UserDto)
     @ApiExtraModels(HorecaProfileDto, ProviderProfileDto)
     async get(@AuthParamDecorator() auth: AuthInfoDto) {
-        return this.usersService.get(auth)
+        return this.usersService.getProfile(auth)
     }
 }

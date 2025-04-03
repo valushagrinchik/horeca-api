@@ -22,7 +22,7 @@ export class UploadsLinkService {
     async createMany(sourceType: UploadsLinkType, sourceId: number, imageIds: number[]) {
         await this.prisma.uploadsLink.createMany({
             data: imageIds.map(imageId => ({
-                imageId,
+                imageId: +imageId,
                 sourceType,
                 sourceId,
             })),
