@@ -15,7 +15,7 @@ import { UploadsLinkService } from '../../uploads/uploads.link.service'
 import { HorecaRequestItemDto } from '../dto/horecaRequest.item.dto'
 import { HorecaRequestsDbService } from './horecaRequests.db.service'
 import { HorecaRequestSetStatusDto } from '../dto/horecaRequest.approveProviderRequest.dto'
-import { HorecaRequestWithProviderRequestDto } from '../dto/horecaRequest.withProviderRequests.dto'
+import { HorecaRequestWithProviderRequestDto, HRProviderRequestDto } from '../dto/horecaRequest.withProviderRequests.dto'
 import { ErrorDto } from '../../system/utils/dto/error.dto'
 import { ErrorCodes } from '../../system/utils/enums/errorCodes.enum'
 import { NotificationWsGateway } from '../../notifications/notification.ws.gateway'
@@ -111,20 +111,24 @@ export class HorecaRequestsService {
     async getWithProviderRequests(id: number) {
         const horecaRequest = await this.horecaRequestsRep.get(id)
         const images = await this.uploadsLinkService.getImages(UploadsLinkType.HorecaRequest, [horecaRequest.id])
-        const prImages = await this.uploadsLinkService.getImages(UploadsLinkType.ProviderRequestItem, horecaRequest.providerRequests.map(p=>(p as any).items.map((i:any)=>i.id)).flat())
+        const pRequestImages = await this.uploadsLinkService.getImages(UploadsLinkType.ProviderRequestItem, horecaRequest.providerRequests.map(p => (p as any).items.map((i: any) => i.id)).flat())
+        const pProfileImages = await this.uploadsLinkService.getImages(UploadsLinkType.Profile, horecaRequest.providerRequests.map(p =>(p as any).user.profile?.id).filter(el=>!!el))
 
         return new HorecaRequestWithProviderRequestDto({
             ...horecaRequest,
             items: horecaRequest.items.map(item => new HorecaRequestItemDto(item)),
             providerRequests: horecaRequest.providerRequests.map(
-                (pR: ProviderRequest & { items: ProviderRequestItem[] }) => ({
-                    ...pR,
-                    items: pR.items.map(item => ({
-                        ...item,
-                        images: (prImages[item.id] || []).map(image => image.image),
-                    })),
-                    cover: pR.items.length / horecaRequest.items.length,
-                })
+                (pR: ProviderRequest & { items: ProviderRequestItem[], user: any }) => {
+                    return new HRProviderRequestDto({
+                        ...pR,
+                        items: pR.items.map(item => ({
+                            ...item,
+                            images: (pRequestImages[item.id] || []).map(image => image.image),
+                        })),
+                        cover: pR.items.length / horecaRequest.items.length,
+                        avatar: (pProfileImages[pR.user.profile?.id] || [])[0]?.image
+                    })
+                }
             ),
             images: (images[id] || []).map(image => image.image),
         })

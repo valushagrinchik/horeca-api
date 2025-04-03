@@ -22,7 +22,7 @@ import { NotificationWsGateway } from '../../notifications/notification.ws.gatew
 import { NotificationEvents } from '../../system/utils/enums/websocketEvents.enum'
 import { ProviderRequestSearchDto } from '../dto/providerRequest.search.dto'
 import { Categories } from '../../system/utils/enums'
-import { isNil, omit } from 'lodash'
+import { omit } from 'lodash'
 import { RequestsMatcherDbService } from '../../system/shared/requestsMatcher/requestsMatcher.db.service'
 
 @Injectable()
