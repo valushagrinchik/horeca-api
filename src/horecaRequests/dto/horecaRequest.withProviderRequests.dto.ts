@@ -5,18 +5,26 @@ import { UploadDto } from '../../uploads/dto/upload.dto'
 import { ValidateNested } from 'class-validator'
 import { TypeValidate, Validate } from '../../system/utils/validation/validate.decotators'
 
-export class HRProviderRequestDto extends ProviderRequestDto {
-    cover: number
 
-    @Exclude()
-    user:  any
+export class HRProviderUserDto {
+    name: string
+
+    rating: number
 
     @Validate(TypeValidate.OBJECT, {required: false})
     @ValidateNested()
     @Type(() => UploadDto)
     avatar?:  UploadDto
 
-    constructor(partial: Partial<HRProviderRequestDto & { cover?: number, avatar?: UploadDto }>) {
+    constructor(partial: Partial<HRProviderUserDto & { avatar?: UploadDto}>) {
+        Object.assign(this, partial)
+    }
+}
+export class HRProviderRequestDto extends ProviderRequestDto {
+    cover: number
+    user:  HRProviderUserDto
+
+    constructor(partial: Partial<HRProviderRequestDto & { cover?: number }>) {
         super(partial)
         Object.assign(this, partial)
     }

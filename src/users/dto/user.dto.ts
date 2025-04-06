@@ -12,6 +12,7 @@ export class UserDto implements User {
     role: UserRole
 
     name: string
+    rating: number
 
     tin: string
 

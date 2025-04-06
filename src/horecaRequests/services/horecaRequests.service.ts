@@ -15,7 +15,7 @@ import { UploadsLinkService } from '../../uploads/uploads.link.service'
 import { HorecaRequestItemDto } from '../dto/horecaRequest.item.dto'
 import { HorecaRequestsDbService } from './horecaRequests.db.service'
 import { HorecaRequestSetStatusDto } from '../dto/horecaRequest.approveProviderRequest.dto'
-import { HorecaRequestWithProviderRequestDto, HRProviderRequestDto } from '../dto/horecaRequest.withProviderRequests.dto'
+import { HorecaRequestWithProviderRequestDto, HRProviderRequestDto, HRProviderUserDto } from '../dto/horecaRequest.withProviderRequests.dto'
 import { ErrorDto } from '../../system/utils/dto/error.dto'
 import { ErrorCodes } from '../../system/utils/enums/errorCodes.enum'
 import { NotificationWsGateway } from '../../notifications/notification.ws.gateway'
@@ -121,12 +121,12 @@ export class HorecaRequestsService {
                 (pR: ProviderRequest & { items: ProviderRequestItem[], user: any }) => {
                     return new HRProviderRequestDto({
                         ...pR,
+                        user: new HRProviderUserDto({...pR.user, avatar: (pProfileImages[pR.user.profile?.id] || [])[0]?.image}),
                         items: pR.items.map(item => ({
                             ...item,
                             images: (pRequestImages[item.id] || []).map(image => image.image),
                         })),
                         cover: pR.items.length / horecaRequest.items.length,
-                        avatar: (pProfileImages[pR.user.profile?.id] || [])[0]?.image
                     })
                 }
             ),

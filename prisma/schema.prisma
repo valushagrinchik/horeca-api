@@ -92,6 +92,8 @@ model User {
   // ИНН
   tin            String
 
+  rating Float @default(0)
+
   role UserRole
 
   phone   String?

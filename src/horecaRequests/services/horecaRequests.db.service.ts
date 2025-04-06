@@ -27,7 +27,7 @@ export class HorecaRequestsDbService {
 
     get = async (
         id: number,
-        include: Prisma.HorecaRequestInclude = { items: true, providerRequests: { include: { items: true, user: { select: { profile: { select: { id: true } } } } } } }
+        include: Prisma.HorecaRequestInclude = { items: true, providerRequests: { include: { items: true, user: { select: { profile: {select: {id: true}}, rating: true, name: true  } } } } } 
     ) => {
         return this.db.horecaRequest.findUnique({
             where: { id },

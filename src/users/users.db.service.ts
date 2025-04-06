@@ -91,11 +91,13 @@ export class UsersDbService {
             throw new BadRequestException(new ErrorDto(ErrorCodes.USER_DOES_NOT_EXISTS))
         }
 
-        if (user.profile.profileType == ProfileType.Horeca) {
+        if (user.role == UserRole.Horeca) {
             return this.updateHorecaProfile(user, dto)
-        } else {
+        } 
+        if (user.role == UserRole.Provider) { 
             return this.updateProviderProfile(user, dto)
         }
+        throw  new BadRequestException(new ErrorDto(ErrorCodes.FORBIDDEN_ACTION, ["Update profile for admin role is not allowed"]))
     }
 
     updateHorecaProfile = async (
