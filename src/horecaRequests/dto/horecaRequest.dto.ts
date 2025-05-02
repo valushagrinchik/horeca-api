@@ -1,7 +1,17 @@
-import { HorecaRequest, HorecaRequestItem, HorecaRequestStatus, PaymentType } from '@prisma/client'
+import { HorecaRequest, HorecaRequestItem, HorecaRequestProviderStatus, HorecaRequestStatus, PaymentType } from '@prisma/client'
 import { SourceWithUploads } from '../../uploads/dto/upload.dto'
 import { HorecaRequestItemDto } from './horecaRequest.item.dto'
 import { ApiProperty } from '@nestjs/swagger'
+
+
+class HorecaRequestProviderStatusDto {
+    "horecaRequestId": number
+    "viewed": boolean
+    "hidden": boolean
+    "providerId": number
+    "createdAt": Date
+    "updatedAt": Date
+}
 
 export class HorecaRequestDto extends SourceWithUploads implements HorecaRequest {
     id: number
@@ -21,12 +31,14 @@ export class HorecaRequestDto extends SourceWithUploads implements HorecaRequest
 
     reviewNotificationSent: boolean
 
+    horecaRequestProviderStatus?:  HorecaRequestProviderStatusDto
+
     createdAt: Date
     updatedAt: Date
 
     cover?: number
 
-    constructor(partial: Partial<HorecaRequest & { items?: HorecaRequestItem[] } & SourceWithUploads>) {
+    constructor(partial: Partial<HorecaRequest & { items?: HorecaRequestItem[], horecaRequestProviderStatus?:  HorecaRequestProviderStatus } & SourceWithUploads>) {
         super()
         Object.assign(this, partial)
     }
