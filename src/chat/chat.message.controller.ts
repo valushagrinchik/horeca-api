@@ -24,7 +24,7 @@ export class ChatsMessageController {
     constructor(private readonly service: ChatMessageService) {}
 
     @Get()
-    @RequestPaginatedDecorator(ChatMessageDto)
+    @RequestPaginatedDecorator(ChatMessageDto, ChatMessageSearchDto)
     @ApiOperation({ summary: 'Получить список сообщений чата. Роль пользователя: Поставщик/Хорека/Админ' })
     async getChatMessages(
         @AuthParamDecorator() auth: AuthInfoDto,
