@@ -89,7 +89,7 @@ export class ProviderRequestsService {
                     },
                     status: HorecaRequestStatus.Pending,
                     ...(hiddenAndViewed === true
-                        ? { horecaRequestProviderStatus: { isNot: null } }
+                        ? { horecaRequestProviderStatus: { hidden: true } }
                         : hiddenAndViewed === false
                           ? { horecaRequestProviderStatus: { is: null } }
                           : {}),
