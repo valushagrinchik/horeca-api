@@ -7,7 +7,7 @@ import { DB_DATE_FORMAT } from '../../system/utils/constants'
 
 @Injectable()
 export class HorecaRequestsDbService {
-    constructor(private db: DatabaseService) { }
+    constructor(private db: DatabaseService) {}
 
     getRawById = async (id: number) => {
         return this.db.horecaRequest.findUnique({
@@ -27,7 +27,15 @@ export class HorecaRequestsDbService {
 
     get = async (
         id: number,
-        include: Prisma.HorecaRequestInclude = { items: true, providerRequests: { include: { items: true, user: { select: { profile: {select: {id: true}}, rating: true, name: true  } } } } } 
+        include: Prisma.HorecaRequestInclude = {
+            items: true,
+            providerRequests: {
+                include: {
+                    items: true,
+                    user: { select: { profile: { select: { id: true } }, rating: true, name: true } },
+                },
+            },
+        }
     ) => {
         return this.db.horecaRequest.findUnique({
             where: { id },

@@ -2,20 +2,12 @@ import { BadRequestException, forwardRef, Inject, Injectable } from '@nestjs/com
 import { HorecaRequestCreateDto } from '../dto/horecaRequest.create.dto'
 import { HorecaRequestDto } from '../dto/horecaRequest.dto'
 import { AuthInfoDto } from '../../auth/dto/auth.info.dto'
-import {
-    HorecaRequestStatus,
-    Prisma,
-    ProviderRequestStatus,
-    UploadsLinkType,
-    ProviderRequest,
-    ProviderRequestItem,
-} from '@prisma/client'
+import { HorecaRequestStatus, Prisma, ProviderRequestStatus, UploadsLinkType } from '@prisma/client'
 import { PaginateValidateType } from '../../system/utils/swagger/decorators'
 import { UploadsLinkService } from '../../uploads/uploads.link.service'
-import { HorecaRequestItemDto } from '../dto/horecaRequest.item.dto'
 import { HorecaRequestsDbService } from './horecaRequests.db.service'
 import { HorecaRequestSetStatusDto } from '../dto/horecaRequest.approveProviderRequest.dto'
-import { HorecaRequestWithProviderRequestDto, HRProviderRequestDto, HRProviderUserDto } from '../dto/horecaRequest.withProviderRequests.dto'
+import { HorecaRequestWithProviderRequestsDto } from '../dto/horecaRequest.withProviderRequests.dto'
 import { ErrorDto } from '../../system/utils/dto/error.dto'
 import { ErrorCodes } from '../../system/utils/enums/errorCodes.enum'
 import { NotificationWsGateway } from '../../notifications/notification.ws.gateway'
@@ -26,6 +18,7 @@ import { ChatServerMessages } from '../../system/utils/constants'
 import { HorecaRequestSearchDto } from '../dto/horecaRequest.search.dto'
 import { ErrorValidationCodeEnum } from '../../system/utils/validation/error.validation.code.enum'
 import { RequestsMatcherDbService } from '../../system/shared/requestsMatcher/requestsMatcher.db.service'
+import { HorecaRequestWithActiveProviderRequestDto } from '../dto/horecaRequest.withActiveProviderRequest.dto'
 
 @Injectable()
 export class HorecaRequestsService {
@@ -36,7 +29,7 @@ export class HorecaRequestsService {
         private requestsMatcherService: RequestsMatcherDbService,
         @Inject(forwardRef(() => ChatWsGateway))
         private chatWsGateway: ChatWsGateway
-    ) { }
+    ) {}
 
     async validate(auth: AuthInfoDto, id: number) {
         const horecaRequest = await this.horecaRequestsRep.getRawById(id)
@@ -89,55 +82,48 @@ export class HorecaRequestsService {
         // TO update provider - horeca requests covering view
         this.requestsMatcherService.updateView()
 
-        return this.getWithProviderRequests(horecaRequest.id)
+        return this.get(horecaRequest.id, { items: true })
     }
 
     async get(id: number, include: Prisma.HorecaRequestInclude) {
         const horecaRequest = await this.horecaRequestsRep.get(id, include)
         if (!horecaRequest) {
-            throw new BadRequestException(
-                new ErrorDto(ErrorCodes.ITEM_NOT_FOUND)
-            )
+            throw new BadRequestException(new ErrorDto(ErrorCodes.ITEM_NOT_FOUND))
         }
         const images = await this.uploadsLinkService.getImages(UploadsLinkType.HorecaRequest, [horecaRequest.id])
 
         return new HorecaRequestDto({
             ...horecaRequest,
-            items: horecaRequest.items.map(item => new HorecaRequestItemDto(item)),
-            images: (images[id] || []).map(image => image.image),
+            images: images[id],
         })
     }
 
-    async getWithProviderRequests(id: number) {
+    async getOneWithCounterProviderRequests(id: number) {
         const horecaRequest = await this.horecaRequestsRep.get(id)
         const images = await this.uploadsLinkService.getImages(UploadsLinkType.HorecaRequest, [horecaRequest.id])
-        const pRequestImages = await this.uploadsLinkService.getImages(UploadsLinkType.ProviderRequestItem, horecaRequest.providerRequests.map(p => (p as any).items.map((i: any) => i.id)).flat())
-        const pProfileImages = await this.uploadsLinkService.getImages(UploadsLinkType.Profile, horecaRequest.providerRequests.map(p => (p as any).user.profile?.id).filter(el => !!el))
+        const providerRequestsImages = await this.uploadsLinkService.getImages(
+            UploadsLinkType.ProviderRequestItem,
+            horecaRequest.providerRequests.map(p => (p as any).items.map((i: any) => i.id)).flat()
+        )
+        const providerProfilesImage = await this.uploadsLinkService.getImages(
+            UploadsLinkType.Profile,
+            horecaRequest.providerRequests.map(p => (p as any).user.profile?.id).filter(el => !!el)
+        )
 
-        return new HorecaRequestWithProviderRequestDto({
-            ...horecaRequest,
-            items: horecaRequest.items.map(item => new HorecaRequestItemDto(item)),
-            providerRequests: horecaRequest.providerRequests.map(
-                (pR: ProviderRequest & { items: ProviderRequestItem[], user: any }) => {
-                    return new HRProviderRequestDto({
-                        ...pR,
-                        user: new HRProviderUserDto({ ...pR.user, avatar: (pProfileImages[pR.user.profile?.id] || [])[0]?.image }),
-                        items: pR.items.map(item => ({
-                            ...item,
-                            images: (pRequestImages[item.id] || []).map(image => image.image),
-                        })),
-                        cover: pR.items.length / horecaRequest.items.length,
-                    })
-                }
-            ),
-            images: (images[id] || []).map(image => image.image),
-        })
+        return new HorecaRequestWithProviderRequestsDto(
+            {
+                ...horecaRequest,
+                images: images[id],
+            },
+            providerRequestsImages,
+            providerProfilesImage
+        )
     }
 
     async findAllAndCount(
         auth: AuthInfoDto,
         paginate: Partial<PaginateValidateType<HorecaRequestSearchDto>> = {}
-    ): Promise<[HorecaRequestDto[], number]> {
+    ): Promise<[HorecaRequestWithActiveProviderRequestDto[], number]> {
         const { status } = paginate.search
 
         const where = {
@@ -147,15 +133,17 @@ export class HorecaRequestsService {
 
         const horecaRequests = await this.horecaRequestsRep.findManyWithItems({
             where,
-            ...(status == HorecaRequestStatus.Active ? {
-                include: {
-                    providerRequests: {
-                        where: {
-                            status: ProviderRequestStatus.Active
-                        }
-                    }
-                }
-            } : {}),
+            ...(status == HorecaRequestStatus.Active
+                ? {
+                      include: {
+                          providerRequests: {
+                              where: {
+                                  status: ProviderRequestStatus.Active,
+                              },
+                          },
+                      },
+                  }
+                : {}),
             orderBy: {
                 createdAt: 'desc',
                 [paginate.sort.field]: paginate.sort.order,
@@ -174,11 +162,10 @@ export class HorecaRequestsService {
         )
 
         const data = horecaRequests.map(
-            p =>
-                new HorecaRequestDto({
-                    ...p,
-                    items: (p.items || []).map(item => new HorecaRequestItemDto(item)),
-                    images: (images[p.id] || []).map(image => image.image),
+            h =>
+                new HorecaRequestWithActiveProviderRequestDto({
+                    ...h,
+                    images: images[h.id],
                 })
         )
 
@@ -197,8 +184,7 @@ export class HorecaRequestsService {
             p =>
                 new HorecaRequestDto({
                     ...p,
-                    items: p.items.map(item => new HorecaRequestItemDto(item)),
-                    images: (images[p.id] || []).map(image => image.image),
+                    images: images[p.id],
                 })
         )
     }
@@ -285,8 +271,7 @@ export class HorecaRequestsService {
             },
         })
         await this.horecaRequestsRep.cancel(id)
-
-        horecaRequest.providerRequests.map(providerRequest => {
+        ;(horecaRequest.providerRequests || []).map(providerRequest => {
             if (providerRequest.status == ProviderRequestStatus.Active) {
                 this.chatWsGateway.sendServerMessage({
                     chatId: providerRequest.chatId,

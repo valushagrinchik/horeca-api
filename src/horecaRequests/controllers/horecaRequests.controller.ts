@@ -14,9 +14,10 @@ import {
 import { HorecaRequestsService } from '../services/horecaRequests.service'
 import { SuccessDto } from '../../system/utils/dto/success.dto'
 import { HorecaRequestSetStatusDto } from '../dto/horecaRequest.approveProviderRequest.dto'
-import { HorecaRequestWithProviderRequestDto } from '../dto/horecaRequest.withProviderRequests.dto'
+import { HorecaRequestWithProviderRequestsDto } from '../dto/horecaRequest.withProviderRequests.dto'
 import { PaginatedDto } from '../../system/utils/dto/paginated.dto'
 import { HorecaRequestSearchDto } from '../dto/horecaRequest.search.dto'
+import { HorecaRequestWithActiveProviderRequestDto } from '../dto/horecaRequest.withActiveProviderRequest.dto'
 
 @AuthUser(UserRole.Horeca)
 @Controller('horeca/requests')
@@ -32,17 +33,17 @@ export class HorecaRequestsController {
     }
 
     @Get(':id')
-    @RequestDecorator(HorecaRequestWithProviderRequestDto)
+    @RequestDecorator(HorecaRequestWithProviderRequestsDto)
     @ApiOperation({
         summary: 'Получить заявку хореки включая все отклики от поставщиков для сравнения. Роль пользователя: Хорека',
     })
     async get(@AuthParamDecorator() auth: AuthInfoDto, @Param('id') id: number) {
         await this.service.validate(auth, +id)
-        return this.service.getWithProviderRequests(+id)
+        return this.service.getOneWithCounterProviderRequests(+id)
     }
 
     @Get()
-    @RequestPaginatedDecorator(HorecaRequestDto, HorecaRequestSearchDto)
+    @RequestPaginatedDecorator(HorecaRequestWithActiveProviderRequestDto, HorecaRequestSearchDto)
     @ApiOperation({ summary: 'Получить все свои заявки. Роль пользователя: Хорека' })
     async findAll(
         @AuthParamDecorator() auth: AuthInfoDto,
@@ -50,7 +51,7 @@ export class HorecaRequestsController {
         paginate: PaginateValidateType<HorecaRequestSearchDto>
     ) {
         const [data, total] = await this.service.findAllAndCount(auth, paginate)
-        return new PaginatedDto<HorecaRequestDto>(data, total)
+        return new PaginatedDto<HorecaRequestWithActiveProviderRequestDto>(data, total)
     }
 
     @Post('approve')

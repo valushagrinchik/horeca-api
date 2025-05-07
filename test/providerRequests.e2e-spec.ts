@@ -158,6 +158,7 @@ describe('ProviderRequestsController (e2e)', () => {
     })
     describe('POST ' + ENDPOINTS.PROVIDER_REQUESTS, () => {
         it('should return just created request data', async () => {
+            expect.assertions(2)
             const acceptUntill = generateFutureDate()
             const deliveryTime = generateFutureDate(14)
 
@@ -178,6 +179,7 @@ describe('ProviderRequestsController (e2e)', () => {
                 phone: 'string',
                 comment: 'string',
             })
+            expect(horecaCreateRequestRes).toHaveProperty('id')
 
             const providerCreateRequestRes = await createProviderRequest(app, providerAuth.accessToken, {
                 horecaRequestId: horecaCreateRequestRes.id,

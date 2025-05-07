@@ -1,28 +1,29 @@
-import { ProviderRequest, ProviderRequestStatus } from '@prisma/client'
+import { HorecaRequest, ProviderRequest, ProviderRequestItem, ProviderRequestStatus } from '@prisma/client'
 import { ProviderRequestItemDto } from './providerRequestItem.dto'
-import { HorecaRequestDto } from '../../horecaRequests/dto/horecaRequest.dto'
-import { SourceWithUploads } from '../../uploads/dto/upload.dto'
+import { UploadDto } from '../../uploads/dto/upload.dto'
+import { IncomeHorecaRequestDto } from './incomeHorecaRequest.dto'
 
-export class ProviderRequestDto extends SourceWithUploads implements ProviderRequest {
+export class ProviderRequestDto implements ProviderRequest {
     id: number
-    userId: number
-    horecaRequest?: HorecaRequestDto
-    horecaRequestId: number
     comment: string
-
+    userId: number
+    horecaRequestId: number
+    status: ProviderRequestStatus
+    chatId: number
     createdAt: Date
     updatedAt: Date
 
-    chatId: number | null
-
     items: ProviderRequestItemDto[]
-
-    status: ProviderRequestStatus
+    horecaRequest?: IncomeHorecaRequestDto
 
     constructor(
-        partial: Partial<ProviderRequest & { items: ProviderRequestItemDto[]; horecaRequest?: HorecaRequestDto } & SourceWithUploads>
+        p: Partial<ProviderRequest & { items: ProviderRequestItem[]; horecaRequest?: HorecaRequest }>,
+        providerRequestItemsImages: Record<string, UploadDto[]>
     ) {
-        super()
-        Object.assign(this, partial)
+        Object.assign(this, p)
+        this.items = (p.items || []).map(item => {
+            return new ProviderRequestItemDto({ ...item, images: providerRequestItemsImages[item.id] })
+        })
+        this.horecaRequest = new IncomeHorecaRequestDto(p.horecaRequest)
     }
 }

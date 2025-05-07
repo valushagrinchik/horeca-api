@@ -30,7 +30,7 @@ export class UpdateUserDto {
         required: false,
     })
     @Type(({ object }) => {
-        if (!object?.profile?.profileType) return Object;
+        if (!object?.profile?.profileType) return Object
         return object.profile.profileType == ProfileType.Horeca ? CreateHorecaProfileDto : CreateProviderProfileDto
     })
     @ValidateNested()

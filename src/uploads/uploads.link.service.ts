@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common'
 import { UploadsLinkType } from '@prisma/client'
 import { DatabaseService } from '../system/database/database.service'
+import { UploadDto } from './dto/upload.dto'
 
 @Injectable()
 export class UploadsLinkService {
     constructor(private prisma: DatabaseService) {}
 
-    async getImages(sourceType: UploadsLinkType, sourceIds: number[]) {
+    async getImages(sourceType: UploadsLinkType, sourceIds: number[]): Promise<Record<string, UploadDto[]>> {
         const images = await this.prisma.uploadsLink.findMany({
             where: {
                 sourceType,
@@ -16,7 +17,10 @@ export class UploadsLinkService {
                 image: true,
             },
         })
-        return Object.groupBy(images, ({ sourceId }) => sourceId)
+        const grouped = Object.groupBy(images, ({ sourceId }) => sourceId)
+        return Object.fromEntries(
+            Object.entries(grouped).map(([sourceId, images]) => [sourceId, images.map(image => image.image)])
+        )
     }
 
     async createMany(sourceType: UploadsLinkType, sourceId: number, imageIds: number[]) {

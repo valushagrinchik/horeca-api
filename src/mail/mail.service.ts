@@ -113,7 +113,6 @@ export class MailService {
         })
     }
 
-
     /**
      * Send password changed
      * @returns
@@ -131,5 +130,3 @@ export class MailService {
         })
     }
 }
-
-

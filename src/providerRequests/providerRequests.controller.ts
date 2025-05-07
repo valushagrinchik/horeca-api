@@ -17,7 +17,7 @@ import { HorecaRequestProviderStatusDto } from './dto/horecaRequest.providerStat
 import { ProviderHorecaRequestSearchDto } from './dto/provider.horecaRequest.search.dto'
 import { PaginatedDto } from '../system/utils/dto/paginated.dto'
 import { ProviderRequestSearchDto } from './dto/providerRequest.search.dto'
-import { HorecaRequestDto } from '../horecaRequests/dto/horecaRequest.dto'
+import { IncomeHorecaRequestDto } from './dto/incomeHorecaRequest.dto'
 
 @AuthUser(UserRole.Provider)
 @Controller('provider/requests')
@@ -26,7 +26,13 @@ export class ProviderRequestsController {
     constructor(private readonly service: ProviderRequestsService) {}
 
     @Get('income')
-    @RequestPaginatedDecorator(HorecaRequestDto, ProviderHorecaRequestSearchDto, null, null, 'createdAt/cover|ASC/DESC')
+    @RequestPaginatedDecorator(
+        IncomeHorecaRequestDto,
+        ProviderHorecaRequestSearchDto,
+        null,
+        null,
+        'createdAt/cover|ASC/DESC'
+    )
     @ApiOperation({
         summary:
             'Список запросов хореки, соответствующих выбранным категориям профиля поставщика. Роль пользователя: Поставщик',
@@ -39,18 +45,17 @@ export class ProviderRequestsController {
         paginate: PaginateValidateType<ProviderHorecaRequestSearchDto>
     ) {
         const [data, total] = await this.service.findHorecaRequests(auth, paginate)
-        return new PaginatedDto<HorecaRequestDto>(data, total)
+        return new PaginatedDto<IncomeHorecaRequestDto>(data, total)
     }
 
     @Get('income/:id')
-    @RequestDecorator(HorecaRequestDto)
+    @RequestDecorator(IncomeHorecaRequestDto)
     @ApiOperation({
         summary:
             'Конкретный запрос хореки, соответствующий выбранным категориям профиля поставщика. Роль пользователя: Поставщик',
     })
     async getIncomeHorecaRequest(@AuthParamDecorator() auth: AuthInfoDto, @Param('id') id: number) {
-        const data = await this.service.getHorecaRequest(auth, +id)
-        return new HorecaRequestDto(data)
+        return this.service.getHorecaRequest(auth, +id)
     }
 
     @Post('income/status')

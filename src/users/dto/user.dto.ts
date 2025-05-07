@@ -1,4 +1,4 @@
-import { ApiProperty, getSchemaPath } from '@nestjs/swagger'
+import { ApiHideProperty, ApiProperty, getSchemaPath } from '@nestjs/swagger'
 import { Profile, ProfileType, User, UserRole } from '@prisma/client'
 import { Exclude, Transform, Type } from 'class-transformer'
 import { HorecaProfileDto } from './horeca/horeca-profile.dto'
@@ -21,15 +21,18 @@ export class UserDto implements User {
     phone: string
 
     @Exclude()
+    @ApiHideProperty()
     password: string
 
     createdAt: Date
     updatedAt: Date
 
     @Exclude()
+    @ApiHideProperty()
     activationLink: string
 
     @Exclude()
+    @ApiHideProperty()
     isActivated: boolean
 
     @ApiProperty({ oneOf: [{ $ref: getSchemaPath(HorecaProfileDto) }, { $ref: getSchemaPath(ProviderProfileDto) }] })

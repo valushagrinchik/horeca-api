@@ -10,7 +10,7 @@ let providerAuth: AuthResultDto
 
 beforeAll(async () => {
     app = await initApp()
-    horecaAuth = await authUser(app, horecaUserInput)   
+    horecaAuth = await authUser(app, horecaUserInput)
     providerAuth = await authUser(app, providerUserInput)
 })
 
@@ -48,7 +48,7 @@ describe('UsersController (e2e)', () => {
             const res = await updateProfile(app, providerAuth.accessToken, {
                 phone: '123123',
                 profile: {
-                   deliveryMethods: [],
+                    deliveryMethods: [],
                 },
             })
             expect(res.email).toBe(providerUserInput.email)

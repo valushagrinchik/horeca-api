@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { DatabaseService } from '../../database/database.service'
-import { Prisma } from '@prisma/client'
+import { HorecaRequest, HorecaRequestItem, HorecaRequestProviderStatus, Prisma } from '@prisma/client'
 
 @Injectable()
 export class RequestsMatcherDbService {
@@ -10,8 +10,29 @@ export class RequestsMatcherDbService {
         await this.db.$queryRaw`REFRESH MATERIALIZED VIEW CONCURRENTLY provider_horeca_requests_cover_view;`
     }
 
-    findHorecaRequests = async (args: Prisma.ProviderHorecaRequestsCoverViewFindManyArgs): Promise<any> => {
-        return this.db.providerHorecaRequestsCoverView.findMany(args)
+    findHorecaRequests = async (
+        args: Prisma.ProviderHorecaRequestsCoverViewFindManyArgs
+    ): Promise<
+        {
+            cover: number
+            horecaRequest: HorecaRequest & {
+                items?: HorecaRequestItem[]
+                horecaRequestProviderStatus?: HorecaRequestProviderStatus
+            }
+        }[]
+    > => {
+        return this.db.providerHorecaRequestsCoverView.findMany({
+            // should be overwritten in args
+            include: {
+                horecaRequest: {
+                    include: {
+                        items: true,
+                        horecaRequestProviderStatus: true,
+                    },
+                },
+            },
+            ...args,
+        })
     }
 
     countHorecaRequests = async (where: Prisma.ProviderHorecaRequestsCoverViewWhereInput) => {

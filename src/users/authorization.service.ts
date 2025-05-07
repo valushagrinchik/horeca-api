@@ -60,7 +60,7 @@ export class AuthorizationService {
             email: user.email,
         })
     }
-    
+
     async login(dto: LoginUserDto) {
         const user = await this.userService.getUserByEmail(dto.email)
 
@@ -117,5 +117,4 @@ export class AuthorizationService {
     //         throw new UnauthorizedException(new ErrorDto(ErrorCodeEnum.ACCESS_CREATE_FAIL))
     //     }
     // }
-
 }

@@ -34,7 +34,7 @@ export class UsersService {
         if (!user) {
             throw new BadRequestException(new ErrorDto(ErrorCodes.ACTIVATION_LINK_ERROR))
         }
-        user = await this.usersRep.updateUser(user.id, {password: dto.password})
+        user = await this.usersRep.updateUser(user.id, { password: dto.password })
         return user
     }
 
@@ -60,7 +60,7 @@ export class UsersService {
         const updated = await this.usersRep.updateProfile(auth.id, dto)
         const images = await this.uploadsLinkService.getImages(UploadsLinkType.Profile, [user.id])
 
-        return new UserDto({ ...updated, avatar: (images[user.id] || [])[0]?.image })
+        return new UserDto({ ...updated, avatar: (images[user.id] || [])[0] })
     }
 
     async getProfile(auth: AuthInfoDto): Promise<UserDto> {
@@ -70,9 +70,11 @@ export class UsersService {
             throw new BadRequestException(new ErrorDto(ErrorCodes.AUTH_FAIL))
         }
 
-        const images = user.profile ? await this.uploadsLinkService.getImages(UploadsLinkType.Profile, [user.profile?.id]) : []
+        const images = user.profile
+            ? await this.uploadsLinkService.getImages(UploadsLinkType.Profile, [user.profile?.id])
+            : []
 
-        return new UserDto({ ...user, avatar: (images[user.profile?.id] || [])[0]?.image })
+        return new UserDto({ ...user, avatar: (images[user.profile?.id] || [])[0] })
     }
 
     async get(auth: AuthInfoDto): Promise<UserDto> {
@@ -81,7 +83,7 @@ export class UsersService {
         if (!user) {
             throw new BadRequestException(new ErrorDto(ErrorCodes.AUTH_FAIL))
         }
-  
+
         return new UserDto(user)
     }
 
@@ -104,7 +106,7 @@ export class UsersService {
                 profile: {
                     include: {
                         addresses: true,
-                    }
+                    },
                 },
             },
         })

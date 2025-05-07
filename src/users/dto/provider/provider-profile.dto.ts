@@ -2,6 +2,7 @@ import { Address, Profile, ProfileType } from '@prisma/client'
 import { Exclude } from 'class-transformer'
 import { Categories, DeliveryMethods } from '../../../system/utils/enums'
 import { TypeValidate, Validate } from '../../../system/utils/validation/validate.decotators'
+import { ApiHideProperty } from '@nestjs/swagger'
 
 export class ProviderProfileDto implements Profile {
     id: number
@@ -26,9 +27,11 @@ export class ProviderProfileDto implements Profile {
     })
     deliveryMethods: DeliveryMethods[]
 
+    @ApiHideProperty()
     @Exclude()
     info: string | null
 
+    @ApiHideProperty()
     @Exclude()
     addresses: Address[]
 

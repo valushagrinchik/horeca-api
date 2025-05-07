@@ -69,7 +69,7 @@ export class ProductsService {
             p =>
                 new ProductDto({
                     ...p,
-                    images: (images[p.id] || []).map(image => image.image),
+                    images: images[p.id],
                 })
         )
         return [data, total]
@@ -84,7 +84,7 @@ export class ProductsService {
 
         return new ProductDto({
             ...product,
-            images: (images[product.id] || []).map(image => image.image),
+            images: images[product.id],
         })
     }
 

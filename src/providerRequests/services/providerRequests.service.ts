@@ -13,8 +13,6 @@ import { HorecaRequestsService } from '../../horecaRequests/services/horecaReque
 import { HorecaRequestProviderStatusDto } from '../dto/horecaRequest.providerStatus.dto'
 import { HorecaRequestProviderStatusDbService } from './horecaRequest.providerStatus.db.service'
 import { ProviderHorecaRequestSearchDto } from '../dto/provider.horecaRequest.search.dto'
-import { HorecaRequestDto } from '../../horecaRequests/dto/horecaRequest.dto'
-import * as dayjs from 'dayjs'
 import { DB_DATE_FORMAT } from '../../system/utils/constants'
 import { ErrorDto } from '../../system/utils/dto/error.dto'
 import { ErrorCodes } from '../../system/utils/enums/errorCodes.enum'
@@ -24,6 +22,9 @@ import { ProviderRequestSearchDto } from '../dto/providerRequest.search.dto'
 import { Categories } from '../../system/utils/enums'
 import { omit } from 'lodash'
 import { RequestsMatcherDbService } from '../../system/shared/requestsMatcher/requestsMatcher.db.service'
+import { IncomeHorecaRequestDto } from '../dto/incomeHorecaRequest.dto'
+
+import * as dayjs from 'dayjs'
 
 @Injectable()
 export class ProviderRequestsService {
@@ -44,7 +45,7 @@ export class ProviderRequestsService {
         }
     }
 
-    async getHorecaRequest(auth: AuthInfoDto, id: number): Promise<HorecaRequestDto> {
+    async getHorecaRequest(auth: AuthInfoDto, id: number): Promise<IncomeHorecaRequestDto> {
         const now = dayjs().format(DB_DATE_FORMAT)
         const provider = await this.usersService.get(auth)
         const categories = provider.profile.categories as Categories[]
@@ -56,19 +57,21 @@ export class ProviderRequestsService {
             },
         })
         if (horecaRequest.items.length == 0) {
-            throw new BadRequestException(new ErrorDto(ErrorCodes.FORBIDDEN_ACTION, ['No matched your categories items']))
+            throw new BadRequestException(
+                new ErrorDto(ErrorCodes.FORBIDDEN_ACTION, ['No matched your categories items'])
+            )
         }
         if (horecaRequest.acceptUntill < new Date(now)) {
             throw new BadRequestException(new ErrorDto(ErrorCodes.FORBIDDEN_ACTION, ['Accept untill date is expired']))
         }
 
-        return horecaRequest
+        return new IncomeHorecaRequestDto(horecaRequest)
     }
 
     async findHorecaRequests(
         auth: AuthInfoDto,
         paginate: Partial<PaginateValidateType<ProviderHorecaRequestSearchDto>> = {}
-    ): Promise<[HorecaRequestDto[], number]> {
+    ): Promise<[IncomeHorecaRequestDto[], number]> {
         const now = dayjs().format(DB_DATE_FORMAT)
         const provider = await this.usersService.get(auth)
         const categories = provider.profile.categories as Categories[]
@@ -127,7 +130,7 @@ export class ProviderRequestsService {
         })
 
         const total = await this.requestsMatcherService.countHorecaRequests(where)
-        return [data.map(item => ({ ...item.horecaRequest, cover: item.cover })), total]
+        return [data.map(item => new IncomeHorecaRequestDto({ ...item.horecaRequest, cover: item.cover })), total]
     }
 
     async setStatusForIncomeHorecaRequest(auth: AuthInfoDto, dto: HorecaRequestProviderStatusDto) {
@@ -155,7 +158,7 @@ export class ProviderRequestsService {
             },
         })
 
-        const itemIdsMap = new Map(providerRequest.items.map(item => [item.horecaRequestItemId, item.id]))
+        const itemIdsMap = new Map((providerRequest.items || []).map(item => [item.horecaRequestItemId, item.id]))
 
         await Promise.all(
             items
@@ -232,23 +235,11 @@ export class ProviderRequestsService {
             where,
         })
 
-        const sourceIds = providerRequests.map(p => p.items.map(item => item.id)).flat()
+        const sourceIds = providerRequests.map(p => (p.items || []).map(item => item.id)).flat()
 
         const images = await this.uploadsLinkService.getImages(UploadsLinkType.ProviderRequestItem, sourceIds)
 
-        const data = providerRequests.map(
-            providerRequest =>
-                new ProviderRequestDto({
-                    ...providerRequest,
-                    items: providerRequest.items.map(item => {
-                        return new ProviderRequestItemDto({
-                            ...item,
-                            images: (images[item.id] || []).map(image => image.image),
-                        })
-                    }),
-                    horecaRequest: new HorecaRequestDto(providerRequest.horecaRequest),
-                })
-        )
+        const data = providerRequests.map(providerRequest => new ProviderRequestDto(providerRequest, images))
         return [data, total]
     }
 
@@ -257,15 +248,9 @@ export class ProviderRequestsService {
 
         const images = await this.uploadsLinkService.getImages(
             UploadsLinkType.ProviderRequestItem,
-            providerRequest.items.map(item => item.id)
+            (providerRequest.items || []).map(item => item.id)
         )
 
-        return new ProviderRequestDto({
-            ...providerRequest,
-            items: providerRequest.items.map(item => {
-                return new ProviderRequestItemDto({ ...item, images: (images[item.id] || []).map(image => image.image) })
-            }),
-            horecaRequest: new HorecaRequestDto(providerRequest.horecaRequest),
-        })
+        return new ProviderRequestDto(providerRequest, images)
     }
 }
