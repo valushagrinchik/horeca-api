@@ -19,7 +19,7 @@ export class ChatMessageService {
     ): Promise<[ChatMessageDto[], number]> {
         const { chatId } = paginate.search
         const where = {
-            chatId,
+            chatId: +chatId,
             chat: {
                 opponents: {
                     has: auth.id,
