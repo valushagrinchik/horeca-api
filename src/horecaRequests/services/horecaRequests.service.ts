@@ -112,7 +112,7 @@ export class HorecaRequestsService {
         const horecaRequest = await this.horecaRequestsRep.get(id)
         const images = await this.uploadsLinkService.getImages(UploadsLinkType.HorecaRequest, [horecaRequest.id])
         const pRequestImages = await this.uploadsLinkService.getImages(UploadsLinkType.ProviderRequestItem, horecaRequest.providerRequests.map(p => (p as any).items.map((i: any) => i.id)).flat())
-        const pProfileImages = await this.uploadsLinkService.getImages(UploadsLinkType.Profile, horecaRequest.providerRequests.map(p =>(p as any).user.profile?.id).filter(el=>!!el))
+        const pProfileImages = await this.uploadsLinkService.getImages(UploadsLinkType.Profile, horecaRequest.providerRequests.map(p => (p as any).user.profile?.id).filter(el => !!el))
 
         return new HorecaRequestWithProviderRequestDto({
             ...horecaRequest,
@@ -121,7 +121,7 @@ export class HorecaRequestsService {
                 (pR: ProviderRequest & { items: ProviderRequestItem[], user: any }) => {
                     return new HRProviderRequestDto({
                         ...pR,
-                        user: new HRProviderUserDto({...pR.user, avatar: (pProfileImages[pR.user.profile?.id] || [])[0]?.image}),
+                        user: new HRProviderUserDto({ ...pR.user, avatar: (pProfileImages[pR.user.profile?.id] || [])[0]?.image }),
                         items: pR.items.map(item => ({
                             ...item,
                             images: (pRequestImages[item.id] || []).map(image => image.image),
@@ -147,6 +147,15 @@ export class HorecaRequestsService {
 
         const horecaRequests = await this.horecaRequestsRep.findManyWithItems({
             where,
+            ...(status == HorecaRequestStatus.Active ? {
+                include: {
+                    providerRequests: {
+                        where: {
+                            status: ProviderRequestStatus.Active
+                        }
+                    }
+                }
+            } : {}),
             orderBy: {
                 createdAt: 'desc',
                 [paginate.sort.field]: paginate.sort.order,
@@ -168,7 +177,7 @@ export class HorecaRequestsService {
             p =>
                 new HorecaRequestDto({
                     ...p,
-                    items: p.items.map(item => new HorecaRequestItemDto(item)),
+                    items: (p.items || []).map(item => new HorecaRequestItemDto(item)),
                     images: (images[p.id] || []).map(image => image.image),
                 })
         )
