@@ -1,12 +1,17 @@
 import { Categories } from '../../system/utils/enums'
-import { TypeValidate, Validate, ValidateEnum } from '../../system/utils/validation/validate.decotators'
+import { ValidateEnum } from '../../system/utils/validation/validate.decotators'
 
+export enum ProviderHorecaRequestStatus {
+    All = 'All',
+    Actual = 'Actual',
+    Hidden = 'Hidden',
+}
 export class ProviderHorecaRequestSearchDto {
-    @Validate(TypeValidate.BOOLEAN, { required: false })
-    hidden?: boolean
-
-    @Validate(TypeValidate.BOOLEAN, { required: false })
-    viewed?: boolean
+    @ValidateEnum(ProviderHorecaRequestStatus, {
+        enum: ProviderHorecaRequestStatus,
+        enumName: 'ProviderHorecaRequestStatus',
+    })
+    status?: ProviderHorecaRequestStatus
 
     @ValidateEnum(Categories, { enum: Categories, enumName: 'Categories' })
     category?: Categories

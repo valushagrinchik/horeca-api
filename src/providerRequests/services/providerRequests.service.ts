@@ -12,7 +12,7 @@ import { UsersService } from '../../users/users.service'
 import { HorecaRequestsService } from '../../horecaRequests/services/horecaRequests.service'
 import { HorecaRequestProviderStatusDto } from '../dto/horecaRequest.providerStatus.dto'
 import { HorecaRequestProviderStatusDbService } from './horecaRequest.providerStatus.db.service'
-import { ProviderHorecaRequestSearchDto } from '../dto/provider.horecaRequest.search.dto'
+import { ProviderHorecaRequestSearchDto, ProviderHorecaRequestStatus } from '../dto/provider.horecaRequest.search.dto'
 import { DB_DATE_FORMAT } from '../../system/utils/constants'
 import { ErrorDto } from '../../system/utils/dto/error.dto'
 import { ErrorCodes } from '../../system/utils/enums/errorCodes.enum'
@@ -75,7 +75,7 @@ export class ProviderRequestsService {
         const now = dayjs().format(DB_DATE_FORMAT)
         const provider = await this.usersService.get(auth)
         const categories = provider.profile.categories as Categories[]
-        const { hidden, viewed, category } = paginate.search
+        const { status, category } = paginate.search
 
         if (category && !categories.includes(category)) {
             throw new BadRequestException(new ErrorDto(ErrorCodes.FORBIDDEN_ACTION))
@@ -91,35 +91,27 @@ export class ProviderRequestsService {
                         hasSome: categoriesFilter,
                     },
                     status: HorecaRequestStatus.Pending,
-                    ...(!hidden && !viewed
+                    ...(status == ProviderHorecaRequestStatus.Hidden
                         ? {
-                              // actual(not hidden, not viewed)
-                              OR: [
-                                  {
-                                      horecaRequestProviderStatus: { is: null },
-                                  },
-                                  {
-                                      horecaRequestProviderStatus: {
-                                          hidden: false,
-                                          viewed: false,
-                                      },
-                                  },
-                              ],
+                              horecaRequestProviderStatus: {
+                                  OR: [{ hidden: true }, { viewed: true }],
+                              },
                           }
-                        : hidden && viewed
+                        : status == ProviderHorecaRequestStatus.Actual
                           ? {
-                                // all = including hidden and viewed
+                                OR: [
+                                    {
+                                        horecaRequestProviderStatus: { is: null },
+                                    },
+                                    {
+                                        horecaRequestProviderStatus: {
+                                            hidden: false,
+                                            viewed: false,
+                                        },
+                                    },
+                                ],
                             }
-                          : (hidden && {
-                                horecaRequestProviderStatus: {
-                                    hidden,
-                                },
-                            }) ||
-                            (viewed && {
-                                horecaRequestProviderStatus: {
-                                    viewed,
-                                },
-                            })),
+                          : {}),
                     acceptUntill: {
                         // TODO: check date
                         gte: new Date(now),

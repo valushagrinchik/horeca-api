@@ -1,4 +1,4 @@
-import { INestApplication } from '@nestjs/common'
+import { INestApplication, Search } from '@nestjs/common'
 import {
     approveProviderRequest,
     authUser,
@@ -16,6 +16,7 @@ import { AuthResultDto } from '../src/auth/dto/auth.result.dto'
 import { horecaRequestInput, horecaRequestInput2, horecaUserInput, providerUserInput } from './mock/seedData'
 import { generateFutureDate } from '../src/system/utils/date'
 import { Categories } from '../src/system/utils/enums'
+import { ProviderHorecaRequestStatus } from '../src/providerRequests/dto/provider.horecaRequest.search.dto'
 
 let app: INestApplication
 let horecaAuth: AuthResultDto
@@ -125,19 +126,15 @@ describe('ProviderRequestsController (e2e)', () => {
 
     describe('POST ' + ENDPOINTS.HOREKA_REQUESTS_FOR_PROVIDER_STATUS, () => {
         it('should apply "viewed" status to one of horeca request and delete it from active requests list', async () => {
-            expect.assertions(10)
-            const actualRes = await findAllHorecaRequestForProvider(app, providerAuth.accessToken)
+            expect.assertions(11)
+            const actualRes = await findAllHorecaRequestForProvider(app, providerAuth.accessToken, {
+                search: { status: ProviderHorecaRequestStatus.Actual },
+            })
             const hiddenRes = await findAllHorecaRequestForProvider(app, providerAuth.accessToken, {
-                search: { hidden: true },
+                search: { status: ProviderHorecaRequestStatus.Hidden },
             })
-            const viewedRes = await findAllHorecaRequestForProvider(app, providerAuth.accessToken, {
-                search: { viewed: true },
-            })
-            const allRes = await findAllHorecaRequestForProvider(app, providerAuth.accessToken, {
-                search: { hidden: true, viewed: true },
-            })
+            const allRes = await findAllHorecaRequestForProvider(app, providerAuth.accessToken)
             expect(actualRes.data.length).toBe(2)
-            expect(viewedRes.data.length).toBe(0)
             expect(hiddenRes.data.length).toBe(0)
             expect(allRes.data.length).toBe(2)
 
@@ -146,26 +143,35 @@ describe('ProviderRequestsController (e2e)', () => {
                 hidden: true,
             })
             expect(setHiddenRes.status).toBe('ok')
-            const setViewedRes = await setHorecaRequestStatus(app, providerAuth.accessToken, {
-                horecaRequestId: actualRes.data[1].id,
-                viewed: true,
-            })
-            expect(setViewedRes.status).toBe('ok')
 
-            const actualRes2 = await findAllHorecaRequestForProvider(app, providerAuth.accessToken)
+            const actualRes2 = await findAllHorecaRequestForProvider(app, providerAuth.accessToken, {
+                search: { status: ProviderHorecaRequestStatus.Actual },
+            })
             const hiddenRes2 = await findAllHorecaRequestForProvider(app, providerAuth.accessToken, {
-                search: { hidden: true },
+                search: { status: ProviderHorecaRequestStatus.Hidden },
             })
-            const viewedRes2 = await findAllHorecaRequestForProvider(app, providerAuth.accessToken, {
-                search: { viewed: true },
-            })
-            const allRes2 = await findAllHorecaRequestForProvider(app, providerAuth.accessToken, {
-                search: { hidden: true, viewed: true },
-            })
-            expect(actualRes2.data.length).toBe(actualRes.data.length - 2)
+            const allRes2 = await findAllHorecaRequestForProvider(app, providerAuth.accessToken)
+            expect(actualRes2.data.length).toBe(actualRes.data.length - 1)
             expect(hiddenRes2.data.length).toBe(1)
-            expect(viewedRes2.data.length).toBe(1)
             expect(allRes2.data.length).toBe(2)
+
+            const setHiddenRes2 = await setHorecaRequestStatus(app, providerAuth.accessToken, {
+                horecaRequestId: actualRes.data[0].id,
+                hidden: false,
+            })
+            expect(setHiddenRes2.status).toBe('ok')
+
+            const actualRes3 = await findAllHorecaRequestForProvider(app, providerAuth.accessToken, {
+                search: { status: ProviderHorecaRequestStatus.Actual },
+            })
+            const hiddenRes3 = await findAllHorecaRequestForProvider(app, providerAuth.accessToken, {
+                search: { status: ProviderHorecaRequestStatus.Hidden },
+            })
+            const allRes3 = await findAllHorecaRequestForProvider(app, providerAuth.accessToken)
+            expect(actualRes3.data.length).toBe(2)
+            expect(hiddenRes3.data.length).toBe(0)
+            expect(allRes3.data.length).toBe(2)
+
             return
         })
     })
