@@ -3,7 +3,10 @@ import { TypeValidate, Validate, ValidateEnum } from '../../system/utils/validat
 
 export class ProviderHorecaRequestSearchDto {
     @Validate(TypeValidate.BOOLEAN, { required: false })
-    hiddenAndViewed?: boolean
+    hidden?: boolean
+
+    @Validate(TypeValidate.BOOLEAN, { required: false })
+    viewed?: boolean
 
     @ValidateEnum(Categories, { enum: Categories, enumName: 'Categories' })
     category?: Categories

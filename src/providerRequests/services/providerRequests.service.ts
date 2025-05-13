@@ -75,7 +75,7 @@ export class ProviderRequestsService {
         const now = dayjs().format(DB_DATE_FORMAT)
         const provider = await this.usersService.get(auth)
         const categories = provider.profile.categories as Categories[]
-        const { hiddenAndViewed, category } = paginate.search
+        const { hidden, viewed, category } = paginate.search
 
         if (category && !categories.includes(category)) {
             throw new BadRequestException(new ErrorDto(ErrorCodes.FORBIDDEN_ACTION))
@@ -91,11 +91,35 @@ export class ProviderRequestsService {
                         hasSome: categoriesFilter,
                     },
                     status: HorecaRequestStatus.Pending,
-                    ...(hiddenAndViewed === true
-                        ? { horecaRequestProviderStatus: { hidden: true } }
-                        : hiddenAndViewed === false
-                          ? { horecaRequestProviderStatus: { is: null } }
-                          : {}),
+                    ...(!hidden && !viewed
+                        ? {
+                              // actual(not hidden, not viewed)
+                              OR: [
+                                  {
+                                      horecaRequestProviderStatus: { is: null },
+                                  },
+                                  {
+                                      horecaRequestProviderStatus: {
+                                          hidden: false,
+                                          viewed: false,
+                                      },
+                                  },
+                              ],
+                          }
+                        : hidden && viewed
+                          ? {
+                                // all = including hidden and viewed
+                            }
+                          : (hidden && {
+                                horecaRequestProviderStatus: {
+                                    hidden,
+                                },
+                            }) ||
+                            (viewed && {
+                                horecaRequestProviderStatus: {
+                                    viewed,
+                                },
+                            })),
                     acceptUntill: {
                         // TODO: check date
                         gte: new Date(now),
