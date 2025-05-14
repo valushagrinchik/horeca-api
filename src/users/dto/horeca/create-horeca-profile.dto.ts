@@ -1,6 +1,6 @@
 import { Type } from 'class-transformer'
-import { ValidateIf, ValidateNested } from 'class-validator'
-import { TypeValidate, Validate } from '../../../system/utils/validation/validate.decotators'
+import { ValidateNested } from 'class-validator'
+import { TypeValidate, Validate } from '@/shared/utils'
 import { Address } from './address.dto'
 import { CreateProfileDto } from '../create-profile.dto'
 

@@ -2,7 +2,7 @@ import { JwtService } from '@nestjs/jwt'
 import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway } from '@nestjs/websockets'
 import { Socket } from 'socket.io'
 
-import { ChatEvents } from '../system/utils/enums/websocketEvents.enum'
+import { ChatEvents } from '@/shared/utils'
 import { ConfigService } from '@nestjs/config'
 import { ChatService } from './services/chat.service'
 import { forwardRef, Inject } from '@nestjs/common'

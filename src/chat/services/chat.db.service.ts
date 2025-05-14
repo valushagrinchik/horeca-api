@@ -1,6 +1,6 @@
-import { PaginateValidateType } from '../../system/utils/swagger/decorators'
+import { PaginateValidateType } from '@/shared/utils'
 import { ChatType, Prisma } from '@prisma/client'
-import { DatabaseService } from '../../system/database/database.service'
+import { DatabaseService } from '@/system/database/database.service'
 import { forwardRef, Inject } from '@nestjs/common'
 import { ChatSearchDto } from '../dto/chat.search.dto'
 import { ChatCreateDto } from '../dto/chat.create.dto'

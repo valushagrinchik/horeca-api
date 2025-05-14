@@ -1,9 +1,8 @@
 import { Injectable } from '@nestjs/common'
-import { DatabaseService } from '../../system/database/database.service'
+import { DatabaseService } from '@/system/database/database.service'
 import { HorecaRequestStatus, Prisma, ProviderRequestStatus } from '@prisma/client'
 import { HorecaRequestSetStatusDto } from '../dto/horecaRequest.approveProviderRequest.dto'
 import * as dayjs from 'dayjs'
-import { DB_DATE_FORMAT } from '../../system/utils/constants'
 
 @Injectable()
 export class HorecaRequestsDbService {

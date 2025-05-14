@@ -8,11 +8,11 @@ import {
     RequestDecorator,
     RequestPaginatedDecorator,
     RequestPaginatedValidateParamsDecorator,
-} from '../system/utils/swagger/decorators'
+    SuccessDto,
+    PaginatedDto,
+} from '@/shared/utils'
 import { FavouritesCreateDto } from './dto/favourites.create.dto'
-import { SuccessDto } from '../system/utils/dto/success.dto'
 import { FavouritesService } from './services/favourites.service'
-import { PaginatedDto } from '../system/utils/dto/paginated.dto'
 import { FavouritesDto } from './dto/favourites.dto'
 
 @AuthUser(UserRole.Horeca)

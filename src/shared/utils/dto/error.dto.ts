@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger'
 
 import { ErrorCodes } from '../enums/errorCodes.enum'
-import { ErrorValidationCodeEnum } from '../validation/error.validation.code.enum'
+import { ErrorValidationCodeEnum } from '../enums/error.validation.code.enum'
 
 export class ErrorDto {
     @ApiProperty({ enum: ErrorCodes, required: false, example: ErrorCodes.AUTH_FAIL })

@@ -12,10 +12,8 @@ import {
 import { ExceptionFilter } from './exception.filter'
 import * as express from 'express'
 import { join } from 'node:path'
-import { ErrorDto } from './system/utils/dto/error.dto'
-import { ErrorCodes } from './system/utils/enums/errorCodes.enum'
+import { ErrorDto, ErrorCodes } from '@/shared/utils'
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston'
-import { RolesGuard } from './auth/guards/roles.guard'
 
 process.on('unhandledRejection', (reason, promise) => {
     console.log('Unhandled Rejection at:', promise, 'reason:', reason)

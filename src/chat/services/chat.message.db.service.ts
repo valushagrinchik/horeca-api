@@ -1,5 +1,5 @@
 import { Prisma } from '@prisma/client'
-import { DatabaseService } from '../../system/database/database.service'
+import { DatabaseService } from '@/system/database/database.service'
 import { forwardRef, Inject } from '@nestjs/common'
 
 export class ChatMessageDbService {

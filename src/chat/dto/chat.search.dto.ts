@@ -1,5 +1,5 @@
 import { ChatType } from '@prisma/client'
-import { TypeValidate, Validate, ValidateEnum } from '../../system/utils/validation/validate.decotators'
+import { ValidateEnum } from '@/shared/utils'
 
 export class ChatSearchDto {
     @ValidateEnum(ChatType, { enum: ChatType, enumName: 'ChatType' })

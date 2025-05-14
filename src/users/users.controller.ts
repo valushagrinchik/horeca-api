@@ -8,7 +8,7 @@ import { UserDto } from './dto/user.dto'
 import { AuthUser, AuthParamDecorator } from '../auth/decorators'
 import { UserRole } from '@prisma/client'
 import { AuthInfoDto } from '../auth/dto/auth.info.dto'
-import { RequestDecorator } from '../system/utils/swagger/decorators'
+import { RequestDecorator } from '@/shared/utils'
 
 @Controller('users')
 @ApiTags('Users')

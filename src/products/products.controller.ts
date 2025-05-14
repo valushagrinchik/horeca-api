@@ -10,11 +10,11 @@ import {
     RequestDecorator,
     RequestPaginatedDecorator,
     RequestPaginatedValidateParamsDecorator,
-} from '../system/utils/swagger/decorators'
+    PaginatedDto,
+} from '@/shared/utils'
 import { ProductSearchDto } from './dto/product.search.dto'
 import { ProductUpdateDto } from './dto/product.update.dto'
 import { ProductCreateDto } from './dto/product.create.dto'
-import { PaginatedDto } from '../system/utils/dto/paginated.dto'
 
 @AuthUser(UserRole.Provider)
 @Controller('products/provider')

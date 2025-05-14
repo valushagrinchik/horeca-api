@@ -11,7 +11,10 @@ import { CronModule } from '../system/cron/cron.module'
 import { HorecaRequestsCronService } from './cron/horecaRequests.cron.service'
 import { NotificationModule } from '../notifications/notification.module'
 import { ChatModule } from '../chat/chat.module'
-import { RequestsMatcherModule } from '../system/shared/requestsMatcher/requestsMatcher.module'
+import { RequestsMatcherModule } from '@/shared/requestsMatcher/requestsMatcher.module'
+import { QUEUES } from '@/shared/utils'
+import { BullModule } from '@nestjs/bull'
+
 @Module({
     imports: [
         UsersModule,
@@ -20,6 +23,9 @@ import { RequestsMatcherModule } from '../system/shared/requestsMatcher/requests
         NotificationModule,
         forwardRef(() => ChatModule),
         RequestsMatcherModule,
+        BullModule.registerQueue({
+            name: QUEUES.HORECA,
+        }),
     ],
     controllers: [HorecaRequestsTemplateController, HorecaRequestsController],
     providers: [

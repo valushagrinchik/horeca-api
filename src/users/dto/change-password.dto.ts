@@ -1,4 +1,4 @@
-import { TypeValidate, Validate } from '../../system/utils/validation/validate.decotators'
+import { TypeValidate, Validate } from '@/shared/utils'
 import { ValidateIf } from 'class-validator'
 import { Match } from '../../auth/decorators'
 

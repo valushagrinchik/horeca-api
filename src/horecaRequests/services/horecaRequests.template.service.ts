@@ -3,10 +3,8 @@ import { HorecaRequestsTemplateDbService } from './horecaRequests.template.db.se
 import { HorecaRequestTemplateCreateDto } from '../dto/horecaRequest.template.create.dto'
 import { HorecaRequestTemplateDto } from '../dto/horecaRequest.template.dto'
 import { AuthInfoDto } from '../../auth/dto/auth.info.dto'
-import { PaginateValidateType } from '../../system/utils/swagger/decorators'
 import { HorecaRequestTemplateUpdateDto } from '../dto/horecaRequest.template.update.dto'
-import { ErrorDto } from '../../system/utils/dto/error.dto'
-import { ErrorCodes } from '../../system/utils/enums/errorCodes.enum'
+import { ErrorDto, ErrorCodes, PaginateValidateType } from '@/shared/utils'
 
 @Injectable()
 export class HorecaRequestsTemplateService {

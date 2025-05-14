@@ -1,6 +1,6 @@
 import { WebSocketGateway } from '@nestjs/websockets'
 
-import { NotificationEvents } from '../system/utils/enums/websocketEvents.enum'
+import { NotificationEvents } from '@/shared/utils'
 
 import { WsGateway } from '../system/ws.gateway'
 import { NotificationPayload } from './dto/notification.payload.dto'

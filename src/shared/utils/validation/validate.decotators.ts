@@ -19,7 +19,7 @@ import {
     ValidateNested,
 } from 'class-validator'
 
-import { ErrorValidationCodeEnum } from './error.validation.code.enum'
+import { ErrorValidationCodeEnum } from '../enums/error.validation.code.enum'
 import { errorMessage } from './error.message'
 import { Transform } from 'class-transformer'
 

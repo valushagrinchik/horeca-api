@@ -1,5 +1,5 @@
 import { HorecaRequestStatus } from '@prisma/client'
-import { ValidateEnum } from '../../system/utils/validation/validate.decotators'
+import { ValidateEnum } from '@/shared/utils'
 
 export class HorecaRequestSearchDto {
     @ValidateEnum(HorecaRequestStatus, { enum: HorecaRequestStatus, enumName: 'HorecaRequestStatus' })

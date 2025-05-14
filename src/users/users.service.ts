@@ -1,15 +1,14 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { RegistrateUserDto } from './dto/registrate-user.dto'
 import { AuthInfoDto } from '../auth/dto/auth.info.dto'
-import { ErrorDto } from '../system/utils/dto/error.dto'
-import { ErrorCodes } from '../system/utils/enums/errorCodes.enum'
+import { ErrorDto, ErrorCodes, PaginateValidateType } from '@/shared/utils'
 import { UpdateUserDto } from './dto/update-user.dto'
 import { UserDto } from './dto/user.dto'
 import { Prisma, ProfileType, UploadsLinkType } from '@prisma/client'
 import { UsersDbService } from './users.db.service'
-import { RequestsMatcherDbService } from '../system/shared/requestsMatcher/requestsMatcher.db.service'
+import { RequestsMatcherDbService } from '@/shared/requestsMatcher/requestsMatcher.db.service'
 import { UploadsLinkService } from '../uploads/uploads.link.service'
-import { PaginateValidateType } from '../system/utils/swagger/decorators'
+
 import { UsersSearchAdminDto } from './dto/usersSearch.admin.dto'
 import { ChangePasswordDto } from './dto/change-password.dto'
 

@@ -1,5 +1,5 @@
 import { SupportRequest, SupportRequestStatus } from '@prisma/client'
-import { ValidateEnum } from '../../system/utils/validation/validate.decotators'
+import { ValidateEnum } from '@/shared/utils'
 
 export class SupportRequestDto implements SupportRequest {
     id: number

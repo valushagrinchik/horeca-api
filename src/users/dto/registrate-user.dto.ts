@@ -1,6 +1,6 @@
 import { getSchemaPath } from '@nestjs/swagger'
 import { ProfileType } from '@prisma/client'
-import { TypeValidate, Validate } from '../../system/utils/validation/validate.decotators'
+import { TypeValidate, Validate } from '@/shared/utils'
 import { ValidateIf, ValidateNested } from 'class-validator'
 import { Type } from 'class-transformer'
 import { CreateProviderProfileDto } from './provider/create-provider-profile.dto'

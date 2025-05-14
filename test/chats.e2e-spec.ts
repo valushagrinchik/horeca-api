@@ -1,7 +1,5 @@
 import { INestApplication } from '@nestjs/common'
-import { io } from 'socket.io-client'
 import { ChatWsGateway } from '../src/chat/chat.ws.gateway'
-import { ChatEvents } from '../src/system/utils/enums/websocketEvents.enum'
 import {
     addFavourites,
     approveProviderRequest,
@@ -23,13 +21,11 @@ import { AuthResultDto } from '../src/auth/dto/auth.result.dto'
 import { adminUserInput, horecaUserInput, providerUserInput } from './mock/seedData'
 import { ChatType } from '@prisma/client'
 import { ENDPOINTS } from './constants'
-import { generateFutureDate } from '../src/system/utils/date'
-import { Categories } from '../src/system/utils/enums'
+import { generateFutureDate, Categories, ErrorCodes, ChatEvents } from '@/shared/utils'
 import { HorecaRequestDto } from '../src/horecaRequests/dto/horecaRequest.dto'
 import { ProviderRequestDto } from '../src/providerRequests/dto/providerRequest.dto'
 import { UserDto } from '../src/users/dto/user.dto'
 import { ChatDto } from '../src/chat/dto/chat.dto'
-import { ErrorCodes } from '../src/system/utils/enums/errorCodes.enum'
 import { SupportRequestDto } from '../src/supportRequests/dto/supportRequest.dto'
 
 let app: INestApplication

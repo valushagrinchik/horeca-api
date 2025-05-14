@@ -1,5 +1,5 @@
 import { ProviderRequestStatus } from '@prisma/client'
-import { ValidateEnum } from '../../system/utils/validation/validate.decotators'
+import { ValidateEnum } from '@/shared/utils'
 
 export class ProviderRequestSearchDto {
     @ValidateEnum(ProviderRequestStatus, { enum: ProviderRequestStatus, enumName: 'ProviderRequestStatus' })

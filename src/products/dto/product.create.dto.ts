@@ -1,5 +1,4 @@
-import { Categories } from '../../system/utils/enums'
-import { TypeValidate, Validate } from '../../system/utils/validation/validate.decotators'
+import { Categories, TypeValidate, Validate } from '@/shared/utils'
 
 export class ProductCreateDto {
     @Validate(TypeValidate.STRING, { enum: Categories, enumName: 'Categories' })

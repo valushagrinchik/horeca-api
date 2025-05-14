@@ -1,11 +1,9 @@
-import { PaginateValidateType } from '../../system/utils/swagger/decorators'
 import { AuthInfoDto } from '../../auth/dto/auth.info.dto'
 import { ChatMessageDto } from '../dto/chat.message.dto'
 import { ChatMessageSearchDto } from '../dto/chat.message.search.dto'
 import { ChatMessageDbService } from './chat.message.db.service'
 import { BadRequestException, forwardRef, Inject } from '@nestjs/common'
-import { ErrorDto } from '../../system/utils/dto/error.dto'
-import { ErrorCodes } from '../../system/utils/enums/errorCodes.enum'
+import { ErrorDto, ErrorCodes, PaginateValidateType } from '@/shared/utils'
 
 export class ChatMessageService {
     constructor(

@@ -6,7 +6,7 @@ import {
 } from '../test/mock/seedData'
 
 import * as dotenv from 'dotenv'
-import { generatePassword } from '../src/system/crypto'
+import { generatePassword } from '@/shared/utils'
 dotenv.config()
 
 export const runTestSeeds = async (prisma: PrismaClient) => {

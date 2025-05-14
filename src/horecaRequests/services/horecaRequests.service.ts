@@ -1,27 +1,31 @@
-import { BadRequestException, forwardRef, Inject, Injectable } from '@nestjs/common'
+import { BadRequestException, forwardRef, Inject, Injectable, Logger } from '@nestjs/common'
 import { HorecaRequestCreateDto } from '../dto/horecaRequest.create.dto'
 import { HorecaRequestDto } from '../dto/horecaRequest.dto'
 import { AuthInfoDto } from '../../auth/dto/auth.info.dto'
 import { HorecaRequestStatus, Prisma, ProviderRequestStatus, UploadsLinkType } from '@prisma/client'
-import { PaginateValidateType } from '../../system/utils/swagger/decorators'
 import { UploadsLinkService } from '../../uploads/uploads.link.service'
 import { HorecaRequestsDbService } from './horecaRequests.db.service'
 import { HorecaRequestSetStatusDto } from '../dto/horecaRequest.approveProviderRequest.dto'
 import { HorecaRequestWithProviderRequestsDto } from '../dto/horecaRequest.withProviderRequests.dto'
-import { ErrorDto } from '../../system/utils/dto/error.dto'
-import { ErrorCodes } from '../../system/utils/enums/errorCodes.enum'
+import { HorecaRequestSearchDto } from '../dto/horecaRequest.search.dto'
+import { ChatWsGateway } from '../../chat/chat.ws.gateway'
 import { NotificationWsGateway } from '../../notifications/notification.ws.gateway'
 import * as dayjs from 'dayjs'
-import { NotificationEvents } from '../../system/utils/enums/websocketEvents.enum'
-import { ChatWsGateway } from '../../chat/chat.ws.gateway'
-import { ChatServerMessages } from '../../system/utils/constants'
-import { HorecaRequestSearchDto } from '../dto/horecaRequest.search.dto'
-import { ErrorValidationCodeEnum } from '../../system/utils/validation/error.validation.code.enum'
-import { RequestsMatcherDbService } from '../../system/shared/requestsMatcher/requestsMatcher.db.service'
+import {
+    ErrorDto,
+    ErrorCodes,
+    PaginateValidateType,
+    NotificationEvents,
+    ChatServerMessages,
+    ErrorValidationCodeEnum,
+} from '@/shared/utils'
+import { RequestsMatcherDbService } from '@/shared/requestsMatcher/requestsMatcher.db.service'
 import { HorecaRequestWithActiveProviderRequestDto } from '../dto/horecaRequest.withActiveProviderRequest.dto'
 
 @Injectable()
 export class HorecaRequestsService {
+    private readonly logger = new Logger(HorecaRequestsService.name)
+
     constructor(
         private horecaRequestsRep: HorecaRequestsDbService,
         private uploadsLinkService: UploadsLinkService,
@@ -390,6 +394,7 @@ export class HorecaRequestsService {
 
     // Cron
     async pastRequests(now = dayjs().toISOString()) {
+        this.logger.log('HorecaRequestsService pastRequests')
         // CompletedUnsuccessfully
         // no provider requests untill acceptUntill passed
         // set horecaRequest.status to CompletedUnsuccessfully

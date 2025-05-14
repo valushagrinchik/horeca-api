@@ -1,5 +1,5 @@
 import { ProfileType } from '@prisma/client'
-import { Categories, DeliveryMethods, Weekday } from '../../src/system/utils/enums'
+import { Categories, DeliveryMethods, Weekday } from '@/shared/utils'
 
 export const horecaUsers = [
     {

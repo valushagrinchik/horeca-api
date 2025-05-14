@@ -1,14 +1,13 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { JwtService } from '@nestjs/jwt'
-import { ErrorDto } from '../system/utils/dto/error.dto'
-import { ErrorCodes } from '../system/utils/enums/errorCodes.enum'
+import { ErrorDto, ErrorCodes, validPassword } from '@/shared/utils'
 import { RegistrateUserDto } from './dto/registrate-user.dto'
 import { UsersService } from '../users/users.service'
 import { MailService } from '../mail/mail.service'
 import { AuthInfoDto } from '../auth/dto/auth.info.dto'
 import { LoginUserDto } from './dto/login-user.dto'
-import { validPassword } from '../system/crypto'
+
 import { ChangePasswordDto } from './dto/change-password.dto'
 
 @Injectable()

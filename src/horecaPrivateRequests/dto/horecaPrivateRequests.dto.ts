@@ -1,4 +1,4 @@
-import { Validate, TypeValidate } from '../../system/utils/validation/validate.decotators'
+import { Validate, TypeValidate } from '@/shared/utils'
 
 export class HorecaPrivateRequestDto {
     @Validate(TypeValidate.NUMBER)

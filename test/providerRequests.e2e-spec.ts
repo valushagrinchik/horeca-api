@@ -1,4 +1,4 @@
-import { INestApplication, Search } from '@nestjs/common'
+import { INestApplication } from '@nestjs/common'
 import {
     approveProviderRequest,
     authUser,
@@ -14,8 +14,7 @@ import {
 import { ENDPOINTS } from './constants'
 import { AuthResultDto } from '../src/auth/dto/auth.result.dto'
 import { horecaRequestInput, horecaRequestInput2, horecaUserInput, providerUserInput } from './mock/seedData'
-import { generateFutureDate } from '../src/system/utils/date'
-import { Categories } from '../src/system/utils/enums'
+import { generateFutureDate, Categories } from '@/shared/utils'
 import { ProviderHorecaRequestStatus } from '../src/providerRequests/dto/provider.horecaRequest.search.dto'
 
 let app: INestApplication

@@ -1,5 +1,4 @@
-import { Categories, DeliveryMethods } from '../../../system/utils/enums'
-import { TypeValidate, Validate } from '../../../system/utils/validation/validate.decotators'
+import { Categories, DeliveryMethods, TypeValidate, Validate } from '@/shared/utils'
 import { CreateProfileDto } from '../create-profile.dto'
 
 export class CreateProviderProfileDto extends CreateProfileDto {

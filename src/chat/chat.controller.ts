@@ -9,12 +9,13 @@ import {
     RequestDecorator,
     RequestPaginatedDecorator,
     RequestPaginatedValidateParamsDecorator,
-} from '../system/utils/swagger/decorators'
+    PaginatedDto,
+} from '@/shared/utils'
 import { ChatService } from './services/chat.service'
 import { ChatDto } from './dto/chat.dto'
 import { ChatCreateDto } from './dto/chat.create.dto'
 import { ChatSearchDto } from './dto/chat.search.dto'
-import { PaginatedDto } from '../system/utils/dto/paginated.dto'
+
 import {
     ChatFullDto,
     ChatProviderRequestDto,

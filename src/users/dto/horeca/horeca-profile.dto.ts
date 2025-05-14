@@ -1,6 +1,6 @@
 import { Profile, ProfileType } from '@prisma/client'
 import { Exclude, Type } from 'class-transformer'
-import { TypeValidate, Validate } from '../../../system/utils/validation/validate.decotators'
+import { TypeValidate, Validate } from '@/shared/utils'
 import { Address } from './address.dto'
 import { ValidateNested } from 'class-validator'
 import { ApiHideProperty } from '@nestjs/swagger'

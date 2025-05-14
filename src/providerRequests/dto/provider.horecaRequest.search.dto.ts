@@ -1,5 +1,4 @@
-import { Categories } from '../../system/utils/enums'
-import { ValidateEnum } from '../../system/utils/validation/validate.decotators'
+import { Categories, ValidateEnum } from '@/shared/utils'
 
 export enum ProviderHorecaRequestStatus {
     All = 'All',

@@ -8,11 +8,10 @@ import {
     ProviderRequestStatusChangedNotificationPayload,
     ReviewNotificationPayload,
 } from './dto/notification.payload.dto'
-import { RequestDecorator } from '../system/utils/swagger/decorators'
+import { RequestDecorator, SuccessDto } from '@/shared/utils'
 import { AuthUser, AuthParamDecorator } from '../auth/decorators'
 import { AuthInfoDto } from '../auth/dto/auth.info.dto'
 import { UserRole } from '@prisma/client'
-import { SuccessDto } from '../system/utils/dto/success.dto'
 
 @AuthUser(UserRole.Admin)
 @Controller('notifications')

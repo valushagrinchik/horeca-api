@@ -10,12 +10,12 @@ import {
     RequestDecorator,
     RequestPaginatedDecorator,
     RequestPaginatedValidateParamsDecorator,
-} from '../../system/utils/swagger/decorators'
+    SuccessDto,
+    PaginatedDto,
+} from '@/shared/utils'
 import { HorecaRequestsService } from '../services/horecaRequests.service'
-import { SuccessDto } from '../../system/utils/dto/success.dto'
 import { HorecaRequestSetStatusDto } from '../dto/horecaRequest.approveProviderRequest.dto'
 import { HorecaRequestWithProviderRequestsDto } from '../dto/horecaRequest.withProviderRequests.dto'
-import { PaginatedDto } from '../../system/utils/dto/paginated.dto'
 import { HorecaRequestSearchDto } from '../dto/horecaRequest.search.dto'
 import { HorecaRequestWithActiveProviderRequestDto } from '../dto/horecaRequest.withActiveProviderRequest.dto'
 

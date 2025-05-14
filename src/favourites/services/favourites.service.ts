@@ -2,10 +2,9 @@ import { Injectable } from '@nestjs/common'
 import { FavouritesDbService } from './favourites.db.service'
 import { AuthInfoDto } from '../../auth/dto/auth.info.dto'
 import { FavouritesCreateDto } from '../dto/favourites.create.dto'
-import { PaginateValidateType } from '../../system/utils/swagger/decorators'
 import { FavouritesDto, FavouritesUserDto } from '../dto/favourites.dto'
 import { NotificationWsGateway } from '../../notifications/notification.ws.gateway'
-import { NotificationEvents } from '../../system/utils/enums/websocketEvents.enum'
+import { NotificationEvents, PaginateValidateType } from '@/shared/utils'
 import { UserRole } from '@prisma/client'
 
 @Injectable()

@@ -11,8 +11,7 @@ import {
 import { ENDPOINTS } from './constants'
 import { AuthResultDto } from '../src/auth/dto/auth.result.dto'
 import { horecaRequestInput, horecaUserInput, providerUserInput } from './mock/seedData'
-import { ErrorCodes } from '../src/system/utils/enums/errorCodes.enum'
-import { Categories } from '../src/system/utils/enums'
+import { ErrorCodes, Categories } from '@/shared/utils'
 
 let app: INestApplication
 let horecaAuth: AuthResultDto

@@ -1,5 +1,5 @@
 import { PaymentType } from '@prisma/client'
-import { TypeValidate, Validate } from '../../system/utils/validation/validate.decotators'
+import { TypeValidate, Validate } from '@/shared/utils'
 import { HorecaRequestItemCreateDto } from './horecaRequest.item.create.dto'
 import { Type } from 'class-transformer'
 import { ValidateNested } from 'class-validator'

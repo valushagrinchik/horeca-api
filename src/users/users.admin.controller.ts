@@ -9,9 +9,9 @@ import {
     PaginateValidateType,
     RequestPaginatedDecorator,
     RequestPaginatedValidateParamsDecorator,
-} from '../system/utils/swagger/decorators'
+    PaginatedDto,
+} from '@/shared/utils'
 import { UsersSearchAdminDto } from './dto/usersSearch.admin.dto'
-import { PaginatedDto } from '../system/utils/dto/paginated.dto'
 
 @Controller('admin/users')
 @ApiTags('Users')

@@ -1,5 +1,5 @@
 import { ProfileType } from '@prisma/client'
-import { ValidateEnum } from '../../system/utils/validation/validate.decotators'
+import { ValidateEnum } from '@/shared/utils'
 
 export class CreateProfileDto {
     @ValidateEnum(ProfileType, { enum: ProfileType, enumName: 'ProfileType' })

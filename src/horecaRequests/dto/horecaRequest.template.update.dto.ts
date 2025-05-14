@@ -1,5 +1,5 @@
 import { HorecaRequestUpdateDto } from './horecaRequest.update.dto'
-import { Validate, TypeValidate } from '../../system/utils/validation/validate.decotators'
+import { Validate, TypeValidate } from '@/shared/utils'
 
 export class HorecaRequestTemplateUpdateDto {
     @Validate(TypeValidate.STRING)

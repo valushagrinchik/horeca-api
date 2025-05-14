@@ -14,7 +14,7 @@ import {
 } from '@prisma/client'
 import { ChatMessageDto } from './chat.message.dto'
 import { ApiProperty } from '@nestjs/swagger'
-import { TypeValidate, Validate } from '../../system/utils/validation/validate.decotators'
+import { TypeValidate, Validate } from '@/shared/utils'
 
 export class ChatProviderRequestReviewDto implements ProviderRequestReview {
     id: number

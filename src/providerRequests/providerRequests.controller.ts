@@ -8,14 +8,14 @@ import {
     RequestDecorator,
     RequestPaginatedDecorator,
     RequestPaginatedValidateParamsDecorator,
-} from '../system/utils/swagger/decorators'
+    PaginatedDto,
+    SuccessDto,
+} from '@/shared/utils'
 import { ProviderRequestsService } from './services/providerRequests.service'
 import { ProviderRequestCreateDto } from './dto/providerRequest.create.dto'
 import { ProviderRequestDto } from './dto/providerRequest.dto'
-import { SuccessDto } from '../system/utils/dto/success.dto'
 import { HorecaRequestProviderStatusDto } from './dto/horecaRequest.providerStatus.dto'
 import { ProviderHorecaRequestSearchDto } from './dto/provider.horecaRequest.search.dto'
-import { PaginatedDto } from '../system/utils/dto/paginated.dto'
 import { ProviderRequestSearchDto } from './dto/providerRequest.search.dto'
 import { IncomeHorecaRequestDto } from './dto/incomeHorecaRequest.dto'
 

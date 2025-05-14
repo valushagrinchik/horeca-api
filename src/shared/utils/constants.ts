@@ -38,3 +38,7 @@ export const DB_DATE_FORMAT = 'YYYY-MM-DD'
 export const ChatServerMessages = {
     requestCanceled: 'Одна из сторон отменила работу заказа',
 }
+
+export const QUEUES = {
+    HORECA: 'horeca-requests',
+}

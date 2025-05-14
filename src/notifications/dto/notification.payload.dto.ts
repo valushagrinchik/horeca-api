@@ -1,5 +1,5 @@
 import { HorecaRequestStatus } from '@prisma/client'
-import { TypeValidate, Validate, ValidateEnum } from '../../system/utils/validation/validate.decotators'
+import { TypeValidate, Validate, ValidateEnum } from '@/shared/utils'
 import { getSchemaPath } from '@nestjs/swagger'
 import { ValidateNested } from 'class-validator'
 

@@ -1,10 +1,9 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { RegistrateUserDto } from './dto/registrate-user.dto'
-import { ErrorDto } from '../system/utils/dto/error.dto'
-import { ErrorCodes } from '../system/utils/enums/errorCodes.enum'
+import { ErrorDto, ErrorCodes, generatePassword } from '@/shared/utils'
 import { UpdateUserDto } from './dto/update-user.dto'
 import { Address, Prisma, Profile, ProfileType, User, UserRole } from '@prisma/client'
-import { generatePassword } from '../system/crypto'
+
 import { DatabaseService } from '../system/database/database.service'
 import { CreateHorecaProfileDto } from './dto/horeca/create-horeca-profile.dto'
 import { CreateProviderProfileDto } from './dto/provider/create-provider-profile.dto'

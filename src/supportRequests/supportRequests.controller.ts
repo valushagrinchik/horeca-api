@@ -9,13 +9,13 @@ import {
     RequestDecorator,
     RequestPaginatedDecorator,
     RequestPaginatedValidateParamsDecorator,
-} from '../system/utils/swagger/decorators'
-
+    SuccessDto,
+    PaginatedDto,
+} from '@/shared/utils'
 import { AuthInfoDto } from '../auth/dto/auth.info.dto'
-import { SuccessDto } from '../system/utils/dto/success.dto'
+
 import { SupportRequestCreateDto } from './dto/supportRequest.create.dto'
 import { SupportRequestDto } from './dto/supportRequest.dto'
-import { PaginatedDto } from '../system/utils/dto/paginated.dto'
 import { SupportRequestSearchDto } from './dto/supportRequest.search.dto'
 
 @AuthUser(UserRole.Provider, UserRole.Horeca)

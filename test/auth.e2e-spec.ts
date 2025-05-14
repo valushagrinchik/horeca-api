@@ -1,6 +1,6 @@
 import { INestApplication } from '@nestjs/common'
 import { horecaUsers, providerUsers } from './mock/authData'
-import { ErrorCodes } from './../src/system/utils/enums/errorCodes.enum'
+import { ErrorCodes } from '@/shared/utils'
 import { UsersDbService } from '../src/users/users.db.service'
 import { DatabaseService } from './../src/system/database/database.service'
 import { activateUser, authUser, initApp, registrateUser } from './helpers'

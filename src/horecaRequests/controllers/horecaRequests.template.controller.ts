@@ -8,12 +8,12 @@ import {
     RequestDecorator,
     RequestPaginatedDecorator,
     RequestPaginatedValidateParamsDecorator,
-} from '../../system/utils/swagger/decorators'
+    PaginatedDto,
+    SuccessDto,
+} from '@/shared/utils'
 import { HorecaRequestTemplateCreateDto } from '../dto/horecaRequest.template.create.dto'
 import { HorecaRequestsTemplateService } from '../services/horecaRequests.template.service'
 import { AuthInfoDto } from '../../auth/dto/auth.info.dto'
-import { PaginatedDto } from '../../system/utils/dto/paginated.dto'
-import { SuccessDto } from '../../system/utils/dto/success.dto'
 import { HorecaRequestTemplateUpdateDto } from '../dto/horecaRequest.template.update.dto'
 
 @AuthUser(UserRole.Horeca)

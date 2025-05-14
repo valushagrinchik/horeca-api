@@ -1,6 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
-import { ErrorCodes } from '../system/utils/enums/errorCodes.enum'
-import { ErrorDto } from '../system/utils/dto/error.dto'
+import { ErrorCodes, ErrorDto } from '@/shared/utils'
 import { DatabaseService } from '../system/database/database.service'
 
 @Injectable()
