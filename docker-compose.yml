@@ -32,6 +32,13 @@ services:
             - POSTGRES_DB=horeca
         networks:
             - horeca_api_network
+    horeca_redis:
+        image: redis:7
+        container_name: horeca_redis
+        ports:
+            - "6379:6379"
+        networks:
+            - horeca_api_network
         
 volumes:
     horeca_api-uploads:

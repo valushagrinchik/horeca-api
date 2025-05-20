@@ -33,28 +33,16 @@ import * as expressBasicAuth from 'express-basic-auth'
         }),
         ScheduleModule.forRoot(),
 
-        BullModule.forRootAsync({
-            imports: [ConfigModule],
-            inject: [ConfigService],
-            useFactory: (configService: ConfigService) => ({
-                redis: {
-                    host: 'localhost',
-                    port: 6379,
-                },
-            }),
+        BullModule.forRoot({
+            redis: {
+                host: 'localhost',
+                port: 6379,
+            },
         }),
 
-        BullBoardModule.forRootAsync({
-            imports: [ConfigModule],
-            inject: [ConfigService],
-            useFactory: (configService: ConfigService) => ({
-                route: '/queues',
-                adapter: ExpressAdapter,
-                middleware: expressBasicAuth({
-                    challenge: true,
-                    users: { admin: configService.get('BULL_BOARD_PASSWORD') },
-                }),
-            }),
+        BullBoardModule.forRoot({
+            route: '/queues',
+            adapter: ExpressAdapter,
         }),
 
         DatabaseModule,

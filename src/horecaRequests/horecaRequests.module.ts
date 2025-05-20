@@ -14,6 +14,8 @@ import { ChatModule } from '../chat/chat.module'
 import { RequestsMatcherModule } from '@/shared/requestsMatcher/requestsMatcher.module'
 import { QUEUES } from '@/shared/utils'
 import { BullModule } from '@nestjs/bull'
+import { BullBoardModule } from '@bull-board/nestjs'
+import { BullAdapter } from "@bull-board/api/BullAdapter";
 
 @Module({
     imports: [
@@ -26,6 +28,11 @@ import { BullModule } from '@nestjs/bull'
         BullModule.registerQueue({
             name: QUEUES.HORECA,
         }),
+
+        BullBoardModule.forFeature({
+            name: QUEUES.HORECA,
+            adapter: BullAdapter,
+        }),
     ],
     controllers: [HorecaRequestsTemplateController, HorecaRequestsController],
     providers: [
@@ -37,4 +44,4 @@ import { BullModule } from '@nestjs/bull'
     ],
     exports: [HorecaRequestsService],
 })
-export class HorecaRequestsModule {}
+export class HorecaRequestsModule { }

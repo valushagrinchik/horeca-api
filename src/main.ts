@@ -1,11 +1,9 @@
 import * as process from 'node:process'
 import { HttpAdapterHost, NestFactory, Reflector } from '@nestjs/core'
 import { AppModule } from './app.module'
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 import {
     BadRequestException,
     ClassSerializerInterceptor,
-    Logger,
     ValidationError,
     ValidationPipe,
 } from '@nestjs/common'
@@ -14,6 +12,8 @@ import * as express from 'express'
 import { join } from 'node:path'
 import { ErrorDto, ErrorCodes } from '@/shared/utils'
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston'
+import { initBullDashboard } from './shared/utils/initBullDashboard'
+import { initSwaggerDoc } from './shared/utils/initSwaggerDoc'
 
 process.on('unhandledRejection', (reason, promise) => {
     console.log('Unhandled Rejection at:', promise, 'reason:', reason)
@@ -22,7 +22,6 @@ process.on('unhandledRejection', (reason, promise) => {
 async function bootstrap() {
     const app = await NestFactory.create(AppModule)
 
-    // app.useLogger(app.get(Logger))
     app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER))
     app.setGlobalPrefix('api')
     app.useGlobalPipes(
@@ -49,16 +48,12 @@ async function bootstrap() {
         allowedHeaders: 'Content-Type, Accept, Authorization',
     })
 
-    const config = new DocumentBuilder()
-        .setTitle('HoReCa API')
-        .setDescription('The API for HoReCa')
-        .setVersion('1.0')
-        .addBearerAuth()
-        .build()
-    const document = SwaggerModule.createDocument(app, config)
-    SwaggerModule.setup('doc', app, document)
+    initSwaggerDoc(app)
 
     app.use('/uploads', express.static(join(process.cwd(), 'uploads')))
+
+    initBullDashboard(app)
+
     await app.listen(process.env.PORT, () => {
         console.log(`Application is running on ${process.env.PORT}`)
     })
