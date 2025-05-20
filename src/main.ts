@@ -1,12 +1,7 @@
 import * as process from 'node:process'
 import { HttpAdapterHost, NestFactory, Reflector } from '@nestjs/core'
 import { AppModule } from './app.module'
-import {
-    BadRequestException,
-    ClassSerializerInterceptor,
-    ValidationError,
-    ValidationPipe,
-} from '@nestjs/common'
+import { BadRequestException, ClassSerializerInterceptor, ValidationError, ValidationPipe } from '@nestjs/common'
 import { ExceptionFilter } from './exception.filter'
 import * as express from 'express'
 import { join } from 'node:path'

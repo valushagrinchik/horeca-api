@@ -15,7 +15,7 @@ import { RequestsMatcherModule } from '@/shared/requestsMatcher/requestsMatcher.
 import { QUEUES } from '@/shared/utils'
 import { BullModule } from '@nestjs/bull'
 import { BullBoardModule } from '@bull-board/nestjs'
-import { BullAdapter } from "@bull-board/api/BullAdapter";
+import { BullAdapter } from '@bull-board/api/BullAdapter'
 
 @Module({
     imports: [
@@ -44,4 +44,4 @@ import { BullAdapter } from "@bull-board/api/BullAdapter";
     ],
     exports: [HorecaRequestsService],
 })
-export class HorecaRequestsModule { }
+export class HorecaRequestsModule {}
