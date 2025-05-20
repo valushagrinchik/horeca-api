@@ -1,5 +1,5 @@
 import { PaymentType, PrismaClient, ProfileType, UserRole } from '@prisma/client'
-import { generatePassword, generateFutureDate, DeliveryMethods, Categories } from '@/shared/utils'
+import { generatePassword, generateFutureDate, DeliveryMethods, Categories } from '../src/shared/utils'
 
 import * as dotenv from 'dotenv'
 dotenv.config()

@@ -175,6 +175,8 @@ describe('ProviderRequestsController (e2e)', () => {
         })
     })
     describe('POST ' + ENDPOINTS.PROVIDER_REQUESTS, () => {
+        let justCreatedHorecaRequestId
+
         it('should return just created request data', async () => {
             expect.assertions(2)
             const acceptUntill = generateFutureDate()
@@ -198,6 +200,7 @@ describe('ProviderRequestsController (e2e)', () => {
                 comment: 'string',
             })
             expect(horecaCreateRequestRes).toHaveProperty('id')
+            justCreatedHorecaRequestId = horecaCreateRequestRes.id
 
             const providerCreateRequestRes = await createProviderRequest(app, providerAuth.accessToken, {
                 horecaRequestId: horecaCreateRequestRes.id,
@@ -214,6 +217,15 @@ describe('ProviderRequestsController (e2e)', () => {
             createdProviderRequestId = providerCreateRequestRes.id
 
             expect(providerCreateRequestRes).toHaveProperty('id')
+            return
+        })
+
+        it('should exclude horeca request that provider just created request data for from income list', async () => {
+            const res = await findAllHorecaRequestForProvider(app, providerAuth.accessToken, {
+                sort: 'createdAt|asc',
+            })
+
+            expect(res.data.find(r => r.id == justCreatedHorecaRequestId)).toBe(undefined)
             return
         })
     })

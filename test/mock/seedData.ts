@@ -1,5 +1,5 @@
 import { UserRole, ProfileType, PaymentType } from '@prisma/client'
-import { DeliveryMethods, Categories, generateFutureDate, generatePassword } from '@/shared/utils'
+import { DeliveryMethods, Categories, generateFutureDate, generatePassword } from '../../src/shared/utils'
 
 export const providerUserInput = {
     email: 'provider-test2@test.com',

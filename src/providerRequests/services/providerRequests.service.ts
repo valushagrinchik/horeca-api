@@ -118,6 +118,11 @@ export class ProviderRequestsService {
                         // TODO: check date
                         gte: new Date(now),
                     },
+                    providerRequests: {
+                        none: {
+                            userId: auth.id,
+                        },
+                    },
                 },
             },
         }
