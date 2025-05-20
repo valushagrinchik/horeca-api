@@ -5,28 +5,43 @@ import { HorecaRequestTemplateDto } from '../dto/horecaRequest.template.dto'
 import { AuthInfoDto } from '../../auth/dto/auth.info.dto'
 import { HorecaRequestTemplateUpdateDto } from '../dto/horecaRequest.template.update.dto'
 import { ErrorDto, ErrorCodes, PaginateValidateType } from '@/shared/utils'
+import { UploadsLinkService } from '@/uploads/uploads.link.service'
+import { UploadsLinkType } from '@prisma/client'
 
 @Injectable()
 export class HorecaRequestsTemplateService {
-    constructor(private horecaRequestsTemplateRep: HorecaRequestsTemplateDbService) {}
+    constructor(
+        private horecaRequestsTemplateRep: HorecaRequestsTemplateDbService,
+        private uploadsLinkService: UploadsLinkService
+    ) {}
 
     async create(auth: AuthInfoDto, { name, content }: HorecaRequestTemplateCreateDto) {
-        const proposalTemplate = await this.horecaRequestsTemplateRep.create({
+        const template = await this.horecaRequestsTemplateRep.create({
             user: {
                 connect: { id: auth.id },
             },
             name,
             content: JSON.stringify(content),
         })
-        return new HorecaRequestTemplateDto(proposalTemplate)
+        if (content.imageIds.length) {
+            await this.uploadsLinkService.createMany(
+                UploadsLinkType.HorecaRequestTemplate,
+                template.id,
+                content.imageIds
+            )
+        }
+        return new HorecaRequestTemplateDto(template)
     }
 
     async find(auth: AuthInfoDto, id: number) {
-        const proposalTemplate = await this.horecaRequestsTemplateRep.find({ id, userId: auth.id })
-        if (!proposalTemplate) {
+        const template = await this.horecaRequestsTemplateRep.find({ id, userId: auth.id })
+        if (!template) {
             throw new BadRequestException(new ErrorDto(ErrorCodes.TEMPLATE_DOES_NOT_EXISTS))
         }
-        return new HorecaRequestTemplateDto(proposalTemplate)
+
+        const images = await this.uploadsLinkService.getImages(UploadsLinkType.HorecaRequestTemplate, [template.id])
+
+        return new HorecaRequestTemplateDto({ ...template, images: images[template.id] })
     }
 
     async findAllAndCount(

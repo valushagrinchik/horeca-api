@@ -5,7 +5,7 @@ import { UploadDto } from './dto/upload.dto'
 
 @Injectable()
 export class UploadsLinkService {
-    constructor(private prisma: DatabaseService) {}
+    constructor(private prisma: DatabaseService) { }
 
     async getImages(sourceType: UploadsLinkType, sourceIds: number[]): Promise<Record<string, UploadDto[]>> {
         const images = await this.prisma.uploadsLink.findMany({

@@ -22,6 +22,7 @@ enum ProfileType {
 enum UploadsLinkType {
   ProviderRequestItem
   HorecaRequest
+  HorecaRequestTemplate
   Product
   Profile
 }

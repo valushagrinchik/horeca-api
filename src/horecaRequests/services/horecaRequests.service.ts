@@ -79,7 +79,7 @@ export class HorecaRequestsService {
             categories: [...new Set(dto.items.map(item => item.category))],
         })
 
-        if (imageIds) {
+        if (imageIds.length) {
             await this.uploadsLinkService.createMany(UploadsLinkType.HorecaRequest, horecaRequest.id, imageIds)
         }
 
