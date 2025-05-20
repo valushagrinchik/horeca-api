@@ -10,5 +10,6 @@ export class ReviewCreateDto {
     isDelivered: number
     @Validate(TypeValidate.NUMBER, { enum: YesNoEnum })
     isSuccessfully: number
+    @Validate(TypeValidate.NUMBER)
     providerRequestId: number
 }
