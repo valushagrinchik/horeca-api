@@ -108,6 +108,10 @@ export class ProviderRequestsService {
                                     {
                                         horecaRequestProviderStatus: {
                                             hidden: false,
+                                        },
+                                    },
+                                    {
+                                        horecaRequestProviderStatus: {
                                             viewed: false,
                                         },
                                     },
