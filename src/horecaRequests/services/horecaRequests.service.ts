@@ -79,7 +79,7 @@ export class HorecaRequestsService {
             categories: [...new Set(dto.items.map(item => item.category))],
         })
 
-        if (imageIds.length) {
+        if (imageIds?.length) {
             await this.uploadsLinkService.createMany(UploadsLinkType.HorecaRequest, horecaRequest.id, imageIds)
         }
 
@@ -318,6 +318,7 @@ export class HorecaRequestsService {
                 },
             })
         }
+        return firstReviewNotificationRequests
     }
 
     async sendSecondReviewNotification() {
@@ -331,113 +332,64 @@ export class HorecaRequestsService {
                 },
             })
         }
+        return secondReviewNotificationRequests
     }
 
-    async validateRequestsOnReview() {
-        // TODO: Argument `where` of type HorecaRequestWhereUniqueInput needs at least one of `id` arguments.
+    async handleRequestsOnReviewToComplete() {
         // 12 hours after second notification
         const hours84Ago = dayjs().add(-3, 'day').toDate()
-        await this.horecaRequestsRep.update({
-            where: {
-                status: HorecaRequestStatus.Active,
-                deliveryTime: { lt: hours84Ago },
-                providerRequests: {
-                    some: {
-                        OR: [
-                            {
-                                status: ProviderRequestStatus.Finished,
-                                providerRequestReview: {
-                                    is: null,
-                                },
-                            },
-                            {
-                                status: ProviderRequestStatus.Finished,
-                                providerRequestReview: {
-                                    isDelivered: 1,
-                                    isSuccessfully: 1,
-                                },
-                            },
-                        ],
-                    },
-                },
-            } as Prisma.HorecaRequestWhereUniqueInput,
-            data: {
-                status: HorecaRequestStatus.CompletedSuccessfully,
-            },
-        })
 
-        await this.horecaRequestsRep.update({
-            where: {
-                status: HorecaRequestStatus.Active,
-                deliveryTime: { lt: hours84Ago },
-                providerRequests: {
-                    some: {
-                        status: ProviderRequestStatus.Finished,
-                        providerRequestReview: {
-                            OR: [
-                                {
-                                    isDelivered: 0,
-                                },
-                                {
-                                    isSuccessfully: 1,
-                                },
-                            ],
-                        },
-                    },
+        const completedSuccessfullyRequests =
+            await this.horecaRequestsRep.findAllForReviewToCompleteSuccessfully(hours84Ago)
+        const completedUnsuccessfullyRequests =
+            await this.horecaRequestsRep.findAllForReviewToCompleteUnsuccessfully(hours84Ago)
+
+        const completedSuccessfullyRequestsPromises = completedSuccessfullyRequests.map(hr =>
+            this.horecaRequestsRep.update({
+                where: { id: hr.id },
+                data: {
+                    status: HorecaRequestStatus.CompletedSuccessfully,
                 },
-            } as Prisma.HorecaRequestWhereUniqueInput,
-            data: {
-                status: HorecaRequestStatus.CompletedUnsuccessfully,
-            },
-        })
+            })
+        )
+
+        const completedUnsuccessfullyRequestsPromises = completedUnsuccessfullyRequests.map(hr =>
+            this.horecaRequestsRep.update({
+                where: { id: hr.id },
+                data: {
+                    status: HorecaRequestStatus.CompletedUnsuccessfully,
+                },
+            })
+        )
+
+        return Promise.all(completedSuccessfullyRequestsPromises.concat(completedUnsuccessfullyRequestsPromises))
     }
 
-    // Cron
     async pastRequests(now = dayjs().toISOString()) {
-        this.logger.log('HorecaRequestsService pastRequests')
-        // CompletedUnsuccessfully
+        this.logger.log('Handling horeca past requests')
         // no provider requests untill acceptUntill passed
-        // set horecaRequest.status to CompletedUnsuccessfully
-        await this.horecaRequestsRep.pastHorecaRequestsWithoutProviderOnes(now)
+        const acceptUntillPassedRequests = await this.horecaRequestsRep.handleCompletedUnsuccessfully(now)
+        const acceptUntillPassedRequestsIds = acceptUntillPassedRequests.map(r => r.id)
 
-        // No сhosen provider request until deliveryTime passed
-        // set horecaRequest.status to CompletedUnsuccessfully
-        // set providerRequest.status to Canceled
-        await this.horecaRequestsRep.pastHorecaRequestsSetStatuses(
-            HorecaRequestStatus.Pending,
-            HorecaRequestStatus.CompletedUnsuccessfully,
-            ProviderRequestStatus.Pending,
-            ProviderRequestStatus.Canceled,
-            now
-        )
+        // deliveryTime passed
+        const deliveryTimePassedRequests = await this.horecaRequestsRep.handlePastNotCompletedRequests(now)
+        const deliveryTimePassedRequestsIds = deliveryTimePassedRequests.map(r => r.id)
 
-        // Chosen provider request, deliveryTime passed
-        // set horecaRequest.status to Finished
-        // set providerRequest.status to Finished for chosen one and Canceled for others
-        await this.horecaRequestsRep.pastHorecaRequestsSetStatuses(
-            HorecaRequestStatus.Active,
-            HorecaRequestStatus.Active,
-            ProviderRequestStatus.Active,
-            ProviderRequestStatus.Finished,
-            now
-        )
-        await this.horecaRequestsRep.pastHorecaRequestsSetStatuses(
-            HorecaRequestStatus.Active,
-            HorecaRequestStatus.Active,
-            ProviderRequestStatus.Pending,
-            ProviderRequestStatus.Canceled,
-            now
-        )
-        return true
+        return {
+            acceptUntillPassedRequests: acceptUntillPassedRequestsIds,
+            deliveryTimePassedRequests: deliveryTimePassedRequestsIds,
+        }
     }
 
     async sendReviewNotification() {
-        await this.sendFirstReviewNotification()
+        const requestsForFirstNotification = await this.sendFirstReviewNotification()
+        const requestsForSecondNotification = await this.sendSecondReviewNotification()
+        const requestsToComplete = await this.handleRequestsOnReviewToComplete()
 
-        await this.sendSecondReviewNotification()
-
-        await this.validateRequestsOnReview()
-
-        return true
+        return {
+            requestsForFirstNotification: requestsForFirstNotification.map(r => r.id),
+            requestsForSecondNotification: requestsForSecondNotification.map(r => r.id),
+            requestsToComplete: requestsToComplete.map(r => r.id),
+        }
     }
 }

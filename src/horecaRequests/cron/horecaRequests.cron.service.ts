@@ -5,11 +5,11 @@ import { InjectQueue } from '@nestjs/bull'
 import { QUEUES } from '@/shared/utils'
 @Injectable()
 export class HorecaRequestsCronService {
-    constructor(@InjectQueue(QUEUES.HORECA) private queue: Queue) {}
+    constructor(@InjectQueue(QUEUES.HORECA) private hQueue: Queue) {}
 
     @Cron(CronExpression.EVERY_HOUR)
     async processTasks(): Promise<void> {
-        this.queue.add('pastRequests', {})
-        this.queue.add('sendReviewNotification', {})
+        this.hQueue.add('pastRequests', {})
+        this.hQueue.add('sendReviewNotification', {})
     }
 }

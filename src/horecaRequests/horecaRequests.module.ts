@@ -16,6 +16,7 @@ import { QUEUES } from '@/shared/utils'
 import { BullModule } from '@nestjs/bull'
 import { BullBoardModule } from '@bull-board/nestjs'
 import { BullAdapter } from '@bull-board/api/dist/src/queueAdapters/bull'
+import { HorecaRequestsConsumerService } from './cron/horecaRequests.consumer.service'
 
 @Module({
     imports: [
@@ -41,6 +42,7 @@ import { BullAdapter } from '@bull-board/api/dist/src/queueAdapters/bull'
         HorecaRequestsService,
         HorecaRequestsTemplateService,
         HorecaRequestsCronService,
+        HorecaRequestsConsumerService,
     ],
     exports: [HorecaRequestsService],
 })

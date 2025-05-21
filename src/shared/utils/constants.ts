@@ -1,3 +1,4 @@
+import { HorecaRequestStatus, ProviderRequestStatus } from '@prisma/client'
 import { Categories, DeliveryMethods } from './enums'
 
 export const CategoryLabels: Record<Categories, string> = {
@@ -41,4 +42,12 @@ export const ChatServerMessages = {
 
 export const QUEUES = {
     HORECA: 'horeca-requests',
+    PROVIDER: 'provider-requests',
 }
+
+export const horecaRequestsStatusMap = new Map()
+horecaRequestsStatusMap.set(HorecaRequestStatus.Pending, HorecaRequestStatus.CompletedUnsuccessfully)
+
+export const providerRequestsStatusMap = new Map()
+providerRequestsStatusMap.set(ProviderRequestStatus.Pending, ProviderRequestStatus.Canceled)
+providerRequestsStatusMap.set(ProviderRequestStatus.Active, ProviderRequestStatus.Finished)

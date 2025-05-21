@@ -23,7 +23,7 @@ export class HorecaRequestsTemplateService {
             name,
             content: JSON.stringify(content),
         })
-        if (content.imageIds.length) {
+        if (content.imageIds?.length) {
             await this.uploadsLinkService.createMany(
                 UploadsLinkType.HorecaRequestTemplate,
                 template.id,

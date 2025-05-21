@@ -3,6 +3,7 @@ import { DatabaseService } from '@/system/database/database.service'
 import { HorecaRequestStatus, Prisma, ProviderRequestStatus } from '@prisma/client'
 import { HorecaRequestSetStatusDto } from '../dto/horecaRequest.approveProviderRequest.dto'
 import * as dayjs from 'dayjs'
+import { horecaRequestsStatusMap, providerRequestsStatusMap } from '@/shared/utils'
 
 @Injectable()
 export class HorecaRequestsDbService {
@@ -120,7 +121,41 @@ export class HorecaRequestsDbService {
         })
     }
 
-    pastHorecaRequestsWithoutProviderOnes = async (now = dayjs().toISOString()) => {
+    handlePastNotCompletedRequests = async (now = dayjs().toISOString()) => {
+        const pastRequests = await this.db.horecaRequest.findMany({
+            where: {
+                deliveryTime: { lte: now },
+                status: {
+                    in: [HorecaRequestStatus.Active, HorecaRequestStatus.Pending],
+                },
+            },
+            include: {
+                providerRequests: true,
+            },
+        })
+        const promises = pastRequests.map(record =>
+            this.db.horecaRequest.update({
+                where: { id: record.id },
+                data: {
+                    status: horecaRequestsStatusMap.get(record.status) || record.status,
+                    providerRequests: {
+                        updateMany: record.providerRequests.map(pRequest => ({
+                            where: {
+                                id: pRequest.id,
+                            },
+                            data: {
+                                status: providerRequestsStatusMap.get(pRequest.status) || pRequest.status,
+                            },
+                        })),
+                    },
+                },
+            })
+        )
+
+        return Promise.all(promises)
+    }
+
+    handleCompletedUnsuccessfully = async (now = dayjs().toISOString()) => {
         const withoutProviderRequests = await this.db.horecaRequest.findMany({
             where: {
                 acceptUntill: { lte: now },
@@ -142,51 +177,7 @@ export class HorecaRequestsDbService {
             })
         )
 
-        await Promise.all(promises)
-        return withoutProviderRequests
-    }
-
-    async pastHorecaRequestsSetStatuses(
-        hrStatusFrom: HorecaRequestStatus,
-        hrStatusTo: HorecaRequestStatus,
-        prStatusFrom: ProviderRequestStatus,
-        prStatusTo: ProviderRequestStatus,
-        now = dayjs().toISOString()
-    ) {
-        const data = await this.db.horecaRequest.findMany({
-            where: {
-                deliveryTime: { lte: now },
-                status: hrStatusFrom,
-            },
-            include: {
-                providerRequests: {
-                    where: {
-                        status: prStatusFrom,
-                    },
-                },
-            },
-        })
-
-        const promises = data.map(record =>
-            this.db.horecaRequest.update({
-                where: { id: record.id },
-                data: {
-                    status: hrStatusTo,
-                    providerRequests: {
-                        updateMany: record.providerRequests.map(pRequest => ({
-                            where: {
-                                id: pRequest.id,
-                            },
-                            data: {
-                                status: prStatusTo,
-                            },
-                        })),
-                    },
-                },
-            })
-        )
-
-        await Promise.all(promises)
+        return Promise.all(promises)
     }
 
     async findAllForReview() {
@@ -230,6 +221,58 @@ export class HorecaRequestsDbService {
                 providerRequests: {
                     where: {
                         status: ProviderRequestStatus.Finished,
+                    },
+                },
+            },
+        })
+    }
+
+    async findAllForReviewToCompleteSuccessfully(hours84Ago: Date) {
+        return this.db.horecaRequest.findMany({
+            where: {
+                status: HorecaRequestStatus.Active,
+                deliveryTime: { lt: hours84Ago },
+                providerRequests: {
+                    some: {
+                        OR: [
+                            {
+                                status: ProviderRequestStatus.Finished,
+                                providerRequestReview: {
+                                    is: null,
+                                },
+                            },
+                            {
+                                status: ProviderRequestStatus.Finished,
+                                providerRequestReview: {
+                                    isDelivered: 1,
+                                    isSuccessfully: 1,
+                                },
+                            },
+                        ],
+                    },
+                },
+            },
+        })
+    }
+
+    async findAllForReviewToCompleteUnsuccessfully(hours84Ago: Date) {
+        return this.db.horecaRequest.findMany({
+            where: {
+                status: HorecaRequestStatus.Active,
+                deliveryTime: { lt: hours84Ago },
+                providerRequests: {
+                    some: {
+                        status: ProviderRequestStatus.Finished,
+                        providerRequestReview: {
+                            OR: [
+                                {
+                                    isDelivered: 0,
+                                },
+                                {
+                                    isSuccessfully: 1,
+                                },
+                            ],
+                        },
                     },
                 },
             },

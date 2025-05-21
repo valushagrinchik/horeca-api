@@ -110,11 +110,6 @@ export class ProviderRequestsService {
                                             hidden: false,
                                         },
                                     },
-                                    {
-                                        horecaRequestProviderStatus: {
-                                            viewed: false,
-                                        },
-                                    },
                                 ],
                             }
                           : {}),

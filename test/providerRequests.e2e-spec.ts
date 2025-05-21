@@ -150,6 +150,7 @@ describe('ProviderRequestsController (e2e)', () => {
                 search: { status: ProviderHorecaRequestStatus.Hidden },
             })
             const allRes2 = await findAllHorecaRequestForProvider(app, providerAuth.accessToken)
+
             expect(actualRes2.data.length).toBe(actualRes.data.length - 1)
             expect(hiddenRes2.data.length).toBe(1)
             expect(allRes2.data.length).toBe(2)
