@@ -33,11 +33,15 @@ import * as expressBasicAuth from 'express-basic-auth'
         }),
         ScheduleModule.forRoot(),
 
-        BullModule.forRoot({
-            redis: {
-                host: 'localhost',
-                port: 6379,
-            },
+        BullModule.forRootAsync({
+            imports: [ConfigModule],
+            inject: [ConfigService],
+            useFactory: (configService: ConfigService) => ({
+                redis: {
+                    host: configService.get<string>('REDIS_HOST'),
+                    port: configService.get<number>('REDIS_PORT'),
+                },
+            }),
         }),
 
         BullBoardModule.forRoot({
