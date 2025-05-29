@@ -49,7 +49,7 @@ async function bootstrap() {
 
     initBullDashboard(app)
 
-    await app.listen(process.env.PORT, () => {
+    await app.listen(process.env.PORT, '0.0.0.0', () => {
         console.log(`Application is running on ${process.env.PORT}`)
     })
 }
