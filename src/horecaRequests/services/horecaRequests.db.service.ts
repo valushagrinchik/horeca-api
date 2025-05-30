@@ -126,7 +126,7 @@ export class HorecaRequestsDbService {
             where: {
                 deliveryTime: { lte: now },
                 status: {
-                    in: [HorecaRequestStatus.Active, HorecaRequestStatus.Pending],
+                    in: [HorecaRequestStatus.Active],
                 },
             },
             include: {
@@ -137,6 +137,7 @@ export class HorecaRequestsDbService {
             this.db.horecaRequest.update({
                 where: { id: record.id },
                 data: {
+                    // Active -> Active
                     status: horecaRequestsStatusMap.get(record.status) || record.status,
                     providerRequests: {
                         updateMany: record.providerRequests.map(pRequest => ({
@@ -144,6 +145,7 @@ export class HorecaRequestsDbService {
                                 id: pRequest.id,
                             },
                             data: {
+                                // Pending -> Canceled, Active -> Finished
                                 status: providerRequestsStatusMap.get(pRequest.status) || pRequest.status,
                             },
                         })),
@@ -160,12 +162,12 @@ export class HorecaRequestsDbService {
         const withoutProviderRequests = await this.db.horecaRequest.findMany({
             where: {
                 acceptUntill: { lte: now },
-                providerRequests: {
-                    none: {},
-                },
                 status: {
                     in: [HorecaRequestStatus.Pending],
                 },
+            },
+            include: {
+                providerRequests: true,
             },
         })
 
@@ -173,7 +175,19 @@ export class HorecaRequestsDbService {
             this.db.horecaRequest.update({
                 where: { id: record.id },
                 data: {
-                    status: HorecaRequestStatus.CompletedUnsuccessfully,
+                    // Pending -> CompletedUnsuccessfully
+                    status: horecaRequestsStatusMap.get(record.status) || record.status,
+                    providerRequests: {
+                        updateMany: record.providerRequests.map(pRequest => ({
+                            where: {
+                                id: pRequest.id,
+                            },
+                            data: {
+                                // Pending -> Canceled
+                                status: providerRequestsStatusMap.get(pRequest.status) || pRequest.status,
+                            },
+                        })),
+                    },
                 },
             })
         )
@@ -242,15 +256,14 @@ export class HorecaRequestsDbService {
                 deliveryTime: { lt: hours84Ago },
                 providerRequests: {
                     some: {
+                        status: ProviderRequestStatus.Finished,
                         OR: [
                             {
-                                status: ProviderRequestStatus.Finished,
                                 providerRequestReview: {
                                     is: null,
                                 },
                             },
                             {
-                                status: ProviderRequestStatus.Finished,
                                 providerRequestReview: {
                                     isDelivered: 1,
                                     isSuccessfully: 1,
@@ -268,21 +281,32 @@ export class HorecaRequestsDbService {
             where: {
                 status: HorecaRequestStatus.Active,
                 deliveryTime: { lt: hours84Ago },
-                providerRequests: {
-                    some: {
-                        status: ProviderRequestStatus.Finished,
-                        providerRequestReview: {
-                            OR: [
-                                {
-                                    isDelivered: 0,
+                OR: [
+                    {
+                        providerRequests: {
+                            some: {
+                                status: ProviderRequestStatus.Finished,
+                                providerRequestReview: {
+                                    OR: [
+                                        {
+                                            isDelivered: 0,
+                                        },
+                                        {
+                                            isSuccessfully: 1,
+                                        },
+                                    ],
                                 },
-                                {
-                                    isSuccessfully: 1,
-                                },
-                            ],
+                            },
                         },
                     },
-                },
+                    {
+                        providerRequests: {
+                            none: {
+                                status: ProviderRequestStatus.Finished,
+                            },
+                        },
+                    },
+                ],
             },
         })
     }

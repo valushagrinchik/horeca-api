@@ -362,7 +362,10 @@ export class HorecaRequestsService {
             })
         )
 
-        return Promise.all(completedSuccessfullyRequestsPromises.concat(completedUnsuccessfullyRequestsPromises))
+        const promises = completedSuccessfullyRequestsPromises.concat(completedUnsuccessfullyRequestsPromises)
+        return Promise.allSettled(promises).then(results => {
+            return results.filter(res => res.status === 'fulfilled').map(res => res.value.id)
+        })
     }
 
     async pastRequests(now = dayjs().toISOString()) {
@@ -382,12 +385,12 @@ export class HorecaRequestsService {
     async sendReviewNotification() {
         const requestsForFirstNotification = await this.sendFirstReviewNotification()
         const requestsForSecondNotification = await this.sendSecondReviewNotification()
-        const requestsToComplete = await this.handleRequestsOnReviewToComplete()
+        const completedRequestsIds = await this.handleRequestsOnReviewToComplete()
 
         return {
             requestsForFirstNotification: requestsForFirstNotification.map(r => r.id),
             requestsForSecondNotification: requestsForSecondNotification.map(r => r.id),
-            requestsToComplete: requestsToComplete.map(r => r.id),
+            requestsToComplete: completedRequestsIds.sort().toString(),
         }
     }
 }
