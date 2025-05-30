@@ -191,6 +191,11 @@ export class HorecaRequestsDbService {
                 status: HorecaRequestStatus.Active,
                 reviewNotificationSent: false,
                 deliveryTime: { lt: hours24Ago },
+                providerRequests: {
+                    some: {
+                        status: ProviderRequestStatus.Finished,
+                    },
+                },
             },
             include: {
                 providerRequests: {
