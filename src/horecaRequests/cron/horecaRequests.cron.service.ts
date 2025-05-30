@@ -7,7 +7,8 @@ import { QUEUES } from '@/shared/utils'
 export class HorecaRequestsCronService {
     constructor(@InjectQueue(QUEUES.HORECA) private hQueue: Queue) {}
 
-    @Cron(CronExpression.EVERY_HOUR)
+    // @Cron(CronExpression.EVERY_HOUR)
+    @Cron(CronExpression.EVERY_5_MINUTES)
     async processTasks(): Promise<void> {
         this.hQueue.add('pastRequests', {})
         this.hQueue.add('sendReviewNotification', {})
