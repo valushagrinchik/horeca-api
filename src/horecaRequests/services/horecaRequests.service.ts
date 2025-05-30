@@ -368,16 +368,14 @@ export class HorecaRequestsService {
     async pastRequests(now = dayjs().toISOString()) {
         this.logger.log('Handling horeca past requests')
         // no provider requests untill acceptUntill passed
-        const acceptUntillPassedRequests = await this.horecaRequestsRep.handleCompletedUnsuccessfully(now)
-        const acceptUntillPassedRequestsIds = acceptUntillPassedRequests.map(r => r.id)
+        const acceptUntillPassedRequestsIds = await this.horecaRequestsRep.handleCompletedUnsuccessfully(now)
 
         // deliveryTime passed
-        const deliveryTimePassedRequests = await this.horecaRequestsRep.handlePastNotCompletedRequests(now)
-        const deliveryTimePassedRequestsIds = deliveryTimePassedRequests.map(r => r.id)
+        const deliveryTimePassedRequestsIds = await this.horecaRequestsRep.handlePastNotCompletedRequests(now)
 
         return {
-            acceptUntillPassedRequests: acceptUntillPassedRequestsIds,
-            deliveryTimePassedRequests: deliveryTimePassedRequestsIds,
+            acceptUntillPassedRequests: acceptUntillPassedRequestsIds.sort().toString(),
+            deliveryTimePassedRequests: deliveryTimePassedRequestsIds.sort().toString(),
         }
     }
 

@@ -151,8 +151,9 @@ export class HorecaRequestsDbService {
                 },
             })
         )
-
-        return Promise.all(promises)
+        return Promise.allSettled(promises).then(results => {
+            return results.filter(res => res.status === 'fulfilled').map(res => res.value.id)
+        })
     }
 
     handleCompletedUnsuccessfully = async (now = dayjs().toISOString()) => {
@@ -177,7 +178,9 @@ export class HorecaRequestsDbService {
             })
         )
 
-        return Promise.all(promises)
+        return Promise.allSettled(promises).then(results => {
+            return results.filter(res => res.status === 'fulfilled').map(res => res.value.id)
+        })
     }
 
     async findAllForReview() {
