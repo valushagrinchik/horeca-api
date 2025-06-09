@@ -100,7 +100,7 @@ export class HorecaRequestWithProviderRequestsDto extends HorecaRequestDto {
                             ...pR.user,
                             avatar: (providerProfilesImage[pR.user.profile?.id] || [])[0],
                         },
-                        cover: pR.items.length / h.items.length,
+                        cover: Math.round((pR.items.length / h.items.length) * 100),
                     },
                     providerRequestsImages
                 )
