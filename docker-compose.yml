@@ -25,7 +25,7 @@ services:
             - ./db_scripts:/docker-entrypoint-initdb.d
             - ~/docker-volumes/horeca_postgres-data:/var/lib/postgresql/data
         ports:
-            - '5432:5432'
+            - '127.0.0.1:5432:5432'
         environment:
             - POSTGRES_USER=horeca
             - POSTGRES_PASSWORD=horeca
@@ -36,7 +36,7 @@ services:
         image: redis:7
         container_name: horeca_redis
         ports:
-            - "6379:6379"
+            - "127.0.0.1:6379:6379"
         networks:
             - horeca_api_network
         
