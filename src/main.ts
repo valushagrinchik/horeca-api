@@ -32,8 +32,14 @@ async function bootstrap() {
                     new ErrorDto(
                         ErrorCodes.VALIDATION_ERROR,
                         errors
-                            .filter(e => !!e.constraints)
-                            .map(e => Object.values(e.constraints))
+                            .map(e =>
+                                e.constraints
+                                    ? Object.values(e.constraints).join(', ')
+                                    : e.children
+                                          .map(child => Object.values(child.constraints))
+                                          .flat()
+                                          .join(', ')
+                            )
                             .flat()
                     )
                 )
