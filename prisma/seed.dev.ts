@@ -105,7 +105,7 @@ export const runDevSeeds = async (prisma: PrismaClient) => {
             description: 'beer',
             producer: 'OOO cool beer',
             cost: 5000,
-            count: 200,
+            count: '200',
             packagingType: "Bottle"
         },
     })

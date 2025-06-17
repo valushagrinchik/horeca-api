@@ -11,7 +11,7 @@ export class ProductDto extends SourceWithUploads implements Product {
     description: string
     producer: string
     cost: number
-    count: number
+    count: string
     packagingType: string | null
     createdAt: Date
     updatedAt: Date

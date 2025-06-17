@@ -11,8 +11,8 @@ export class ProductCreateDto {
     producer: string
     @Validate(TypeValidate.NUMBER)
     cost: number
-    @Validate(TypeValidate.NUMBER)
-    count: number
+    @Validate(TypeValidate.STRING)
+    count: string
     @Validate(TypeValidate.STRING)
     packagingType: string
     @Validate(TypeValidate.ARRAY)
