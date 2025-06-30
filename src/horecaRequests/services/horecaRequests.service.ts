@@ -142,7 +142,9 @@ export class HorecaRequestsService {
                       include: {
                           providerRequests: {
                               where: {
-                                  status: ProviderRequestStatus.Active,
+                                  status: {
+                                      in: [ProviderRequestStatus.Active, ProviderRequestStatus.Finished],
+                                  },
                               },
                           },
                       },
