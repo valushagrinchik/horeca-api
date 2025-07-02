@@ -2,8 +2,8 @@ import { PrismaClient } from '@prisma/client'
 import { parseArgs } from 'node:util'
 import { runTestSeeds } from './seed.test'
 import { runDevSeeds } from './seed.dev'
-import * as dotenv from 'dotenv'
 
+import * as dotenv from 'dotenv'
 dotenv.config()
 
 const options = {

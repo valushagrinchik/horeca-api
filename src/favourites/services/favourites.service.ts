@@ -4,14 +4,16 @@ import { AuthInfoDto } from '../../auth/dto/auth.info.dto'
 import { FavouritesCreateDto } from '../dto/favourites.create.dto'
 import { FavouritesDto, FavouritesUserDto } from '../dto/favourites.dto'
 import { NotificationWsGateway } from '../../notifications/notification.ws.gateway'
-import { NotificationEvents, PaginateValidateType } from '@/shared/utils'
-import { UserRole } from '@prisma/client'
+import { NotificationEvents, PaginateValidateType, ProviderUserDto } from '@/shared/utils'
+import { UploadsLinkType, UserRole } from '@prisma/client'
+import { UploadsLinkService } from '@/uploads/uploads.link.service'
 
 @Injectable()
 export class FavouritesService {
     constructor(
         private readonly favsRep: FavouritesDbService,
-        private notificationWsGateway: NotificationWsGateway
+        private notificationWsGateway: NotificationWsGateway,
+        private uploadsLinkService: UploadsLinkService
     ) {}
 
     async create(auth: AuthInfoDto, dto: FavouritesCreateDto) {
@@ -45,9 +47,14 @@ export class FavouritesService {
         const where = auth.role == UserRole.Horeca ? { userId: auth.id } : { providerId: auth.id }
         const data = await this.favsRep.findAll({
             where,
-            include: {
+            select: {
+                userId: true,
+                providerId: true,
+                chatId: true,
+                createdAt: true,
+                updatedAt: true,
                 user: { select: { name: true } },
-                provider: { select: { name: true } },
+                provider: { select: { profile: { select: { id: true, categories: true } }, rating: true, name: true } },
             },
             orderBy: {
                 createdAt: 'desc',
@@ -58,13 +65,21 @@ export class FavouritesService {
         })
         const total = await this.favsRep.count({ where })
 
+        const providerProfilesImage = await this.uploadsLinkService.getImages(
+            UploadsLinkType.Profile,
+            data.map(f => (f as any).provider.profile?.id).filter(el => !!el)
+        )
+
         return [
             data.map(
                 (f: any) =>
                     new FavouritesDto({
                         ...f,
                         user: new FavouritesUserDto(f.user),
-                        provider: new FavouritesUserDto(f.provider),
+                        provider: new ProviderUserDto({
+                            ...f.provider,
+                            avatar: (providerProfilesImage[f.provider.profile?.id] || [])[0],
+                        }),
                     })
             ),
             total,

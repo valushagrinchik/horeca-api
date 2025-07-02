@@ -2,7 +2,7 @@ import { Exclude, Type } from 'class-transformer'
 import { HorecaRequestDto } from './horecaRequest.dto'
 import { SourceWithUploads, UploadDto } from '../../uploads/dto/upload.dto'
 import { ValidateNested } from 'class-validator'
-import { TypeValidate, Validate } from '@/shared/utils'
+import { ProviderUserDto, TypeValidate, Validate } from '@/shared/utils'
 import {
     HorecaRequest,
     HorecaRequestItem,
@@ -12,21 +12,6 @@ import {
     ProviderRequestStatus,
 } from '@prisma/client'
 import { ApiHideProperty } from '@nestjs/swagger'
-
-export class IncomeProviderUserDto {
-    name: string
-
-    rating: number
-
-    @Validate(TypeValidate.OBJECT, { required: false })
-    @ValidateNested()
-    @Type(() => UploadDto)
-    avatar?: UploadDto
-
-    constructor(partial: Partial<IncomeProviderUserDto & { avatar?: UploadDto }>) {
-        Object.assign(this, partial)
-    }
-}
 
 export class IncomeProviderRequestItemDto extends SourceWithUploads implements ProviderRequestItem {
     id: number
@@ -63,10 +48,10 @@ export class IncomeProviderRequestDto implements ProviderRequest {
     items: IncomeProviderRequestItemDto[]
 
     cover: number
-    user: IncomeProviderUserDto
+    user: ProviderUserDto
 
     constructor(
-        p: Partial<ProviderRequest & { items: ProviderRequestItem[]; cover: number; user: IncomeProviderUserDto }>,
+        p: Partial<ProviderRequest & { items: ProviderRequestItem[]; cover: number; user: ProviderUserDto }>,
         providerRequestItemsImages: Record<string, UploadDto[]>
     ) {
         Object.assign(this, p)

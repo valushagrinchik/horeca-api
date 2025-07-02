@@ -1,3 +1,4 @@
+import { ProviderUserDto } from '@/shared/utils'
 import { HorecaFavourites } from '@prisma/client'
 
 export class FavouritesUserDto {
@@ -14,9 +15,9 @@ export class FavouritesDto implements HorecaFavourites {
     createdAt: Date
     updatedAt: Date
     user: FavouritesUserDto
-    provider: FavouritesUserDto
+    provider: ProviderUserDto
 
-    constructor(partial: Partial<HorecaFavourites & { user: FavouritesUserDto; provider: FavouritesUserDto }>) {
+    constructor(partial: Partial<HorecaFavourites & { user: FavouritesUserDto; provider: ProviderUserDto }>) {
         Object.assign(this, partial)
     }
 }
