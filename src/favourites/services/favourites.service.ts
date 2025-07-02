@@ -72,13 +72,14 @@ export class FavouritesService {
 
         return [
             data.map(
-                (f: any) =>
+                ({ provider: { profile, ...providerData }, ...favData }: any) =>
                     new FavouritesDto({
-                        ...f,
-                        user: new FavouritesUserDto(f.user),
+                        ...favData,
+                        user: new FavouritesUserDto(favData.user),
                         provider: new ProviderUserDto({
-                            ...f.provider,
-                            avatar: (providerProfilesImage[f.provider.profile?.id] || [])[0],
+                            ...providerData,
+                            categories: profile.categories,
+                            avatar: (providerProfilesImage[profile?.id] || [])[0],
                         }),
                     })
             ),
