@@ -9,9 +9,6 @@ export class ProviderUserDto {
 
     rating: number
 
-    @Exclude()
-    password: string
-
     @Validate(TypeValidate.OBJECT, { required: false })
     @ValidateNested()
     @Type(() => UploadDto)
