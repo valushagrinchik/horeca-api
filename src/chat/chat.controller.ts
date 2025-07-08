@@ -31,7 +31,7 @@ import { UserDto } from '../users/dto/user.dto'
 @Controller('chats')
 @ApiTags('Chats')
 export class ChatsController {
-    constructor(private readonly service: ChatService) { }
+    constructor(private readonly service: ChatService) {}
 
     @Post()
     @RequestDecorator(ChatDto, ChatCreateDto)
@@ -76,18 +76,18 @@ export class ChatsController {
             ),
             ...(chat.providerRequest
                 ? {
-                    providerRequest: new ChatProviderRequestDto({
-                        ...chat.providerRequest,
-                        horecaRequest: new ChatHorecaRequestDto(chat.providerRequest.horecaRequest),
-                        ...(chat.providerRequest.providerRequestReview
-                            ? {
-                                providerRequestReview: new ChatProviderRequestReviewDto(
-                                    chat.providerRequest.providerRequestReview
-                                ),
-                            }
-                            : {}),
-                    }),
-                }
+                      providerRequest: new ChatProviderRequestDto({
+                          ...chat.providerRequest,
+                          horecaRequest: new ChatHorecaRequestDto(chat.providerRequest.horecaRequest),
+                          ...(chat.providerRequest.providerRequestReview
+                              ? {
+                                    providerRequestReview: new ChatProviderRequestReviewDto(
+                                        chat.providerRequest.providerRequestReview
+                                    ),
+                                }
+                              : {}),
+                      }),
+                  }
                 : {}),
             ...(chat.horecaFavourites ? { horecaFavourites: new ChatHorecaFavouritesDto(chat.horecaFavourites) } : {}),
             ...(chat.supportRequest ? { supportRequest: new ChatSupportRequestDto(chat.supportRequest) } : {}),

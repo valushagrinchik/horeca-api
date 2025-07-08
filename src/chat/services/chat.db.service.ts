@@ -120,12 +120,20 @@ export class ChatDbService {
         paginate: PaginateValidateType<ChatSearchDto>
     ): Promise<[ChatDto[], number]> {
         const search = paginate.search || { type: ChatType.Order }
-        const where: Prisma.ChatWhereInput = {
-            opponents: {
-                has: opponentId,
-            },
-            type: search.type,
-        }
+        const where: Prisma.ChatWhereInput = search.chatParticipantId
+            ? // Private and Order chats between user and horeca/provider respectively
+              {
+                  opponents: { hasEvery: [opponentId, +search.chatParticipantId] },
+                  type: { in: [ChatType.Order, ChatType.Private] },
+              }
+            : // user's Support chats
+              {
+                  opponents: {
+                      has: opponentId,
+                  },
+                  type: search.type,
+              }
+
         const data = await this.db.chat.findMany({
             where,
             orderBy: {
