@@ -1,9 +1,18 @@
-import { ProviderUserDto } from '@/shared/utils'
+import { ProviderUserDto, Validate, TypeValidate } from '@/shared/utils'
+import { UploadDto } from '@/uploads/dto/upload.dto'
 import { HorecaFavourites } from '@prisma/client'
+import { Type } from 'class-transformer'
+import { ValidateNested } from 'class-validator'
 
 export class FavouritesUserDto {
     name: string
-    constructor(partial: Partial<FavouritesUserDto>) {
+
+    @Validate(TypeValidate.OBJECT, { required: false })
+    @ValidateNested()
+    @Type(() => UploadDto)
+    avatar?: UploadDto
+
+    constructor(partial: Partial<FavouritesUserDto> & { avatar?: UploadDto }) {
         Object.assign(this, partial)
     }
 }

@@ -53,7 +53,7 @@ export class FavouritesService {
                 chatId: true,
                 createdAt: true,
                 updatedAt: true,
-                user: { select: { name: true } },
+                user: { select: { name: true, profile: { select: { id: true } } } },
                 provider: { select: { profile: { select: { id: true, categories: true } }, rating: true, name: true } },
             },
             orderBy: {
@@ -65,21 +65,30 @@ export class FavouritesService {
         })
         const total = await this.favsRep.count({ where })
 
-        const providerProfilesImage = await this.uploadsLinkService.getImages(
-            UploadsLinkType.Profile,
-            data.map(f => (f as any).provider.profile?.id).filter(el => !!el)
-        )
+        const profilesIds = [
+            ...data.map(f => (f as any).user.profile?.id),
+            ...data.map(f => (f as any).provider.profile?.id),
+        ].filter(el => !!el)
+
+        const profilesImages = await this.uploadsLinkService.getImages(UploadsLinkType.Profile, profilesIds)
 
         return [
             data.map(
-                ({ provider: { profile, ...providerData }, ...favData }: any) =>
+                ({
+                    provider: { profile: providerProfile, ...providerData },
+                    user: { profile: userProfile, ...userData },
+                    ...favData
+                }: any) =>
                     new FavouritesDto({
                         ...favData,
-                        user: new FavouritesUserDto(favData.user),
+                        user: new FavouritesUserDto({
+                            ...userData,
+                            avatar: (profilesImages[userProfile?.id] || [])[0],
+                        }),
                         provider: new ProviderUserDto({
                             ...providerData,
-                            categories: profile.categories,
-                            avatar: (providerProfilesImage[profile?.id] || [])[0],
+                            categories: providerProfile.categories,
+                            avatar: (profilesImages[providerProfile?.id] || [])[0],
                         }),
                     })
             ),

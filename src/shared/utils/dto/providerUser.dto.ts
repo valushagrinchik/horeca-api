@@ -1,8 +1,7 @@
 import { UploadDto } from '../../../uploads/dto/upload.dto'
-import { Exclude, Type } from 'class-transformer'
+import { Type } from 'class-transformer'
 import { ValidateNested } from 'class-validator'
 import { Validate, TypeValidate } from '../validation/validate.decotators'
-import { $Enums, User } from '@prisma/client'
 
 export class ProviderUserDto {
     name: string
