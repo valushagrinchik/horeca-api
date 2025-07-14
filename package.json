@@ -21,9 +21,8 @@
         "test:watch": "jest --watch",
         "test:cov": "jest --coverage",
         "test:docker:restart": "pnpm exec docker compose -f docker-compose.test.yml down && pnpm exec docker compose -f docker-compose.test.yml up -d",
-        "test:db:seed": "dotenvx run -f .env.test -- pnpm exec prisma db seed -- --environment test",
-        "test:db:migrate": "dotenvx run -f .env.test -- pnpm migration:run:prod",
-        "test:db:prepare": "pnpm test:docker:restart && pnpm test:db:migrate && pnpm test:db:seed",
+        "test:db:reset": "dotenv -e .env.test -- sh -c 'NODE_ENV=test npx prisma migrate reset'",
+        "test:db:prepare": "pnpm test:docker:restart && pnpm test:db:reset",
         "test": "pnpm test:db:prepare && dotenvx run -f .env.test -- jest -i",
         "test:e2e": "pnpm test:db:prepare && dotenvx run -f .env.test -- jest --config ./test/jest-e2e.json --runInBand"
     },

@@ -1,22 +1,14 @@
 import { PrismaClient } from '@prisma/client'
-import { parseArgs } from 'node:util'
 import { runTestSeeds } from './seed.test'
 import { runDevSeeds } from './seed.dev'
 
+const envFile = process.env.NODE_ENV === 'test' ? '.env.test' : '.env';
 import * as dotenv from 'dotenv'
-dotenv.config()
-
-const options = {
-    environment: { type: 'string' as 'string' },
-}
+dotenv.config({ path: envFile });
 
 const prisma = new PrismaClient()
 async function main() {
-    const {
-        values: { environment },
-    } = parseArgs({ options })
-
-    switch (environment) {
+    switch (process.env.NODE_ENV) {
         case 'test':
             await runTestSeeds(prisma)
             break

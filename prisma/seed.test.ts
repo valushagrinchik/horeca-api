@@ -5,9 +5,7 @@ import {
     adminUserInput,
 } from '../test/mock/seedData'
 
-import * as dotenv from 'dotenv'
 import { generatePassword } from '../src/shared/utils'
-dotenv.config()
 
 export const runTestSeeds = async (prisma: PrismaClient) => {
     const horeca = await prisma.user.create({

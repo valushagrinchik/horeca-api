@@ -1,5 +1,4 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common'
-import { ChatWsGateway } from '../chat/chat.ws.gateway'
+import { Injectable } from '@nestjs/common'
 import { HorecaRequestsService } from '../horecaRequests/services/horecaRequests.service'
 import { ProviderRequestsService } from '../providerRequests/services/providerRequests.service'
 import { AuthInfoDto } from '../auth/dto/auth.info.dto'

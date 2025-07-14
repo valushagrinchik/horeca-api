@@ -3,9 +3,11 @@ import { OnGatewayConnection, OnGatewayDisconnect, WebSocketServer } from '@nest
 import { Server, Socket } from 'socket.io'
 
 import { ConfigService } from '@nestjs/config'
-import { OnModuleInit } from '@nestjs/common'
+import { Logger, OnModuleInit } from '@nestjs/common'
 
 export class WsGateway<E, P> implements OnModuleInit, OnGatewayConnection, OnGatewayDisconnect {
+    private readonly logger = new Logger(this.constructor.name)
+
     @WebSocketServer() server: Server
     protected clients: { userId: number; client: Socket }[] = []
 
@@ -32,9 +34,11 @@ export class WsGateway<E, P> implements OnModuleInit, OnGatewayConnection, OnGat
                 })
                 this.clients.push({ userId: payload.id, client })
             } else {
+                this.logger.error('No handshake auth')
                 client.disconnect()
             }
         } catch (error) {
+            this.logger.error(error)
             client.disconnect()
         }
     }

@@ -20,7 +20,6 @@ import { HorecaRequestTemplateUpdateDto } from '../src/horecaRequests/dto/horeca
 import { io, Socket } from 'socket.io-client'
 import { SupportRequestCreateDto } from '../src/supportRequests/dto/supportRequest.create.dto'
 import { SupportRequestSearchDto } from '../src/supportRequests/dto/supportRequest.search.dto'
-import { ProviderHorecaRequestSearchDto } from '../src/providerRequests/dto/provider.horecaRequest.search.dto'
 
 export const ioClient = (namespace: string, accessToken: string): Socket => {
     return io(process.env.WS_URL + namespace, {

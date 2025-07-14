@@ -1,9 +1,6 @@
 import { PaymentType, PrismaClient, ProfileType, UserRole } from '@prisma/client'
 import { generatePassword, generateFutureDate, DeliveryMethods, Categories } from '../src/shared/utils'
 
-import * as dotenv from 'dotenv'
-dotenv.config()
-
 export const runDevSeeds = async (prisma: PrismaClient) => {
     const horeca = await prisma.user.upsert({
         where: { email: 'horeca@test.com' },
