@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { RegistrateUserDto } from './dto/registrate-user.dto'
 import { AuthInfoDto } from '../auth/dto/auth.info.dto'
-import { ErrorDto, ErrorCodes, PaginateValidateType } from '@/shared/utils'
+import { ErrorDto, ErrorCodes, PaginateValidateType, generatePassword } from '@/shared/utils'
 import { UpdateUserDto } from './dto/update-user.dto'
 import { UserDto } from './dto/user.dto'
 import { Prisma, ProfileType, UploadsLinkType } from '@prisma/client'
@@ -33,7 +33,9 @@ export class UsersService {
         if (!user) {
             throw new BadRequestException(new ErrorDto(ErrorCodes.ACTIVATION_LINK_ERROR))
         }
-        user = await this.usersRep.updateUser(user.id, { password: dto.password })
+        user = await this.usersRep.updateUser(user.id, {
+            password: generatePassword(dto.password),
+        })
         return user
     }
 

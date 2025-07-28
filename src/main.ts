@@ -12,17 +12,14 @@ import { initSwaggerDoc } from './shared/utils/initSwaggerDoc'
 
 const extractErrorMessage = (e: ValidationError) => {
     if (e.constraints) {
-        return Object.values(e.constraints).join(', ');
+        return Object.values(e.constraints).join(', ')
     }
 
     if (e.children?.length) {
-        return e.children
-            .map(extractErrorMessage)
-            .filter(Boolean)
-            .join(', ');
+        return e.children.map(extractErrorMessage).filter(Boolean).join(', ')
     }
 
-    return '';
+    return ''
 }
 
 process.on('unhandledRejection', (reason, promise) => {
@@ -43,10 +40,8 @@ async function bootstrap() {
             whitelist: true,
             // forbidNonWhitelisted: true, //when true - throws exception if not mentioned in dto props exist
             exceptionFactory: (errors: ValidationError[]) => {
-                const messages = errors.map(extractErrorMessage).filter(Boolean);
-                return new BadRequestException(
-                    new ErrorDto(ErrorCodes.VALIDATION_ERROR, messages)
-                );
+                const messages = errors.map(extractErrorMessage).filter(Boolean)
+                return new BadRequestException(new ErrorDto(ErrorCodes.VALIDATION_ERROR, messages))
             },
         })
     )
