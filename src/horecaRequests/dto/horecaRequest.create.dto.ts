@@ -6,7 +6,7 @@ import { ValidateNested } from 'class-validator'
 
 export class HorecaRequestCreateDto {
     @Validate(TypeValidate.ARRAY, { minItems: 1 })
-    @ValidateNested()
+    @ValidateNested({ each: true })
     @Type(() => HorecaRequestItemCreateDto)
     items: HorecaRequestItemCreateDto[]
 

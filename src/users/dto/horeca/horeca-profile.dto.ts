@@ -19,7 +19,7 @@ export class HorecaProfileDto implements Profile {
     info: string
 
     @Validate(TypeValidate.ARRAY, { minItems: 1 })
-    @ValidateNested()
+    @ValidateNested({ each: true })
     @Type(() => Address)
     addresses: Address[]
 

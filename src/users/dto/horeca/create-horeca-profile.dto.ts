@@ -9,7 +9,7 @@ export class CreateHorecaProfileDto extends CreateProfileDto {
     info: string
 
     @Validate(TypeValidate.ARRAY, { minItems: 1 })
-    @ValidateNested()
+    @ValidateNested({ each: true })
     @Type(() => Address)
     addresses: Address[]
 }

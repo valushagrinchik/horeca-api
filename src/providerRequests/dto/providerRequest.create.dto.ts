@@ -11,7 +11,7 @@ export class ProviderRequestCreateDto {
     comment: string
 
     @Validate(TypeValidate.ARRAY, { minItems: 1 })
-    @ValidateNested()
+    @ValidateNested({ each: true })
     @Type(() => ProviderRequestItemCreateDto)
     items: ProviderRequestItemCreateDto[]
 }
