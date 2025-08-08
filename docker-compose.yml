@@ -41,6 +41,7 @@ services:
             - horeca_api_network
         
 volumes:
+    horeca_api-logs:
     horeca_api-uploads:
     horeca_postgres-data:
 
