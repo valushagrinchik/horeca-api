@@ -2,7 +2,7 @@ import { ValidateIf } from 'class-validator'
 import { TypeValidate, Validate, Weekday } from '@/shared/utils'
 
 export class Address {
-    @Validate(TypeValidate.STRING, { required: false })
+    @Validate(TypeValidate.NUMBER, { required: false })
     id?: number
 
     @Validate(TypeValidate.STRING)
