@@ -124,12 +124,17 @@ export class UsersDbService {
                                     .filter(a => a.id && existingAddresses.includes(a.id))
                                     .map(address => {
                                         return {
-                                            address: address.address,
-                                            ...address.weekdays.reduce((prev, weekday) => {
-                                                prev[weekday + 'From'] = address[weekday + 'From']
-                                                prev[weekday + 'To'] = address[weekday + 'To']
-                                                return prev
-                                            }, {}),
+                                            where: {
+                                                id: address.id,
+                                            },
+                                            data: {
+                                                address: address.address,
+                                                ...address.weekdays.reduce((prev, weekday) => {
+                                                    prev[weekday + 'From'] = address[weekday + 'From']
+                                                    prev[weekday + 'To'] = address[weekday + 'To']
+                                                    return prev
+                                                }, {}),
+                                            },
                                         }
                                     }) as unknown as Prisma.AddressUpdateWithWhereUniqueWithoutProfileInput[],
                                 create: addresses
