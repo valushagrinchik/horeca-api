@@ -20,6 +20,10 @@ export class UsersService {
         private uploadsLinkService: UploadsLinkService
     ) {}
 
+    async isUserExist(email: string) {
+        return this.usersRep.getUserByEmail(email)
+    }
+
     async create(dto: RegistrateUserDto) {
         const user = await this.usersRep.createUser(dto)
         if (dto.profile.profileType == ProfileType.Provider) {

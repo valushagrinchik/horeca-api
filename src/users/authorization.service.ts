@@ -23,6 +23,12 @@ export class AuthorizationService {
         if (!dto.GDPRApproved) {
             throw new BadRequestException(new ErrorDto(ErrorCodes.GDPR_IS_NOT_APPROVED))
         }
+
+        const existed = await this.userService.isUserExist(dto.email)
+        if (existed) {
+            throw new BadRequestException(new ErrorDto(ErrorCodes.USER_ALREADY_EXISTS))
+        }
+
         const user = await this.userService.create(dto)
 
         await this.mailService?.sendActivationMail({
