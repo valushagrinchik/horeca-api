@@ -11,7 +11,7 @@ services:
         ports:
             - '127.0.0.1:3001:3001'
             - '127.0.0.1:4001:4001'
-        restart: always
+        restart: unless-stopped
         depends_on:
             - horeca_ps
         networks:
@@ -20,7 +20,7 @@ services:
     horeca_ps:
         container_name: horeca_ps
         image: postgres:14
-        restart: always
+        restart: unless-stopped
         volumes:
             - ./db_scripts:/docker-entrypoint-initdb.d
             - ~/docker-volumes/horeca_postgres-data:/var/lib/postgresql/data
@@ -37,6 +37,7 @@ services:
         container_name: horeca_redis
         ports:
             - "127.0.0.1:6379:6379"
+        restart: unless-stopped
         networks:
             - horeca_api_network
         
