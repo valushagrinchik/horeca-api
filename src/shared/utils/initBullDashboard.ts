@@ -1,5 +1,5 @@
 import { createBullBoard } from '@bull-board/api'
-import { BullAdapter } from '@bull-board/api/dist/src/queueAdapters/bull'
+import { BullAdapter } from '@bull-board/api/bullAdapter'
 import { ExpressAdapter } from '@bull-board/express'
 import { getQueueToken } from '@nestjs/bull'
 import { INestApplication } from '@nestjs/common'
