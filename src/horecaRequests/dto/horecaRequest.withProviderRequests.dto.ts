@@ -2,7 +2,7 @@ import { Exclude, Type } from 'class-transformer'
 import { HorecaRequestDto } from './horecaRequest.dto'
 import { SourceWithUploads, UploadDto } from '../../uploads/dto/upload.dto'
 import { ValidateNested } from 'class-validator'
-import { ProviderUserDto, TypeValidate, Validate } from '@/shared/utils'
+import { ProviderUserDto } from '@/shared/utils'
 import {
     HorecaRequest,
     HorecaRequestItem,
@@ -48,6 +48,9 @@ export class IncomeProviderRequestDto implements ProviderRequest {
     items: IncomeProviderRequestItemDto[]
 
     cover: number
+
+    @ValidateNested()
+    @Type(() => ProviderUserDto)
     user: ProviderUserDto
 
     constructor(

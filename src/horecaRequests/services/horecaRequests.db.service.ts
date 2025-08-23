@@ -32,7 +32,7 @@ export class HorecaRequestsDbService {
             providerRequests: {
                 include: {
                     items: true,
-                    user: { select: { profile: { select: { id: true } }, rating: true, name: true } },
+                    user: { select: { id: true, profile: { select: { id: true } }, rating: true, name: true } },
                 },
             },
         }
