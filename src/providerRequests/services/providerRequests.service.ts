@@ -38,7 +38,7 @@ export class ProviderRequestsService {
         private horecaRequestProviderStatusRep: HorecaRequestProviderStatusDbService,
         private notificationWsGateway: NotificationWsGateway,
         private requestsMatcherService: RequestsMatcherDbService
-    ) {}
+    ) { }
 
     async validate(auth: AuthInfoDto, id: number) {
         const pRequest = await this.providerRequestsRep.getRawById(auth.id, id)
@@ -95,12 +95,12 @@ export class ProviderRequestsService {
                     status: HorecaRequestStatus.Pending,
                     ...(status == ProviderHorecaRequestStatus.Hidden
                         ? {
-                              horecaRequestProviderStatus: {
-                                  OR: [{ hidden: true }, { viewed: true }],
-                              },
-                          }
+                            horecaRequestProviderStatus: {
+                                OR: [{ hidden: true }, { viewed: true }],
+                            },
+                        }
                         : status == ProviderHorecaRequestStatus.Actual
-                          ? {
+                            ? {
                                 OR: [
                                     {
                                         horecaRequestProviderStatus: { is: null },
@@ -112,7 +112,7 @@ export class ProviderRequestsService {
                                     },
                                 ],
                             }
-                          : {}),
+                            : {}),
                     acceptUntill: {
                         // TODO: check date
                         gte: new Date(now),
@@ -194,7 +194,7 @@ export class ProviderRequestsService {
                 )
         )
 
-        this.notificationWsGateway.sendNotification(horecaRequest.userId, NotificationEvents.PROVIDER_REQUEST_CREATED, {
+        this.notificationWsGateway.sendNotification(horecaRequest.userId, NotificationEvents.NEW_PROVIDER_REQUEST, {
             data: {
                 hRequestId: horecaRequest.id,
                 pRequestId: providerRequest.id,

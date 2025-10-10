@@ -18,9 +18,12 @@ import {
     NotificationEvents,
     ChatServerMessages,
     ErrorValidationCodeEnum,
+    QUEUES,
 } from '@/shared/utils'
-import { RequestsMatcherDbService } from '@/shared/requestsMatcher/requestsMatcher.db.service'
 import { HorecaRequestWithActiveProviderRequestDto } from '../dto/horecaRequest.withActiveProviderRequest.dto'
+import { InjectQueue } from '@nestjs/bull'
+import { Queue } from 'bull'
+import { UsersService } from '@/users/users.service'
 
 @Injectable()
 export class HorecaRequestsService {
@@ -30,10 +33,11 @@ export class HorecaRequestsService {
         private horecaRequestsRep: HorecaRequestsDbService,
         private uploadsLinkService: UploadsLinkService,
         private notificationWsGateway: NotificationWsGateway,
-        private requestsMatcherService: RequestsMatcherDbService,
+        private usersService: UsersService,
+        @InjectQueue(QUEUES.HORECA) private hQueue: Queue,
         @Inject(forwardRef(() => ChatWsGateway))
         private chatWsGateway: ChatWsGateway
-    ) {}
+    ) { }
 
     async validate(auth: AuthInfoDto, id: number) {
         const horecaRequest = await this.horecaRequestsRep.getRawById(id)
@@ -83,10 +87,26 @@ export class HorecaRequestsService {
             await this.uploadsLinkService.createMany(UploadsLinkType.HorecaRequest, horecaRequest.id, imageIds)
         }
 
-        // TO update provider - horeca requests covering view
-        this.requestsMatcherService.updateView()
+        this.hQueue.add('updateProviderHorecaRequestsCoverView', {})
+        this.hQueue.add('sendNotificationToAllMatchedProviders', { data: { horecaRequestId: horecaRequest.id } })
 
         return this.get(horecaRequest.id, { items: true })
+    }
+
+
+    async sendNotificationToAllMatchedProviders(horecaRequestId: number) {
+        const horecaRequest = await this.horecaRequestsRep.getRawById(horecaRequestId)
+        const providers = await this.usersService.getProvidersWithIntersectionProfileCategories(horecaRequest.categories as string[])
+
+        console.log(providers,'providers')
+        await Promise.all(providers.map(provider => {
+            this.notificationWsGateway.sendNotification(provider.id, NotificationEvents.NEW_HORECA_REQUEST, {
+                data: {
+                    hRequestId: horecaRequestId,
+                    hProviderId: provider.id
+                },
+            })
+        }))
     }
 
     async get(id: number, include: Prisma.HorecaRequestInclude) {
@@ -139,16 +159,16 @@ export class HorecaRequestsService {
             where,
             ...(status == HorecaRequestStatus.Active
                 ? {
-                      include: {
-                          providerRequests: {
-                              where: {
-                                  status: {
-                                      in: [ProviderRequestStatus.Active, ProviderRequestStatus.Finished],
-                                  },
-                              },
-                          },
-                      },
-                  }
+                    include: {
+                        providerRequests: {
+                            where: {
+                                status: {
+                                    in: [ProviderRequestStatus.Active, ProviderRequestStatus.Finished],
+                                },
+                            },
+                        },
+                    },
+                }
                 : {}),
             orderBy: {
                 createdAt: 'desc',
@@ -218,7 +238,7 @@ export class HorecaRequestsService {
         if (notification) {
             this.notificationWsGateway.sendNotification(
                 dto.providerRequestId,
-                NotificationEvents.PROVIDER_REQUEST_STATUS_CHANGED,
+                NotificationEvents.PROVIDER_APPROVED,
                 {
                     data: {
                         pRequestId: dto.providerRequestId,
@@ -237,33 +257,6 @@ export class HorecaRequestsService {
             chatId: horecaRequest.providerRequests[0].chatId,
             message: ChatServerMessages.requestCanceled,
         })
-        if (byHoreca) {
-            this.notificationWsGateway.sendNotification(
-                // to provider
-                horecaRequest.providerRequests[0].userId,
-                NotificationEvents.PROVIDER_REQUEST_STATUS_CHANGED,
-                {
-                    data: {
-                        pRequestId: dto.providerRequestId,
-                        hRequestId: dto.horecaRequestId,
-                        status: horecaRequest.providerRequests[0].status,
-                    },
-                }
-            )
-        } else {
-            // Notification to horeca only if request was active before
-            this.notificationWsGateway.sendNotification(
-                horecaRequest.userId,
-                NotificationEvents.PROVIDER_REQUEST_STATUS_CHANGED,
-                {
-                    data: {
-                        pRequestId: dto.providerRequestId,
-                        hRequestId: dto.horecaRequestId,
-                        status: horecaRequest.providerRequests[0].status,
-                    },
-                }
-            )
-        }
     }
 
     async cancel(id: number) {
@@ -277,26 +270,24 @@ export class HorecaRequestsService {
             },
         })
         await this.horecaRequestsRep.cancel(id)
-        ;(horecaRequest.providerRequests || []).map(providerRequest => {
-            if (providerRequest.status == ProviderRequestStatus.Active) {
+
+            ; (horecaRequest.providerRequests || []).filter(providerRequest => providerRequest.status == ProviderRequestStatus.Active).map((providerRequest, index) => {
+                if (index == 0) {
+                    // send message to horeca
+                    this.chatWsGateway.sendServerMessage({
+                        chatId: providerRequest.chatId,
+                        message: ChatServerMessages.requestCanceled,
+                        opponents: [horecaRequest.userId]
+                    });
+                }
+
+                // send message to all associated providers
                 this.chatWsGateway.sendServerMessage({
                     chatId: providerRequest.chatId,
                     message: ChatServerMessages.requestCanceled,
-                })
-            }
-
-            this.notificationWsGateway.sendNotification(
-                horecaRequest.userId,
-                NotificationEvents.PROVIDER_REQUEST_STATUS_CHANGED,
-                {
-                    data: {
-                        pRequestId: providerRequest.id,
-                        hRequestId: horecaRequest.id,
-                        status: ProviderRequestStatus.Canceled,
-                    },
-                }
-            )
-        })
+                    opponents: [providerRequest.userId]
+                });
+            })
     }
 
     // To render review block on the ui request to get review required and in case no review ws listen for notification
@@ -308,6 +299,11 @@ export class HorecaRequestsService {
                 data: {
                     hRequestId: request.id,
                     pRequestId: request.providerRequests[0].id,
+                    chatId: request.providerRequests[0].chatId,
+                },
+            })
+            this.notificationWsGateway.sendNotification(request.userId, NotificationEvents.NEW_MESSAGE, {
+                data: {
                     chatId: request.providerRequests[0].chatId,
                 },
             })
@@ -325,7 +321,8 @@ export class HorecaRequestsService {
 
     async sendSecondReviewNotification() {
         const secondReviewNotificationRequests = await this.horecaRequestsRep.findAllForReviewSecondNotification()
-        for (const request of secondReviewNotificationRequests) {
+
+        secondReviewNotificationRequests.map(request => {
             this.notificationWsGateway.sendNotification(request.userId, NotificationEvents.REVIEW_REMINDER, {
                 data: {
                     hRequestId: request.id,
@@ -333,7 +330,13 @@ export class HorecaRequestsService {
                     chatId: request.providerRequests[0].chatId,
                 },
             })
-        }
+            this.notificationWsGateway.sendNotification(request.userId, NotificationEvents.NEW_MESSAGE, {
+                data: {
+                    chatId: request.providerRequests[0].chatId,
+                },
+            })
+        })
+
         return secondReviewNotificationRequests
     }
 

@@ -36,7 +36,7 @@ services:
         image: redis:7
         container_name: horeca_redis
         ports:
-            - "127.0.0.1:6379:6379"
+            - "127.0.0.1:6380:6379"
         restart: unless-stopped
         networks:
             - horeca_api_network

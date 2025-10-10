@@ -3,13 +3,12 @@ import { UsersModule } from '../users/users.module'
 import { FavouritesController } from './favourites.controller'
 import { FavouritesService } from './services/favourites.service'
 import { FavouritesDbService } from './services/favourites.db.service'
-import { NotificationModule } from '../notifications/notification.module'
 import { UploadsModule } from '@/uploads/uploads.module'
 
 @Module({
-    imports: [UsersModule, NotificationModule, UploadsModule],
+    imports: [UsersModule, UploadsModule],
     controllers: [FavouritesController],
     providers: [FavouritesDbService, FavouritesService],
     exports: [FavouritesService],
 })
-export class FavouritesModule {}
+export class FavouritesModule { }

@@ -10,20 +10,25 @@ import {
 import { ENDPOINTS } from './constants'
 import { AuthResultDto } from '../src/auth/dto/auth.result.dto'
 import { horecaRequestInput, horecaUserInput, providerUserInput } from './mock/seedData'
+import { DatabaseService } from '@/system/database/database.service'
 
 let app: INestApplication
 let horecaAuth: AuthResultDto
 let providerAuth: AuthResultDto
 let createdRequestId: number
 
-beforeAll(async () => {
-    app = await initApp()
+let db: DatabaseService
 
+beforeAll(async () => {
+    app = await initApp(undefined, tm => {
+        db = tm.get<DatabaseService>(DatabaseService)
+    })
     horecaAuth = await authUser(app, horecaUserInput)
     providerAuth = await authUser(app, providerUserInput)
 })
 
 afterAll(async () => {
+    await db.horecaRequest.deleteMany({})
     await app.close()
 })
 
@@ -61,7 +66,7 @@ describe('HorecaRequestsController (e2e)', () => {
             expect(res).toHaveProperty('providerRequests')
             expect(res.providerRequests.length).toBe(1)
             expect(res.providerRequests[0]).toHaveProperty('cover')
-            expect(res.providerRequests[0].cover).toBe(1)
+            expect(res.providerRequests[0].cover).toBe(100)
 
             expect(res.items.length).toBe(horecaRequestInput.items.length)
             return

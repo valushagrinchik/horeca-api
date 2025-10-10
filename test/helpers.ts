@@ -292,7 +292,7 @@ export const getChat = async (app: INestApplication, accessToken: string, id: nu
 
 export const getChatMessages = async (app: INestApplication, accessToken: string, id: number) => {
     return request(app.getHttpServer())
-        .get(ENDPOINTS.CHAT_MESSAGES + '?chatId=' + id)
+        .get(ENDPOINTS.CHAT_MESSAGES + '?search%5BchatId%5D=' + id)
         .set('Authorization', 'Bearer ' + accessToken)
         .then(res => res.body)
 }

@@ -1,10 +1,12 @@
 import { Injectable } from '@nestjs/common'
 import { DatabaseService } from '../../system/database/database.service'
-import { HorecaRequest, HorecaRequestItem, HorecaRequestProviderStatus, Prisma } from '@prisma/client'
+import { HorecaRequest, HorecaRequestItem, HorecaRequestProviderStatus, Prisma, ProfileType } from '@prisma/client'
 
 @Injectable()
 export class RequestsMatcherDbService {
-    constructor(private db: DatabaseService) {}
+    constructor(
+        private db: DatabaseService
+    ) { }
 
     updateView = async () => {
         await this.db.$queryRaw`REFRESH MATERIALIZED VIEW CONCURRENTLY provider_horeca_requests_cover_view;`

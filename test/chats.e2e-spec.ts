@@ -143,36 +143,111 @@ describe('ChatWsGateway (e2e)', () => {
                 const horecaWsClient = ioClient('chats', horecaAuth.accessToken)
                 const providerWsClient = ioClient('chats', providerAuth.accessToken)
 
-                horecaWsClient.connect()
-                providerWsClient.connect()
-
                 expect.assertions(2)
 
-                return new Promise<void>(resolve => {
-                    providerWsClient.on(ChatEvents.MESSAGE, data => {
-                        const res = expect(data.message).toBe('Hello!')
+                return new Promise<void>((resolve, reject) => {
+                    let horecaConnected = false
+                    let providerConnected = false
+                    let conversationStarted = false
+
+                    const timeout = setTimeout(() => {
                         horecaWsClient.disconnect()
                         providerWsClient.disconnect()
-                        return resolve(res)
+                        reject(new Error('Test timeout: WebSocket communication failed'))
+                    }, 15000)
+
+                    const startConversation = () => {
+                        if (horecaConnected && providerConnected && !conversationStarted) {
+                            conversationStarted = true
+                            setTimeout(() => {
+                                providerWsClient.emit(ChatEvents.MESSAGE, {
+                                    chatId: chat.id,
+                                    message: 'Hi!',
+                                    authorId: provider.id,
+                                })
+                            }, 100)
+                        }
+                    }
+
+                    horecaWsClient.on('connect', () => {
+                        console.log('Horeca connected to order chat')
+                        horecaConnected = true
+                        startConversation()
                     })
 
-                    providerWsClient.emit(ChatEvents.MESSAGE, {
-                        chatId: chat.id,
-                        message: 'Hi!',
-                        authorId: provider.id,
+                    providerWsClient.on('connect', () => {
+                        console.log('Provider connected to order chat')
+                        providerConnected = true
+                        startConversation()
+                    })
+
+                    providerWsClient.on(ChatEvents.MESSAGE, data => {
+                        console.log('Provider received order message:', data.message)
+                        try {
+                            expect(data.message).toBe('Hello!')
+                            clearTimeout(timeout)
+                            horecaWsClient.disconnect()
+                            providerWsClient.disconnect()
+                            resolve()
+                        } catch (error) {
+                            clearTimeout(timeout)
+                            horecaWsClient.disconnect()
+                            providerWsClient.disconnect()
+                            reject(error)
+                        }
                     })
 
                     horecaWsClient.on(ChatEvents.MESSAGE, data => {
-                        expect(data.message).toBe('Hi!')
-
-                        horecaWsClient.emit(ChatEvents.MESSAGE, {
-                            chatId: chat.id,
-                            message: 'Hello!',
-                            authorId: horeca.id,
-                        })
+                        console.log('Horeca received order message:', data.message)
+                        try {
+                            expect(data.message).toBe('Hi!')
+                            setTimeout(() => {
+                                horecaWsClient.emit(ChatEvents.MESSAGE, {
+                                    chatId: chat.id,
+                                    message: 'Hello!',
+                                    authorId: horeca.id,
+                                })
+                            }, 100)
+                        } catch (error) {
+                            clearTimeout(timeout)
+                            horecaWsClient.disconnect()
+                            providerWsClient.disconnect()
+                            reject(error)
+                        }
                     })
+
+                    horecaWsClient.on('error', (err) => {
+                        console.error('Horeca order chat WebSocket error:', err)
+                        clearTimeout(timeout)
+                        reject(err)
+                    })
+
+                    providerWsClient.on('error', (err) => {
+                        console.error('Provider order chat WebSocket error:', err)
+                        clearTimeout(timeout)
+                        reject(err)
+                    })
+
+                    horecaWsClient.on('connect_error', (err) => {
+                        console.error('Horeca order chat connection error:', err)
+                        clearTimeout(timeout)
+                        reject(err)
+                    })
+
+                    providerWsClient.on('connect_error', (err) => {
+                        console.error('Provider order chat connection error:', err)
+                        clearTimeout(timeout)
+                        reject(err)
+                    })
+
+                    // Connect after setting up all listeners
+                    horecaWsClient.connect()
+                    providerWsClient.connect()
                 })
-            })
+            }, 20000)
+
+
+
         })
         describe(`with type=${ChatType.Private}`, () => {
             let chat: ChatDto
@@ -209,36 +284,108 @@ describe('ChatWsGateway (e2e)', () => {
                 const horecaWsClient = ioClient('chats', horecaAuth.accessToken)
                 const providerWsClient = ioClient('chats', providerAuth.accessToken)
 
-                horecaWsClient.connect()
-                providerWsClient.connect()
-
                 expect.assertions(2)
 
-                return new Promise<void>(resolve => {
-                    providerWsClient.on(ChatEvents.MESSAGE, data => {
-                        const res = expect(data.message).toBe('Hello!')
+                return new Promise<void>((resolve, reject) => {
+                    let horecaConnected = false
+                    let providerConnected = false
+                    let conversationStarted = false
+
+                    const timeout = setTimeout(() => {
                         horecaWsClient.disconnect()
                         providerWsClient.disconnect()
-                        return resolve(res)
+                        reject(new Error('Test timeout: WebSocket communication failed'))
+                    }, 15000)
+
+                    const startConversation = () => {
+                        if (horecaConnected && providerConnected && !conversationStarted) {
+                            conversationStarted = true
+                            setTimeout(() => {
+                                providerWsClient.emit(ChatEvents.MESSAGE, {
+                                    chatId: chat.id,
+                                    message: 'Hi!',
+                                    authorId: provider.id,
+                                })
+                            }, 100)
+                        }
+                    }
+
+                    horecaWsClient.on('connect', () => {
+                        console.log('Horeca connected to private chat')
+                        horecaConnected = true
+                        startConversation()
                     })
 
-                    providerWsClient.emit(ChatEvents.MESSAGE, {
-                        chatId: chat.id,
-                        message: 'Hi!',
-                        authorId: provider.id,
+                    providerWsClient.on('connect', () => {
+                        console.log('Provider connected to private chat')
+                        providerConnected = true
+                        startConversation()
+                    })
+
+                    providerWsClient.on(ChatEvents.MESSAGE, data => {
+                        console.log('Provider received private message:', data.message)
+                        try {
+                            expect(data.message).toBe('Hello!')
+                            clearTimeout(timeout)
+                            horecaWsClient.disconnect()
+                            providerWsClient.disconnect()
+                            resolve()
+                        } catch (error) {
+                            clearTimeout(timeout)
+                            horecaWsClient.disconnect()
+                            providerWsClient.disconnect()
+                            reject(error)
+                        }
                     })
 
                     horecaWsClient.on(ChatEvents.MESSAGE, data => {
-                        expect(data.message).toBe('Hi!')
-
-                        horecaWsClient.emit(ChatEvents.MESSAGE, {
-                            chatId: chat.id,
-                            message: 'Hello!',
-                            authorId: horeca.id,
-                        })
+                        console.log('Horeca received private message:', data.message)
+                        try {
+                            expect(data.message).toBe('Hi!')
+                            setTimeout(() => {
+                                horecaWsClient.emit(ChatEvents.MESSAGE, {
+                                    chatId: chat.id,
+                                    message: 'Hello!',
+                                    authorId: horeca.id,
+                                })
+                            }, 100)
+                        } catch (error) {
+                            clearTimeout(timeout)
+                            horecaWsClient.disconnect()
+                            providerWsClient.disconnect()
+                            reject(error)
+                        }
                     })
+
+                    horecaWsClient.on('error', (err) => {
+                        console.error('Horeca private chat WebSocket error:', err)
+                        clearTimeout(timeout)
+                        reject(err)
+                    })
+
+                    providerWsClient.on('error', (err) => {
+                        console.error('Provider private chat WebSocket error:', err)
+                        clearTimeout(timeout)
+                        reject(err)
+                    })
+
+                    horecaWsClient.on('connect_error', (err) => {
+                        console.error('Horeca private chat connection error:', err)
+                        clearTimeout(timeout)
+                        reject(err)
+                    })
+
+                    providerWsClient.on('connect_error', (err) => {
+                        console.error('Provider private chat connection error:', err)
+                        clearTimeout(timeout)
+                        reject(err)
+                    })
+
+                    // Connect after setting up all listeners
+                    horecaWsClient.connect()
+                    providerWsClient.connect()
                 })
-            })
+            }, 20000)
         })
         describe(`with type=${ChatType.Support}`, () => {
             let chat: ChatDto
@@ -288,36 +435,108 @@ describe('ChatWsGateway (e2e)', () => {
                 const adminWsClient = ioClient('chats', adminAuth.accessToken)
                 const providerWsClient = ioClient('chats', providerAuth.accessToken)
 
-                adminWsClient.connect()
-                providerWsClient.connect()
-
                 expect.assertions(2)
 
-                return new Promise<void>(resolve => {
-                    providerWsClient.on(ChatEvents.MESSAGE, data => {
-                        const res = expect(data.message).toBe('Hello!')
+                return new Promise<void>((resolve, reject) => {
+                    let adminConnected = false
+                    let providerConnected = false
+                    let conversationStarted = false
+
+                    const timeout = setTimeout(() => {
                         adminWsClient.disconnect()
                         providerWsClient.disconnect()
-                        return resolve(res)
+                        reject(new Error('Test timeout: WebSocket communication failed'))
+                    }, 15000)
+
+                    const startConversation = () => {
+                        if (adminConnected && providerConnected && !conversationStarted) {
+                            conversationStarted = true
+                            setTimeout(() => {
+                                providerWsClient.emit(ChatEvents.MESSAGE, {
+                                    chatId: chat.id,
+                                    message: 'Hi!',
+                                    authorId: provider.id,
+                                })
+                            }, 100)
+                        }
+                    }
+
+                    adminWsClient.on('connect', () => {
+                        console.log('Admin connected to support chat')
+                        adminConnected = true
+                        startConversation()
+                    })
+
+                    providerWsClient.on('connect', () => {
+                        console.log('Provider connected to support chat')
+                        providerConnected = true
+                        startConversation()
+                    })
+
+                    providerWsClient.on(ChatEvents.MESSAGE, data => {
+                        console.log('Provider received support message:', data.message)
+                        try {
+                            expect(data.message).toBe('Hello!')
+                            clearTimeout(timeout)
+                            adminWsClient.disconnect()
+                            providerWsClient.disconnect()
+                            resolve()
+                        } catch (error) {
+                            clearTimeout(timeout)
+                            adminWsClient.disconnect()
+                            providerWsClient.disconnect()
+                            reject(error)
+                        }
                     })
 
                     adminWsClient.on(ChatEvents.MESSAGE, data => {
-                        expect(data.message).toBe('Hi!')
-
-                        adminWsClient.emit(ChatEvents.MESSAGE, {
-                            chatId: chat.id,
-                            message: 'Hello!',
-                            authorId: admin.id,
-                        })
+                        console.log('Admin received support message:', data.message)
+                        try {
+                            expect(data.message).toBe('Hi!')
+                            setTimeout(() => {
+                                adminWsClient.emit(ChatEvents.MESSAGE, {
+                                    chatId: chat.id,
+                                    message: 'Hello!',
+                                    authorId: admin.id,
+                                })
+                            }, 100)
+                        } catch (error) {
+                            clearTimeout(timeout)
+                            adminWsClient.disconnect()
+                            providerWsClient.disconnect()
+                            reject(error)
+                        }
                     })
 
-                    providerWsClient.emit(ChatEvents.MESSAGE, {
-                        chatId: chat.id,
-                        message: 'Hi!',
-                        authorId: provider.id,
+                    adminWsClient.on('error', (err) => {
+                        console.error('Admin support chat WebSocket error:', err)
+                        clearTimeout(timeout)
+                        reject(err)
                     })
+
+                    providerWsClient.on('error', (err) => {
+                        console.error('Provider support chat WebSocket error:', err)
+                        clearTimeout(timeout)
+                        reject(err)
+                    })
+
+                    adminWsClient.on('connect_error', (err) => {
+                        console.error('Admin support chat connection error:', err)
+                        clearTimeout(timeout)
+                        reject(err)
+                    })
+
+                    providerWsClient.on('connect_error', (err) => {
+                        console.error('Provider support chat connection error:', err)
+                        clearTimeout(timeout)
+                        reject(err)
+                    })
+
+                    // Connect after setting up all listeners
+                    adminWsClient.connect()
+                    providerWsClient.connect()
                 })
-            })
+            }, 20000)
         })
     })
 
@@ -375,8 +594,7 @@ describe('ChatWsGateway (e2e)', () => {
     describe('GET ' + ENDPOINTS.CHAT_MESSAGES, () => {
         it(`should return paginated data and total`, async () => {
             const chatRes = await getChats(app, providerAuth.accessToken)
-
-            const res = await getChatMessages(app, horecaAuth.accessToken, chatRes.data[0].id)
+            const res = await getChatMessages(app, horecaAuth.accessToken, chatRes.data.find(chat => chat.type == ChatType.Order).id)
 
             expect(res).toHaveProperty('data')
             expect(res).toHaveProperty('total')

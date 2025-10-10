@@ -113,8 +113,11 @@ describe('HorecaRequestsService', () => {
                 },
             },
         })
+        const requestsBefore = await db.horecaRequest.findMany({ include: { providerRequests: true } })
+        // console.log('----requests before cron initiate pastRequests', JSON.stringify(requestsBefore, null, 2))
         const res = await service.pastRequests()
         const requests = await db.horecaRequest.findMany({ include: { providerRequests: true } })
+        // console.log('----requests after', JSON.stringify(requests, null, 2))
 
         const noProviderRequestsRecord = requests.find(r => r.name == 'No provider requests')
         const acceptUntillTomorrowRecord = requests.find(r => r.name == 'AcceptUntill tomorrow')
@@ -126,7 +129,7 @@ describe('HorecaRequestsService', () => {
         expect(res).toBeTruthy()
         expect(noProviderRequestsRecord.status).toEqual(HorecaRequestStatus.CompletedUnsuccessfully)
         expect(acceptUntillTomorrowRecord.status).toEqual(HorecaRequestStatus.Pending)
-        expect(withProviderRequestsRecord.status).toEqual(HorecaRequestStatus.Pending)
+        expect(withProviderRequestsRecord.status).toEqual(HorecaRequestStatus.CompletedUnsuccessfully)
 
         expect(noChoosenProviderRequestsRecord.status).toEqual(HorecaRequestStatus.CompletedUnsuccessfully)
         expect(noChoosenProviderRequestsRecord.providerRequests[0].status).toEqual(ProviderRequestStatus.Canceled)

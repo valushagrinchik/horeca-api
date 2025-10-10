@@ -128,7 +128,7 @@ model User {
 
 model Profile {
   id     Int  @id @default(autoincrement())
-  user   User @relation(fields: [userId], references: [id])
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId Int  @unique @map("user_id")
 
   profileType ProfileType @map("profile_type")
@@ -152,7 +152,7 @@ model Address {
   id      Int    @id @default(autoincrement())
   address String
 
-  profile   Profile @relation(fields: [profileId], references: [id])
+  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
   profileId Int     @map("profile_id")
 
   // Monday
@@ -183,7 +183,7 @@ model Address {
 model Product {
   id Int @id @default(autoincrement())
 
-  user   User @relation(fields: [userId], references: [id])
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId Int  @map("user_id")
 
   category      String
@@ -225,7 +225,7 @@ model UploadsLink {
   sourceType UploadsLinkType
   sourceId   Int             @map("proposal_id")
 
-  image   Upload? @relation(fields: [imageId], references: [id])
+  image   Upload? @relation(fields: [imageId], references: [id], onDelete: Cascade)
   imageId Int     @unique
 
   createdAt DateTime @default(now()) @map("created_at")
@@ -253,7 +253,7 @@ model CronTask {
 
 model Mail {
   id     Int  @id @default(autoincrement())
-  user   User @relation(fields: [userId], references: [id])
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId Int  @map("user_id")
 
   to       String
@@ -263,7 +263,7 @@ model Mail {
 
   logs MailLog[]
 
-  cron   CronTask @relation(fields: [cronId], references: [id])
+  cron   CronTask @relation(fields: [cronId], references: [id], onDelete: Cascade)
   cronId Int      @unique @map("cron_id")
 
   createdAt DateTime @default(now()) @map("created_at")
@@ -275,7 +275,7 @@ model Mail {
 model MailLog {
   id Int @id @default(autoincrement())
 
-  mail   Mail @relation(fields: [mailId], references: [id])
+  mail   Mail @relation(fields: [mailId], references: [id], onDelete: Cascade)
   mailId Int  @map("mail_id")
 
   message String
@@ -289,13 +289,13 @@ model MailLog {
 model HorecaFavourites {
   id Int @id @default(autoincrement())
 
-  user   User @relation("user", fields: [userId], references: [id])
+  user   User @relation("user", fields: [userId], references: [id], onDelete: Cascade)
   userId Int  @map("user_id")
 
-  provider   User @relation("provider", fields: [providerId], references: [id])
+  provider   User @relation("provider", fields: [providerId], references: [id], onDelete: Cascade)
   providerId Int  @map("provider_id")
 
-  chat   Chat? @relation(fields: [chatId], references: [id])
+  chat   Chat? @relation(fields: [chatId], references: [id], onDelete: SetNull)
   chatId Int?  @unique @map("chat_id")
 
   createdAt DateTime @default(now()) @map("created_at")
@@ -306,7 +306,7 @@ model HorecaFavourites {
 
 model HorecaRequest {
   id         Int                 @id @default(autoincrement())
-  user       User                @relation(fields: [userId], references: [id])
+  user       User                @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId     Int                 @map("user_id")
   // uniq categories list of items for 'cover' persetage calculation
   categories String[]
@@ -341,7 +341,7 @@ model HorecaRequest {
 model HorecaRequestItem {
   id              Int           @id @default(autoincrement())
   horecaRequestId Int           @map("horeca_request_id")
-  horecaRequest   HorecaRequest @relation(fields: [horecaRequestId], references: [id])
+  horecaRequest   HorecaRequest @relation(fields: [horecaRequestId], references: [id], onDelete: Cascade)
   name            String
   amount          Float
   unit            String
@@ -357,7 +357,7 @@ model HorecaRequestItem {
 model HorecaRequestTemplate {
   id Int @id @default(autoincrement())
 
-  user   User @relation(fields: [userId], references: [id])
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId Int  @map("user_id")
 
   content Json
@@ -370,13 +370,13 @@ model HorecaRequestTemplate {
 }
 
 model HorecaRequestProviderStatus {
-  horecaRequest   HorecaRequest @relation(fields: [horecaRequestId], references: [id])
+  horecaRequest   HorecaRequest @relation(fields: [horecaRequestId], references: [id], onDelete: Cascade)
   horecaRequestId Int           @unique @map("horeca_request_id")
 
   viewed Boolean @default(false)
   hidden Boolean @default(false)
 
-  provider   User @relation(fields: [providerId], references: [id])
+  provider   User @relation(fields: [providerId], references: [id], onDelete: Cascade)
   providerId Int  @map("provider_id")
 
   createdAt DateTime @default(now()) @map("created_at")
@@ -388,18 +388,18 @@ model HorecaRequestProviderStatus {
 model ProviderRequest {
   id      Int                   @id @default(autoincrement())
   comment String?
-  user    User                  @relation(fields: [userId], references: [id])
+  user    User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId  Int                   @map("user_id")
   items   ProviderRequestItem[]
 
-  horecaRequest   HorecaRequest @relation("allProviderRequests", fields: [horecaRequestId], references: [id])
+  horecaRequest   HorecaRequest @relation("allProviderRequests", fields: [horecaRequestId], references: [id], onDelete: Cascade)
   horecaRequestId Int           @map("horeca_request_id")
 
   providerRequestReview ProviderRequestReview?
 
   status ProviderRequestStatus @default(Pending)
 
-  chat   Chat? @relation(fields: [chatId], references: [id])
+  chat   Chat? @relation(fields: [chatId], references: [id], onDelete: SetNull)
   chatId Int?  @unique @map("chat_id")
 
   // images - could be loaded on runtime from UploadsLink     
@@ -414,13 +414,13 @@ model ProviderRequestReview {
   id Int @id @default(autoincrement())
 
   // Horeca
-  user   User @relation(fields: [userId], references: [id])
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId Int  @map("user_id")
 
   isDelivered    Int @map("is_delivered")
   isSuccessfully Int @map("is_successfully")
 
-  providerRequest   ProviderRequest @relation(fields: [providerRequestId], references: [id])
+  providerRequest   ProviderRequest @relation(fields: [providerRequestId], references: [id], onDelete: Cascade)
   providerRequestId Int             @unique @map("provider_request_id")
 
   createdAt DateTime @default(now()) @map("created_at")
@@ -432,10 +432,10 @@ model ProviderRequestReview {
 model ProviderRequestItem {
   id                Int             @id @default(autoincrement())
   providerRequestId Int             @map("provider_request_id")
-  providerRequest   ProviderRequest @relation(fields: [providerRequestId], references: [id])
+  providerRequest   ProviderRequest @relation(fields: [providerRequestId], references: [id], onDelete: Cascade)
 
   horecaRequestItemId Int               @map("horeca_request_item_id")
-  horecaRequestItem   HorecaRequestItem @relation(fields: [horecaRequestItemId], references: [id])
+  horecaRequestItem   HorecaRequestItem @relation(fields: [horecaRequestItemId], references: [id], onDelete: Cascade)
 
   available    Boolean @default(true)
   manufacturer String
@@ -468,7 +468,7 @@ model ChatMessage {
   id Int @id @default(autoincrement())
 
   chatId Int  @map("chat_id")
-  chat   Chat @relation(fields: [chatId], references: [id])
+  chat   Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
 
   message String
 
@@ -477,7 +477,7 @@ model ChatMessage {
 
   // as it can be server message
   authorId Int?    @map("author_id")
-  author   User?   @relation(fields: [authorId], references: [id])
+  author   User?   @relation(fields: [authorId], references: [id], onDelete: SetNull)
   // indicates that this is server message
   isServer Boolean @default(false) @map("is_server")
 
@@ -490,7 +490,7 @@ model ChatMessage {
 model SupportRequest {
   id Int @id @default(autoincrement())
 
-  user   User @relation(fields: [userId], references: [id])
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId Int  @map("user_id")
 
   content String?
@@ -498,7 +498,7 @@ model SupportRequest {
 
   adminId Int? @map("admin_id")
 
-  chat   Chat? @relation(fields: [chatId], references: [id])
+  chat   Chat? @relation(fields: [chatId], references: [id], onDelete: SetNull)
   chatId Int?  @unique @map("chat_id")
 
   createdAt DateTime @default(now()) @map("created_at")
@@ -515,7 +515,7 @@ view ProviderHorecaRequestsCoverView {
   createdAt     DateTime      @map("horeca_request_created_at")
   acceptUntill  DateTime      @map("horeca_request_accept_untill")
   cover         Float
-  horecaRequest HorecaRequest @relation(fields: [hrId], references: [id])
+  horecaRequest HorecaRequest @relation(fields: [hrId], references: [id], onDelete: Cascade)
 
   @@unique([providerId, hrId])
   @@map("provider_horeca_requests_cover_view")

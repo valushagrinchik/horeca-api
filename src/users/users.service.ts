@@ -92,6 +92,10 @@ export class UsersService {
         return new UserDto(user)
     }
 
+    async getProvidersWithIntersectionProfileCategories(categories: string[]) {
+        return this.usersRep.getProvidersWithIntersectionProfileCategories(categories)
+    }
+
     async findAllAndCount(
         auth: AuthInfoDto,
         paginate: PaginateValidateType<UsersSearchAdminDto>

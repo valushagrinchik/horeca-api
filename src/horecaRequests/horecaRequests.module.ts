@@ -26,6 +26,7 @@ import { HorecaRequestsConsumerService } from './cron/horecaRequests.consumer.se
         NotificationModule,
         forwardRef(() => ChatModule),
         RequestsMatcherModule,
+
         BullModule.registerQueue({
             name: QUEUES.HORECA,
         }),
