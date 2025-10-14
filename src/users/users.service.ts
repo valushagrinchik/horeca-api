@@ -24,8 +24,6 @@ export class UsersService {
 
     async delete(id: number): Promise<void> {
         const user = await this.usersRep.getUserWithProfile(id)
-
-        console.log(JSON.stringify(user, null, 2),'user')
         if (!user) {
             throw new BadRequestException(new ErrorDto(ErrorCodes.USER_DOES_NOT_EXISTS))
         }

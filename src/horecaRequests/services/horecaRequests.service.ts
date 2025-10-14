@@ -98,7 +98,6 @@ export class HorecaRequestsService {
         const horecaRequest = await this.horecaRequestsRep.getRawById(horecaRequestId)
         const providers = await this.usersService.getProvidersWithIntersectionProfileCategories(horecaRequest.categories as string[])
 
-        console.log(providers,'providers')
         await Promise.all(providers.map(provider => {
             this.notificationWsGateway.sendNotification(provider.id, NotificationEvents.NEW_HORECA_REQUEST, {
                 data: {

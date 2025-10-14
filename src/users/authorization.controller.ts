@@ -45,7 +45,6 @@ export class AuthorizationController {
     @Get('password/recovery')
     @RequestDecorator(SuccessDto)
     async passwordRecovery(@Query('email') email: string) {
-        console.log(email, 'email')
         await this.authService.passwordRecovery(email)
         return new SuccessDto('ok')
     }
