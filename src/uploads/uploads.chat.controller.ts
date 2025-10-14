@@ -11,6 +11,7 @@ import { AuthInfoDto } from '@/auth/dto/auth.info.dto'
 import { diskStorage } from 'multer'
 import { extname } from 'path'
 import * as fs from 'fs'
+import { ErrorCodes } from '@/shared/utils'
 
 @Controller('uploads/chat/:chatId')
 @ApiTags('Uploads')
@@ -71,7 +72,7 @@ export class UploadsChatController {
                 if (allowedMimes.includes(file.mimetype)) {
                     cb(null, true)
                 } else {
-                    cb(new Error('File type not allowed for chat uploads'), false)
+                    cb(new Error(ErrorCodes.FILE_TYPE_NOT_ALLOWED_FOR_CHAT_UPLOADS), false)
                 }
             }
         })

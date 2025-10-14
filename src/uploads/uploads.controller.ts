@@ -1,4 +1,4 @@
-import { Controller, Param, Post, Delete, UploadedFile, UseInterceptors, Body, Get, Res } from '@nestjs/common'
+import { Controller, Param, Post, Delete, UploadedFile, UseInterceptors, Body, Get, Res, BadRequestException } from '@nestjs/common'
 import { UploadsService } from './uploads.service'
 import { FileInterceptor } from '@nestjs/platform-express/multer'
 import { ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger'
@@ -6,6 +6,7 @@ import {  AuthUser } from '../auth/decorators'
 import { UserRole } from '@prisma/client'
 import { UploadDto } from './dto/upload.dto'
 import { ChatService } from '@/chat/services/chat.service'
+import { ErrorCodes, ErrorDto } from '@/shared/utils'
 
 @Controller('uploads')
 @ApiTags('Uploads')
@@ -35,7 +36,7 @@ export class UploadsController {
                 if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png') {
                     cb(null, true)
                 } else {
-                    cb(new Error('Only images are allowed...'), false)
+                    cb(new BadRequestException(new ErrorDto(ErrorCodes.ONLY_IMAGES_ARE_ALLOWED)), false)
                 }
             }
         })
