@@ -56,7 +56,7 @@ async function bootstrap() {
 
     initSwaggerDoc(app)
 
-    app.use('/uploads', express.static(join(process.cwd(), 'uploads')))
+    app.use('/uploads/public', express.static(join(process.cwd(), 'uploads/public')))
 
     initBullDashboard(app)
 

@@ -210,6 +210,10 @@ model Upload {
   path     String
   size     Int
 
+  // Optional chat association for chat uploads
+  chatId Int? @map("chat_id")
+  chat   Chat? @relation(fields: [chatId], references: [id])
+
   // Horeca
   uploadsLink UploadsLink?
 
@@ -451,8 +455,12 @@ model Chat {
   id Int @id @default(autoincrement())
 
   messages  ChatMessage[]
+
   opponents Int[]
   type      ChatType
+
+  // don't use directly
+  uploads   Upload[]
 
   providerRequest  ProviderRequest?
   horecaFavourites HorecaFavourites?

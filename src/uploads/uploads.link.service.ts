@@ -19,7 +19,7 @@ export class UploadsLinkService {
         })
         const grouped = Object.groupBy(images, ({ sourceId }) => sourceId)
         return Object.fromEntries(
-            Object.entries(grouped).map(([sourceId, images]) => [sourceId, images.map(image => image.image)])
+            Object.entries(grouped).map(([sourceId, images]) => [sourceId, images.map(image => new UploadDto(image.image))])
         )
     }
 

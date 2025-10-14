@@ -17,8 +17,8 @@ import { SupportRequestsModule } from '../supportRequests/supportRequests.module
         ConfigModule.forRoot({
             isGlobal: true,
         }),
-        UsersModule,
-        FavouritesModule,
+        forwardRef(() => UsersModule),
+        forwardRef(() => FavouritesModule),
         forwardRef(() => HorecaRequestsModule),
         SupportRequestsModule,
     ],
