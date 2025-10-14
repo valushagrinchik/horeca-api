@@ -6,4 +6,7 @@ export class ChatServerMessageCreateDto {
 
     @Validate(TypeValidate.STRING)
     message: string
+
+    @Validate(TypeValidate.ARRAY)
+    opponents?: number[]
 }

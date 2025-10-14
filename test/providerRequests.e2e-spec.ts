@@ -1,5 +1,6 @@
 import { INestApplication } from '@nestjs/common'
 import {
+    activateUser,
     approveProviderRequest,
     authUser,
     createHorecaRequest,
@@ -9,39 +10,88 @@ import {
     getHorecaRequestForProvider,
     getProfile,
     initApp,
+    registrateUser,
     setHorecaRequestStatus,
-} from './helpers'
+} from './helpers/api'
 import { ENDPOINTS } from './constants'
 import { AuthResultDto } from '../src/auth/dto/auth.result.dto'
-import { horecaRequestInput, horecaRequestInput2, horecaUserInput, providerUserInput } from './mock/seedData'
+import { horecaRequestInput, horecaRequestInput2 } from './mock/seedData'
+import { horecaUsers, providerUsers } from './mock/authData'
 import { generateFutureDate, Categories } from '@/shared/utils'
 import { ProviderHorecaRequestStatus } from '../src/providerRequests/dto/provider.horecaRequest.search.dto'
+import { DatabaseService } from '@/system/database/database.service'
+import { cleanDatabase } from './helpers/seed'
+import { RequestsMatcherDbService } from '@/shared/requestsMatcher/requestsMatcher.db.service'
 
 let app: INestApplication
 let horecaAuth: AuthResultDto
 let providerAuth: AuthResultDto
-
-let createdhorecaRequestId: number
-let createdProviderRequestId: number
+let db: DatabaseService
+let matcher: RequestsMatcherDbService
 
 beforeAll(async () => {
-    app = await initApp()
+    app = await initApp(undefined, tm => {
+        db = tm.get<DatabaseService>(DatabaseService)
+        matcher = tm.get<RequestsMatcherDbService>(RequestsMatcherDbService)
+    })
+})
 
-    horecaAuth = await authUser(app, horecaUserInput)
-    providerAuth = await authUser(app, providerUserInput)
+beforeEach(async () => {
+    try {
+        await cleanDatabase(db)
+        
+        // Create and activate horeca user
+        const horecaUser = await registrateUser(app, horecaUsers[0])
+        await activateUser(app, horecaUser.activationLink)
+        horecaAuth = await authUser(app, {
+            email: horecaUsers[0].email,
+            password: horecaUsers[0].password
+        })
+        
+        // Create and activate provider user  
+        const providerUser = await registrateUser(app, providerUsers[0])
+        await activateUser(app, providerUser.activationLink)
+        providerAuth = await authUser(app, {
+            email: providerUsers[0].email,
+            password: providerUsers[0].password
+        })
+    } catch (error) {
+        console.error('Error in beforeEach setup:', error)
+        throw error
+    }
+})
+
+afterEach(async () => {
+    try {
+        await cleanDatabase(db)
+    } catch (error) {
+        console.error('Error in afterEach cleanup:', error)
+    }
 })
 
 afterAll(async () => {
-    await app.close()
-})
+    try {
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        if (db) {
+            await db.$disconnect()
+        }
+        if (app) {
+            await app.close()
+        }
+    } catch (error) {
+        console.error('Error during cleanup:', error)
+    }
+}, 10000)
 
 describe('ProviderRequestsController (e2e)', () => {
-    beforeAll(async () => {
-        await createHorecaRequest(app, horecaAuth.accessToken, horecaRequestInput)
-        await createHorecaRequest(app, horecaAuth.accessToken, horecaRequestInput2)
-    })
     describe('GET ' + ENDPOINTS.HOREKA_REQUESTS_FOR_PROVIDER, () => {
         it('should return paginated data and total', async () => {
+            // Create horeca requests for this test
+            await createHorecaRequest(app, horecaAuth.accessToken, horecaRequestInput)
+            await createHorecaRequest(app, horecaAuth.accessToken, horecaRequestInput2)
+
+            await matcher.updateView()
+            
             const res = await findAllHorecaRequestForProvider(app, providerAuth.accessToken)
 
             expect(res).toHaveProperty('data')
@@ -54,6 +104,12 @@ describe('ProviderRequestsController (e2e)', () => {
         })
 
         it('should return data sorted by cover desc', async () => {
+            // Create horeca requests for this test
+            await createHorecaRequest(app, horecaAuth.accessToken, horecaRequestInput)
+            await createHorecaRequest(app, horecaAuth.accessToken, horecaRequestInput2)
+            
+            await matcher.updateView()
+
             const res = await findAllHorecaRequestForProvider(app, providerAuth.accessToken, { sort: 'cover|desc' })
 
             expect(res).toHaveProperty('data')
@@ -66,6 +122,10 @@ describe('ProviderRequestsController (e2e)', () => {
         })
 
         it('should return data sorted by cover asc', async () => {
+            // Create horeca requests for this test
+            await createHorecaRequest(app, horecaAuth.accessToken, horecaRequestInput)
+            await createHorecaRequest(app, horecaAuth.accessToken, horecaRequestInput2)
+            await matcher.updateView()
             const res = await findAllHorecaRequestForProvider(app, providerAuth.accessToken, { sort: 'cover|asc' })
 
             expect(res).toHaveProperty('data')
@@ -79,6 +139,9 @@ describe('ProviderRequestsController (e2e)', () => {
 
         describe('get active horeca requests for provider', () => {
             it('should return array of active horeca requests that matche with providers categories', async () => {
+                await createHorecaRequest(app, horecaAuth.accessToken, horecaRequestInput)
+                await createHorecaRequest(app, horecaAuth.accessToken, horecaRequestInput2)
+                await matcher.updateView()
                 const res = await findAllHorecaRequestForProvider(app, providerAuth.accessToken, {
                     sort: 'createdAt|asc',
                 })
@@ -97,6 +160,9 @@ describe('ProviderRequestsController (e2e)', () => {
 
         describe('get all (active and hidden or viewed) horeca requests for provider', () => {
             it('should return array of inactive horeca requests that match with providers categories', async () => {
+                await createHorecaRequest(app, horecaAuth.accessToken, horecaRequestInput)
+                await createHorecaRequest(app, horecaAuth.accessToken, horecaRequestInput2)
+                await matcher.updateView()
                 const res = await findAllHorecaRequestForProvider(app, providerAuth.accessToken)
                 expect(res.data.length).toBe(2)
 
@@ -108,6 +174,9 @@ describe('ProviderRequestsController (e2e)', () => {
     describe('GET ' + ENDPOINTS.HOREKA_REQUEST_FOR_PROVIDER, () => {
         describe('get horeca request by id', () => {
             it('should return horeca request with only matched items by categories', async () => {
+                await createHorecaRequest(app, horecaAuth.accessToken, horecaRequestInput)
+                await createHorecaRequest(app, horecaAuth.accessToken, horecaRequestInput2)
+                await matcher.updateView()
                 const all = await findAllHorecaRequestForProvider(app, providerAuth.accessToken)
                 const res = await getHorecaRequestForProvider(
                     app,
@@ -125,6 +194,9 @@ describe('ProviderRequestsController (e2e)', () => {
 
     describe('POST ' + ENDPOINTS.HOREKA_REQUESTS_FOR_PROVIDER_STATUS, () => {
         it('should apply "viewed" status to one of horeca request and delete it from active requests list', async () => {
+            await createHorecaRequest(app, horecaAuth.accessToken, horecaRequestInput)
+            await createHorecaRequest(app, horecaAuth.accessToken, horecaRequestInput2)
+            await matcher.updateView()
             expect.assertions(11)
             const actualRes = await findAllHorecaRequestForProvider(app, providerAuth.accessToken, {
                 search: { status: ProviderHorecaRequestStatus.Actual },
@@ -176,7 +248,6 @@ describe('ProviderRequestsController (e2e)', () => {
         })
     })
     describe('POST ' + ENDPOINTS.PROVIDER_REQUESTS, () => {
-        let justCreatedHorecaRequestId
 
         it('should return just created request data', async () => {
             expect.assertions(2)
@@ -201,7 +272,6 @@ describe('ProviderRequestsController (e2e)', () => {
                 comment: 'string',
             })
             expect(horecaCreateRequestRes).toHaveProperty('id')
-            justCreatedHorecaRequestId = horecaCreateRequestRes.id
 
             const providerCreateRequestRes = await createProviderRequest(app, providerAuth.accessToken, {
                 horecaRequestId: horecaCreateRequestRes.id,
@@ -214,25 +284,88 @@ describe('ProviderRequestsController (e2e)', () => {
                 })),
             })
 
-            createdhorecaRequestId = horecaCreateRequestRes.id
-            createdProviderRequestId = providerCreateRequestRes.id
-
             expect(providerCreateRequestRes).toHaveProperty('id')
             return
         })
 
         it('should exclude horeca request that provider just created request data for from income list', async () => {
+            const acceptUntill = generateFutureDate()
+            const deliveryTime = generateFutureDate(14)
+
+            const horecaCreateRequestRes = await createHorecaRequest(app, horecaAuth.accessToken, {
+                items: [
+                    {
+                        name: 'string',
+                        amount: 10,
+                        unit: 'string',
+                        category: Categories.alcoholicDrinks,
+                    },
+                ],
+                address: 'string',
+                deliveryTime,
+                acceptUntill,
+                paymentType: 'Prepayment',
+                name: 'string',
+                phone: 'string',
+                comment: 'string',
+            })
+            expect(horecaCreateRequestRes).toHaveProperty('id')
+
+            const providerCreateRequestRes = await createProviderRequest(app, providerAuth.accessToken, {
+                horecaRequestId: horecaCreateRequestRes.id,
+                comment: 'string',
+                items: horecaCreateRequestRes.items.map(item => ({
+                    horecaRequestItemId: item.id,
+                    available: true,
+                    manufacturer: 'string',
+                    cost: 2000,
+                })),
+            })
+            
+            await matcher.updateView()
+
             const res = await findAllHorecaRequestForProvider(app, providerAuth.accessToken, {
                 sort: 'createdAt|asc',
             })
 
-            expect(res.data.find(r => r.id == justCreatedHorecaRequestId)).toBe(undefined)
+            expect(res.data.find(r => r.id == horecaCreateRequestRes.id)).toBe(undefined)
             return
         })
     })
 
     describe('GET ' + ENDPOINTS.PROVIDER_REQUESTS, () => {
         it('should return paginated data and total', async () => {
+            const acceptUntill = generateFutureDate()
+            const deliveryTime = generateFutureDate(14)
+
+            const horecaCreateRequestRes = await createHorecaRequest(app, horecaAuth.accessToken, {
+                items: [
+                    {
+                        name: 'string',
+                        amount: 10,
+                        unit: 'string',
+                        category: Categories.alcoholicDrinks,
+                    },
+                ],
+                address: 'string',
+                deliveryTime,
+                acceptUntill,
+                paymentType: 'Prepayment',
+                name: 'string',
+                phone: 'string',
+                comment: 'string',
+            })
+
+            const providerCreateRequestRes = await createProviderRequest(app, providerAuth.accessToken, {
+                horecaRequestId: horecaCreateRequestRes.id,
+                comment: 'string',
+                items: horecaCreateRequestRes.items.map(item => ({
+                    horecaRequestItemId: item.id,
+                    available: true,
+                    manufacturer: 'string',
+                    cost: 2000,
+                })),
+            })
             const res = await findAllProviderRequests(app, providerAuth.accessToken)
 
             expect(res).toHaveProperty('data')
@@ -247,9 +380,41 @@ describe('ProviderRequestsController (e2e)', () => {
     // TODO: move to horeca requests tests
     describe('POST ' + ENDPOINTS.HOREKA_APPROVE_PROVIDER_REQUEST, () => {
         it('should return just created request data', async () => {
+            const acceptUntill = generateFutureDate()
+            const deliveryTime = generateFutureDate(14)
+
+            const horecaCreateRequestRes = await createHorecaRequest(app, horecaAuth.accessToken, {
+                items: [
+                    {
+                        name: 'string',
+                        amount: 10,
+                        unit: 'string',
+                        category: Categories.alcoholicDrinks,
+                    },
+                ],
+                address: 'string',
+                deliveryTime,
+                acceptUntill,
+                paymentType: 'Prepayment',
+                name: 'string',
+                phone: 'string',
+                comment: 'string',
+            })
+
+            const providerCreateRequestRes = await createProviderRequest(app, providerAuth.accessToken, {
+                horecaRequestId: horecaCreateRequestRes.id,
+                comment: 'string',
+                items: horecaCreateRequestRes.items.map(item => ({
+                    horecaRequestItemId: item.id,
+                    available: true,
+                    manufacturer: 'string',
+                    cost: 2000,
+                })),
+            })
+
             const res = await approveProviderRequest(app, horecaAuth.accessToken, {
-                horecaRequestId: createdhorecaRequestId,
-                providerRequestId: createdProviderRequestId,
+                horecaRequestId: horecaCreateRequestRes.id,
+                providerRequestId: providerCreateRequestRes.id,
             })
 
             expect(res.status).toBe('ok')

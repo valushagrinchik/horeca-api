@@ -2,7 +2,7 @@ import { JwtService } from '@nestjs/jwt'
 import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway } from '@nestjs/websockets'
 import { Socket } from 'socket.io'
 
-import { ChatEvents } from '@/shared/utils'
+import { ChatEvents, NotificationEvents } from '@/shared/utils'
 import { ConfigService } from '@nestjs/config'
 import { ChatService } from './services/chat.service'
 import { forwardRef, Inject } from '@nestjs/common'
@@ -10,6 +10,7 @@ import { WsMessageCreateDto } from './dto/ws.message.create.dto'
 import { ChatMessageDto } from './dto/chat.message.dto'
 import { WsGateway } from '../system/ws.gateway'
 import { ChatServerMessageCreateDto } from './dto/chat.server.message.create.dto'
+import { NotificationWsGateway } from '@/notifications/notification.ws.gateway'
 
 const WS_PORT = Number(process.env.WS_PORT ?? 4000)
 
@@ -19,7 +20,9 @@ export class ChatWsGateway extends WsGateway<ChatEvents, ChatMessageDto> {
         protected jwtService: JwtService,
         protected configService: ConfigService,
         @Inject(forwardRef(() => ChatService))
-        protected chatService: ChatService
+        protected chatService: ChatService,
+        private notificationWsGateway: NotificationWsGateway,
+
     ) {
         super(jwtService, configService)
     }
@@ -32,13 +35,23 @@ export class ChatWsGateway extends WsGateway<ChatEvents, ChatMessageDto> {
         const message = await this.chatService.createIncomeMessage(dto)
         const sendTo = chat.opponents.find(o => o != dto.authorId)
         this.sendTo(sendTo, ChatEvents.MESSAGE, message)
+        this.notificationWsGateway.sendNotification(sendTo, NotificationEvents.NEW_MESSAGE, {
+            data: {
+                chatId: dto.chatId,
+            }
+        })
     }
 
     async sendServerMessage(dto: ChatServerMessageCreateDto): Promise<void> {
         const chat = await this.chatService.getChat(dto.chatId)
         const message = await this.chatService.createServerMessage(dto)
-        chat.opponents.map(opponent => {
-            this.sendTo(opponent, ChatEvents.MESSAGE, message)
-        })
+            ; (dto.opponents || chat.opponents).map(opponent => {
+                this.sendTo(opponent, ChatEvents.MESSAGE, message)
+                this.notificationWsGateway.sendNotification(opponent, NotificationEvents.NEW_MESSAGE, {
+                    data: {
+                        chatId: dto.chatId,
+                    }
+                })
+            })
     }
 }

@@ -12,26 +12,15 @@ import { UploadsLinkService } from '@/uploads/uploads.link.service'
 export class FavouritesService {
     constructor(
         private readonly favsRep: FavouritesDbService,
-        private notificationWsGateway: NotificationWsGateway,
         private uploadsLinkService: UploadsLinkService
-    ) {}
+    ) { }
 
     async create(auth: AuthInfoDto, dto: FavouritesCreateDto) {
-        const fav = await this.favsRep.create(auth.id, dto)
-        this.notificationWsGateway.sendNotification(dto.providerId, NotificationEvents.PROVIDER_ADDED_TO_FAVOURITES, {
-            data: { horecaId: auth.id },
-        })
-        return fav
+        return this.favsRep.create(auth.id, dto)
     }
 
     async delete(auth: AuthInfoDto, providerId: number) {
-        const fav = this.favsRep.delete(auth.id, providerId)
-        this.notificationWsGateway.sendNotification(providerId, NotificationEvents.PROVIDER_DELETED_FROM_FAVOURITES, {
-            data: {
-                horecaId: auth.id,
-            },
-        })
-        return fav
+        return this.favsRep.delete(auth.id, providerId)
     }
 
     // Horeca creates Private chat, Admin creates Support chat, Horeca creates Order chat

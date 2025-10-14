@@ -6,7 +6,7 @@ import { ConfigService } from '@nestjs/config'
 import { Logger, OnModuleInit } from '@nestjs/common'
 
 export class WsGateway<E, P> implements OnModuleInit, OnGatewayConnection, OnGatewayDisconnect {
-    private readonly logger = new Logger(this.constructor.name)
+    protected readonly logger = new Logger(this.constructor.name)
 
     @WebSocketServer() server: Server
     protected clients: { userId: number; client: Socket }[] = []
@@ -49,8 +49,10 @@ export class WsGateway<E, P> implements OnModuleInit, OnGatewayConnection, OnGat
 
     public sendTo(userId: number, event: E, payload: P) {
         const connected = this.clients.find(client => client.userId == userId)
-        if (connected) {
-            connected.client.emit(event as string, payload)
+        if(!connected){
+            this.logger.error(`${userId} is not connected client`)
+            return
         }
+        connected.client.emit(event as string, payload)
     }
 }

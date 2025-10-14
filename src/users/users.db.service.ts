@@ -11,7 +11,7 @@ import { v4 as uuidv4 } from 'uuid'
 
 @Injectable()
 export class UsersDbService {
-    constructor(private db: DatabaseService) {}
+    constructor(private db: DatabaseService) { }
 
     createUser = async (dto: Omit<RegistrateUserDto, 'repeatPassword' | 'GDPRApproved'>) => {
         return this.db.user.create({
@@ -30,21 +30,21 @@ export class UsersDbService {
                         ...('categories' in dto.profile ? { categories: [...new Set(dto.profile.categories)] } : {}),
                         ...('addresses' in dto.profile
                             ? {
-                                  addresses: {
-                                      createMany: {
-                                          data: dto.profile.addresses.map(address => {
-                                              return {
-                                                  address: address.address,
-                                                  ...address.weekdays.reduce((prev, weekday) => {
-                                                      prev[weekday + 'From'] = address[weekday + 'From']
-                                                      prev[weekday + 'To'] = address[weekday + 'To']
-                                                      return prev
-                                                  }, {}),
-                                              }
-                                          }) as Prisma.AddressCreateManyProfileInput[],
-                                      },
-                                  },
-                              }
+                                addresses: {
+                                    createMany: {
+                                        data: dto.profile.addresses.map(address => {
+                                            return {
+                                                address: address.address,
+                                                ...address.weekdays.reduce((prev, weekday) => {
+                                                    prev[weekday + 'From'] = address[weekday + 'From']
+                                                    prev[weekday + 'To'] = address[weekday + 'To']
+                                                    return prev
+                                                }, {}),
+                                            }
+                                        }) as Prisma.AddressCreateManyProfileInput[],
+                                    },
+                                },
+                            }
                             : {}),
                     },
                 },
@@ -186,5 +186,22 @@ export class UsersDbService {
 
     async count(args: Prisma.UserCountArgs) {
         return this.db.user.count(args)
+    }
+
+    async getProvidersWithIntersectionProfileCategories(categories: string[]) {
+        return this.db.user.findMany({
+            where: {
+                role: UserRole.Provider,
+                profile: {
+                    categories: {
+                        hasSome: categories
+                    },
+                },
+            },
+        })
+    }
+
+    async delete(id: number) {
+        return this.db.user.delete({ where: { id } })
     }
 }

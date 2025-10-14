@@ -12,14 +12,21 @@ export class ReviewNotificationPayload {
     chatId: number
 }
 
-export class ProviderRequestCreatedNotificationPayload {
+export class NewHorecaRequestNotificationPayload {
+    @Validate(TypeValidate.NUMBER)
+    hRequestId: number
+    @Validate(TypeValidate.NUMBER)
+    hProviderId: number
+}
+
+export class NewProviderRequestNotificationPayload {
     @Validate(TypeValidate.NUMBER)
     hRequestId: number
     @Validate(TypeValidate.NUMBER)
     pRequestId: number
 }
 
-export class ProviderRequestStatusChangedNotificationPayload {
+export class ProviderApprovedNotificationPayload {
     @Validate(TypeValidate.NUMBER)
     pRequestId: number
     @Validate(TypeValidate.NUMBER)
@@ -28,32 +35,27 @@ export class ProviderRequestStatusChangedNotificationPayload {
     status: HorecaRequestStatus
 }
 
-export class ProviderAddedToFavouritesNotificationPayload {
+export class NewMessageNotificationPayload {
     @Validate(TypeValidate.NUMBER)
-    horecaId: number
-}
-
-export class ProviderDeletedFromFavouritesNotificationPayload {
-    @Validate(TypeValidate.NUMBER)
-    horecaId: number
+    chatId: number
 }
 
 export class NotificationPayload {
     @Validate(TypeValidate.OBJECT, {
         oneOf: [
+            { $ref: getSchemaPath(NewHorecaRequestNotificationPayload) },
             { $ref: getSchemaPath(ReviewNotificationPayload) },
-            { $ref: getSchemaPath(ProviderRequestCreatedNotificationPayload) },
-            { $ref: getSchemaPath(ProviderRequestStatusChangedNotificationPayload) },
-            { $ref: getSchemaPath(ProviderAddedToFavouritesNotificationPayload) },
-            { $ref: getSchemaPath(ProviderDeletedFromFavouritesNotificationPayload) },
+            { $ref: getSchemaPath(NewProviderRequestNotificationPayload) },
+            { $ref: getSchemaPath(ProviderApprovedNotificationPayload) },
+            { $ref: getSchemaPath(NewMessageNotificationPayload) },
         ],
     })
     @ValidateNested()
     data:
+        | NewHorecaRequestNotificationPayload
         | ReviewNotificationPayload
-        | ProviderRequestCreatedNotificationPayload
-        | ProviderRequestStatusChangedNotificationPayload
-        | ProviderAddedToFavouritesNotificationPayload
-        | ProviderDeletedFromFavouritesNotificationPayload
+        | NewProviderRequestNotificationPayload
+        | ProviderApprovedNotificationPayload
+        | NewMessageNotificationPayload
         | {}
 }

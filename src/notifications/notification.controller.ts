@@ -1,12 +1,12 @@
 import { Controller, Get } from '@nestjs/common'
 import { ApiExtraModels, ApiOperation, ApiTags } from '@nestjs/swagger'
 import {
+    NewHorecaRequestNotificationPayload,
     NotificationPayload,
-    ProviderAddedToFavouritesNotificationPayload,
-    ProviderDeletedFromFavouritesNotificationPayload,
-    ProviderRequestCreatedNotificationPayload,
-    ProviderRequestStatusChangedNotificationPayload,
+    NewProviderRequestNotificationPayload,
+    ProviderApprovedNotificationPayload,
     ReviewNotificationPayload,
+    NewMessageNotificationPayload,
 } from './dto/notification.payload.dto'
 import { RequestDecorator, SuccessDto } from '@/shared/utils'
 import { AuthUser, AuthParamDecorator } from '../auth/decorators'
@@ -19,10 +19,10 @@ import { UserRole } from '@prisma/client'
 @ApiExtraModels(
     NotificationPayload,
     ReviewNotificationPayload,
-    ProviderRequestCreatedNotificationPayload,
-    ProviderRequestStatusChangedNotificationPayload,
-    ProviderAddedToFavouritesNotificationPayload,
-    ProviderDeletedFromFavouritesNotificationPayload
+    NewHorecaRequestNotificationPayload,
+    NewProviderRequestNotificationPayload,
+    ProviderApprovedNotificationPayload,
+    NewMessageNotificationPayload
 )
 export class NotificationController {
     @Get()

@@ -11,6 +11,7 @@ import { ChatMessageDbService } from './services/chat.message.db.service'
 import { ChatMessageService } from './services/chat.message.service'
 import { ChatsMessageController } from './chat.message.controller'
 import { SupportRequestsModule } from '../supportRequests/supportRequests.module'
+import { NotificationModule } from '@/notifications/notification.module'
 
 @Module({
     imports: [
@@ -21,9 +22,10 @@ import { SupportRequestsModule } from '../supportRequests/supportRequests.module
         forwardRef(() => FavouritesModule),
         forwardRef(() => HorecaRequestsModule),
         SupportRequestsModule,
+        NotificationModule
     ],
     providers: [ChatWsGateway, ChatDbService, ChatService, ChatMessageDbService, ChatMessageService],
     controllers: [ChatsController, ChatsMessageController],
     exports: [ChatService, ChatWsGateway],
 })
-export class ChatModule {}
+export class ChatModule { }
