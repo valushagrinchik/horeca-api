@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common'
+import { forwardRef, Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 import { NotificationWsGateway } from './notification.ws.gateway'
 import { UsersModule } from '../users/users.module'
@@ -9,7 +9,7 @@ import { NotificationController } from './notification.controller'
         ConfigModule.forRoot({
             isGlobal: true,
         }),
-        UsersModule,
+        forwardRef(() => UsersModule),
     ],
     controllers: [NotificationController],
     providers: [NotificationWsGateway],

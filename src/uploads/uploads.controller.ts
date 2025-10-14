@@ -1,16 +1,20 @@
-import { Controller, Param, Post, Delete, UploadedFile, UseInterceptors } from '@nestjs/common'
+import { Controller, Param, Post, Delete, UploadedFile, UseInterceptors, Body, Get, Res, BadRequestException } from '@nestjs/common'
 import { UploadsService } from './uploads.service'
 import { FileInterceptor } from '@nestjs/platform-express/multer'
 import { ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger'
-import { AuthUser } from '../auth/decorators'
+import {  AuthUser } from '../auth/decorators'
 import { UserRole } from '@prisma/client'
 import { UploadDto } from './dto/upload.dto'
+import { ChatService } from '@/chat/services/chat.service'
+import { ErrorCodes, ErrorDto } from '@/shared/utils'
 
 @Controller('uploads')
 @ApiTags('Uploads')
 @AuthUser(UserRole.Provider, UserRole.Horeca, UserRole.Admin)
 export class UploadsController {
-    constructor(private readonly uploadsService: UploadsService) {}
+    constructor(
+        private readonly uploadsService: UploadsService,
+    ) {}
 
     @Post()
     @ApiConsumes('multipart/form-data')
@@ -28,6 +32,13 @@ export class UploadsController {
     @UseInterceptors(
         FileInterceptor('file', {
             limits: { fileSize: Math.pow(1024, 2) * 1 },
+            fileFilter: (req, file, cb) => {
+                if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png') {
+                    cb(null, true)
+                } else {
+                    cb(new BadRequestException(new ErrorDto(ErrorCodes.ONLY_IMAGES_ARE_ALLOWED)), false)
+                }
+            }
         })
     )
     @ApiOperation({ summary: 'Загрузить файл. Роль пользователя: Поставщик/Хорека/Админ' })
@@ -35,6 +46,7 @@ export class UploadsController {
         const upload = await this.uploadsService.upload(file)
         return new UploadDto(upload)
     }
+    
 
     @Delete(':id')
     @ApiOperation({ summary: 'Удалить файл. Роль пользователя: Поставщик/Хорека/Админ' })

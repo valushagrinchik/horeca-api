@@ -1,4 +1,4 @@
-import { Logger, Module } from '@nestjs/common'
+import { forwardRef, Logger, Module } from '@nestjs/common'
 import { UsersService } from './users.service'
 import { UsersController } from './users.controller'
 import { MailService } from '../mail/mail.service'
@@ -23,7 +23,7 @@ import { UsersAdminController } from './users.admin.controller'
         }),
         MailModule,
         RequestsMatcherModule,
-        UploadsModule,
+        forwardRef(() => UploadsModule),
     ],
     controllers: [UsersController, AuthorizationController, UsersAdminController],
     providers: [UsersDbService, AuthorizationService, UsersService, MailService, Logger],

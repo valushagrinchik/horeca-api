@@ -20,10 +20,10 @@ import { HorecaRequestsConsumerService } from './cron/horecaRequests.consumer.se
 
 @Module({
     imports: [
-        UsersModule,
-        UploadsModule,
+        forwardRef(() => UsersModule),
+        forwardRef(() => UploadsModule),
         CronModule,
-        NotificationModule,
+        forwardRef(() => NotificationModule),
         forwardRef(() => ChatModule),
         RequestsMatcherModule,
 

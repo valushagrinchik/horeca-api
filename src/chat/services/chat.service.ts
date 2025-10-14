@@ -22,8 +22,8 @@ export class ChatService {
     ) {}
 
     async validate(auth: AuthInfoDto, id: number) {
-        const horecaRequest = await this.chatRep.getRawById(auth.id, id)
-        if (!horecaRequest) {
+        const chat = await this.chatRep.getRawById(auth.id, id)
+        if (!chat) {
             throw new BadRequestException(new ErrorDto(ErrorCodes.ITEM_NOT_FOUND))
         }
     }

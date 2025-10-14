@@ -18,8 +18,8 @@ import { NotificationModule } from '@/notifications/notification.module'
         ConfigModule.forRoot({
             isGlobal: true,
         }),
-        UsersModule,
-        FavouritesModule,
+        forwardRef(() => UsersModule),
+        forwardRef(() => FavouritesModule),
         forwardRef(() => HorecaRequestsModule),
         SupportRequestsModule,
         NotificationModule

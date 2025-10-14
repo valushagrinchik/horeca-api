@@ -3,7 +3,7 @@ import { DatabaseService } from '@/system/database/database.service'
 import { HorecaRequestStatus, Prisma, ProviderRequestStatus } from '@prisma/client'
 import { HorecaRequestSetStatusDto } from '../dto/horecaRequest.approveProviderRequest.dto'
 import * as dayjs from 'dayjs'
-import { horecaRequestsStatusMap, providerRequestsStatusMap } from '@/shared/utils'
+import { DB_DATE_FORMAT, horecaRequestsStatusMap, providerRequestsStatusMap } from '@/shared/utils'
 
 @Injectable()
 export class HorecaRequestsDbService {
@@ -157,11 +157,10 @@ export class HorecaRequestsDbService {
             return results.filter(res => res.status === 'fulfilled').map(res => res.value.id)
         })
     }
-
-    handleCompletedUnsuccessfully = async (now = dayjs().toISOString()) => {
+    handleCompletedUnsuccessfully = async (now = dayjs().format(DB_DATE_FORMAT)) => {
         const withoutProviderRequests = await this.db.horecaRequest.findMany({
             where: {
-                acceptUntill: { lte: now },
+                acceptUntill: { lt: new Date(now) },
                 status: {
                     in: [HorecaRequestStatus.Pending],
                 },
