@@ -114,7 +114,6 @@ export class ProviderRequestsService {
                             }
                           : {}),
                     acceptUntill: {
-                        // TODO: check date
                         gte: new Date(now),
                     },
                     providerRequests: {
