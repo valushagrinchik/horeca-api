@@ -1,25 +1,27 @@
 import { INestApplication } from '@nestjs/common'
-import { ENDPOINTS } from './constants'
+import { ENDPOINTS } from '../constants'
 import * as request from 'supertest'
-import { LoginUserDto } from '../src/users/dto/login-user.dto'
-import { RegistrateUserDto } from '../src/users/dto/registrate-user.dto'
-import { UpdateUserDto } from '../src/users/dto/update-user.dto'
-import { HorecaRequestCreateDto } from '../src/horecaRequests/dto/horecaRequest.create.dto'
+import { LoginUserDto } from '../../src/users/dto/login-user.dto'
+import { RegistrateUserDto } from '../../src/users/dto/registrate-user.dto'
+import { UpdateUserDto } from '../../src/users/dto/update-user.dto'
+import { HorecaRequestCreateDto } from '../../src/horecaRequests/dto/horecaRequest.create.dto'
 import { PaginateValidateType } from '@/shared/utils'
 import { Test, TestingModule, TestingModuleBuilder } from '@nestjs/testing'
-import { AppModule } from '../src/app.module'
-import { AuthResultDto } from '../src/auth/dto/auth.result.dto'
-import { ProviderRequestCreateDto } from '../src/providerRequests/dto/providerRequest.create.dto'
-import { HorecaRequestProviderStatusDto } from '../src/providerRequests/dto/horecaRequest.providerStatus.dto'
-import { HorecaRequestTemplateCreateDto } from '../src/horecaRequests/dto/horecaRequest.template.create.dto'
-import { HorecaRequestSetStatusDto } from '../src/horecaRequests/dto/horecaRequest.approveProviderRequest.dto'
-import { FavouritesCreateDto } from '../src/favourites/dto/favourites.create.dto'
-import { ChatCreateDto } from '../src/chat/dto/chat.create.dto'
-import { ChatDto } from '../src/chat/dto/chat.dto'
-import { HorecaRequestTemplateUpdateDto } from '../src/horecaRequests/dto/horecaRequest.template.update.dto'
+import { AppModule } from '../../src/app.module'
+import { AuthResultDto } from '../../src/auth/dto/auth.result.dto'
+import { ProviderRequestCreateDto } from '../../src/providerRequests/dto/providerRequest.create.dto'
+import { HorecaRequestProviderStatusDto } from '../../src/providerRequests/dto/horecaRequest.providerStatus.dto'
+import { HorecaRequestTemplateCreateDto } from '../../src/horecaRequests/dto/horecaRequest.template.create.dto'
+import { HorecaRequestSetStatusDto } from '../../src/horecaRequests/dto/horecaRequest.approveProviderRequest.dto'
+import { FavouritesCreateDto } from '../../src/favourites/dto/favourites.create.dto'
+import { ChatCreateDto } from '../../src/chat/dto/chat.create.dto'
+import { ChatDto } from '../../src/chat/dto/chat.dto'
+import { HorecaRequestTemplateUpdateDto } from '../../src/horecaRequests/dto/horecaRequest.template.update.dto'
 import { io, Socket } from 'socket.io-client'
-import { SupportRequestCreateDto } from '../src/supportRequests/dto/supportRequest.create.dto'
-import { SupportRequestSearchDto } from '../src/supportRequests/dto/supportRequest.search.dto'
+import { SupportRequestCreateDto } from '../../src/supportRequests/dto/supportRequest.create.dto'
+import { SupportRequestSearchDto } from '../../src/supportRequests/dto/supportRequest.search.dto'
+import { DatabaseService } from '@/system/database/database.service'
+import { UserDto } from '@/users/dto/user.dto'
 
 export const ioClient = (namespace: string, accessToken: string): Socket => {
     return io(process.env.WS_URL + namespace, {
@@ -363,4 +365,15 @@ export const assignAdminToSupportRequest = async (app: INestApplication, accessT
         .post(ENDPOINTS.SUPPORT_REQUESTS_ADMIN.replace(':id', id.toString()))
         .set('Authorization', 'Bearer ' + accessToken)
         .then(res => res.body)
+}
+
+
+export const  getAdminUsers = async (app: INestApplication, accessToken: string) => {
+    return await request(app.getHttpServer()).get(ENDPOINTS.ADMIN_USERS).set('Authorization', `Bearer ${accessToken}`)
+    .then(res => res.body)
+}
+
+export const deleteAdminUser = async(app: INestApplication, accessToken: string, userId: number) => {
+    return await request(app.getHttpServer()).delete(`${ENDPOINTS.ADMIN_USERS}/${userId}`).set('Authorization', `Bearer ${accessToken}`)
+    .then(res => res.status)
 }

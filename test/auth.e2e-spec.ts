@@ -3,42 +3,62 @@ import { horecaUsers, providerUsers } from './mock/authData'
 import { ErrorCodes } from '@/shared/utils'
 import { UsersDbService } from '../src/users/users.db.service'
 import { DatabaseService } from './../src/system/database/database.service'
-import { activateUser, authUser, initApp, registrateUser } from './helpers'
+import { activateUser, authUser, initApp, registrateUser } from './helpers/api'
 import { ENDPOINTS } from './constants'
 import { MailerService } from '@nestjs-modules/mailer'
 import { MailService } from '../src/mail/mail.service'
+import { cleanDatabase } from './helpers/seed'
 
 let app: INestApplication
 let mailer: MailerService
 let users = []
+let db: DatabaseService
 
 beforeAll(async () => {
-    const dbService = new DatabaseService()
-    const usersDbServiceMocked = new UsersDbService(dbService)
-    usersDbServiceMocked.createUser = new Proxy(usersDbServiceMocked.createUser, {
-        async apply(target, thisArg, argumentsList) {
-            const user = await Reflect.apply(target, thisArg, argumentsList)
-            users.push(user)
-            return user
-        },
-    })
-
     const mailServiceMocked = { sendMail: jest.fn(), sendActivationMail: jest.fn() }
 
     app = await initApp(
         mb => {
-            mb.overrideProvider(UsersDbService).useValue(usersDbServiceMocked)
             mb.overrideProvider(MailService).useValue(mailServiceMocked)
         },
         tm => {
             mailer = tm.get<MailerService>(MailerService)
+            db = tm.get<DatabaseService>(DatabaseService)
         }
     )
 })
 
-afterAll(async () => {
-    await app.close()
+beforeEach(async () => {
+    try {
+        await cleanDatabase(db)
+        users = [] // Reset users array
+    } catch (error) {
+        console.error('Error in beforeEach setup:', error)
+        throw error
+    }
 })
+
+afterEach(async () => {
+    try {
+        await cleanDatabase(db)
+    } catch (error) {
+        console.error('Error in afterEach cleanup:', error)
+    }
+})
+
+afterAll(async () => {
+    try {
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        if (db) {
+            await db.$disconnect()
+        }
+        if (app) {
+            await app.close()
+        }
+    } catch (error) {
+        console.error('Error during cleanup:', error)
+    }
+}, 10000)
 
 describe('AuthorizationController (e2e)', () => {
     describe.each([
@@ -57,12 +77,19 @@ describe('AuthorizationController (e2e)', () => {
                 expect(res).toHaveProperty('id')
                 expect(res).toHaveProperty('profile')
                 expect(res.email).toEqual(payload.email)
+                
+                // Store user for later tests
+                users.push(res)
                 return
             })
         })
 
         describe('POST ' + ENDPOINTS.SIGNIN, () => {
             it('should throw an AUTH_FAIL in case of profile is not activated', async () => {
+                // Create user first
+                const userRes = await registrateUser(app, payload)
+                users.push(userRes)
+
                 const res = await authUser(app, {
                     email: payload.email,
                     password: payload.password,
@@ -73,6 +100,10 @@ describe('AuthorizationController (e2e)', () => {
                 return
             })
             it('should return accessToken and refreshToken', async () => {
+                // Create user first
+                const userRes = await registrateUser(app, payload)
+                users.push(userRes)
+                
                 const user = users.find(user => user.email == payload.email)
                 await activateUser(app, user.activationLink)
 

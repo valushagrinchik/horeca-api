@@ -200,4 +200,8 @@ export class UsersDbService {
             },
         })
     }
+
+    async delete(id: number) {
+        return this.db.user.delete({ where: { id } })
+    }
 }

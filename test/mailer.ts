@@ -1,5 +1,5 @@
 import { MailerService } from '@nestjs-modules/mailer'
-import { initApp } from './helpers'
+import { initApp } from './helpers/api'
 import { INestApplication } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 

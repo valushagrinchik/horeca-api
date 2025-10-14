@@ -1,5 +1,6 @@
 import { INestApplication } from '@nestjs/common'
 import { 
+    activateUser,
     authUser, 
     getProfile, 
     initApp, 
@@ -8,10 +9,12 @@ import {
     createProviderRequest, 
     approveProviderRequest,
     createChat,
-    addFavourites
-} from './helpers'
+    addFavourites,
+    registrateUser
+} from './helpers/api'
 import { AuthResultDto } from '../src/auth/dto/auth.result.dto'
-import { horecaRequestInput, horecaUserInput, providerUserInput, adminUserInput } from './mock/seedData'
+import { horecaRequestInput, adminUserInput } from './mock/seedData'
+import { horecaUsers, providerUsers } from './mock/authData'
 import { UserDto } from '../src/users/dto/user.dto'
 import { NotificationWsGateway } from '@/notifications/notification.ws.gateway'
 import { NotificationEvents, Categories, generateFutureDate } from '@/shared/utils'
@@ -19,6 +22,8 @@ import { HorecaRequestsService } from '@/horecaRequests/services/horecaRequests.
 import { ProviderRequestsService } from '@/providerRequests/services/providerRequests.service'
 import { ChatWsGateway } from '@/chat/chat.ws.gateway'
 import { DatabaseService } from '@/system/database/database.service'
+import { cleanDatabase } from './helpers/seed'
+import { RequestsMatcherDbService } from '@/shared/requestsMatcher/requestsMatcher.db.service'
 import { ChatType, PaymentType } from '@prisma/client'
 import { HorecaRequestDto } from '@/horecaRequests/dto/horecaRequest.dto'
 import { ProviderRequestDto } from '@/providerRequests/dto/providerRequest.dto'
@@ -30,6 +35,7 @@ let horecaRequestsService: HorecaRequestsService
 let providerRequestsService: ProviderRequestsService
 let chatGateway: ChatWsGateway
 let db: DatabaseService
+let matcher: RequestsMatcherDbService
 
 let horecaAuth: AuthResultDto
 let providerAuth: AuthResultDto
@@ -45,20 +51,70 @@ beforeAll(async () => {
         providerRequestsService = tm.get<ProviderRequestsService>(ProviderRequestsService)
         chatGateway = tm.get<ChatWsGateway>(ChatWsGateway)
         db = tm.get<DatabaseService>(DatabaseService)
+        matcher = tm.get<RequestsMatcherDbService>(RequestsMatcherDbService)
     })
+})
 
-    horecaAuth = await authUser(app, horecaUserInput)
-    providerAuth = await authUser(app, providerUserInput)
-    adminAuth = await authUser(app, adminUserInput)
+beforeEach(async () => {
+    try {
+        await cleanDatabase(db)
+        
+        // Create admin user in database first
+        await db.user.create({
+            data: adminUserInput
+        })
+        
+        // Then authenticate with plain password
+        adminAuth = await authUser(app, { 
+            email: adminUserInput.email, 
+            password: 'admin!' // Use plain password for login
+        })
+        admin = await getProfile(app, adminAuth.accessToken)
+        
+        // Create and activate horeca user
+        const horecaUser = await registrateUser(app, horecaUsers[0])
+        await activateUser(app, horecaUser.activationLink)
+        horecaAuth = await authUser(app, {
+            email: horecaUsers[0].email,
+            password: horecaUsers[0].password
+        })
+        horeca = await getProfile(app, horecaAuth.accessToken)
+        
+        // Create and activate provider user  
+        const providerUser = await registrateUser(app, providerUsers[0])
+        await activateUser(app, providerUser.activationLink)
+        providerAuth = await authUser(app, {
+            email: providerUsers[0].email,
+            password: providerUsers[0].password
+        })
+        provider = await getProfile(app, providerAuth.accessToken)
+    } catch (error) {
+        console.error('Error in beforeEach setup:', error)
+        throw error
+    }
+})
 
-    horeca = await getProfile(app, horecaAuth.accessToken)
-    provider = await getProfile(app, providerAuth.accessToken)
-    admin = await getProfile(app, adminAuth.accessToken)
+afterEach(async () => {
+    try {
+        await cleanDatabase(db)
+    } catch (error) {
+        console.error('Error in afterEach cleanup:', error)
+    }
 })
 
 afterAll(async () => {
-    await app.close()
-})
+    try {
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        if (db) {
+            await db.$disconnect()
+        }
+        if (app) {
+            await app.close()
+        }
+    } catch (error) {
+        console.error('Error during cleanup:', error)
+    }
+}, 10000)
 
 describe('NotificationWsGateway - All sendNotification Cases (e2e)', () => {
     it('NotificationWsGateway should be defined', () => {
@@ -118,19 +174,20 @@ describe('NotificationWsGateway - All sendNotification Cases (e2e)', () => {
                 }]
             })
 
+            await matcher.updateView()
+
             expect(horecaRequest).toBeDefined()
             return notificationPromise
         }, 15000)
     })
 
     describe('NEW_PROVIDER_REQUEST notifications', () => {
-        let horecaRequest: HorecaRequestDto
-
-        beforeAll(async () => {
+        it('should send notification to horeca when provider creates request', async () => {
+            // Create horeca request first
             const acceptUntill = generateFutureDate()
             const deliveryTime = generateFutureDate(14)
 
-            horecaRequest = await createHorecaRequest(app, horecaAuth.accessToken, {
+            const horecaRequest = await createHorecaRequest(app, horecaAuth.accessToken, {
                 items: [{
                     name: 'Test Item for Provider Request',
                     amount: 5,
@@ -145,9 +202,8 @@ describe('NotificationWsGateway - All sendNotification Cases (e2e)', () => {
                 phone: '+1234567890',
                 comment: 'Test comment',
             })
-        })
 
-        it('should send notification to horeca when provider creates request', async () => {
+            await matcher.updateView()
             const horecaWsClient = ioClient('notifications', horecaAuth.accessToken)
             
             const notificationPromise = new Promise<void>((resolve, reject) => {
@@ -203,14 +259,12 @@ describe('NotificationWsGateway - All sendNotification Cases (e2e)', () => {
     })
 
     describe('PROVIDER_APPROVED notifications', () => {
-        let horecaRequest: HorecaRequestDto
-        let providerRequest: ProviderRequestDto
-
-        beforeAll(async () => {
+        it('should send notification when provider request is approved', async () => {
+            // Create the required data first
             const acceptUntill = generateFutureDate()
             const deliveryTime = generateFutureDate(14)
 
-            horecaRequest = await createHorecaRequest(app, horecaAuth.accessToken, {
+            const horecaRequest = await createHorecaRequest(app, horecaAuth.accessToken, {
                 items: [{
                     name: 'Test Item for Approval',
                     amount: 3,
@@ -226,7 +280,7 @@ describe('NotificationWsGateway - All sendNotification Cases (e2e)', () => {
                 comment: 'Approval test comment',
             })
 
-            providerRequest = await createProviderRequest(app, providerAuth.accessToken, {
+            const providerRequest = await createProviderRequest(app, providerAuth.accessToken, {
                 horecaRequestId: horecaRequest.id,
                 comment: 'Test provider request for approval',
                 items: [{
@@ -236,9 +290,8 @@ describe('NotificationWsGateway - All sendNotification Cases (e2e)', () => {
                     horecaRequestItemId: horecaRequest.items[0].id,
                 }]
             })
-        })
 
-        it('should send notification when provider request is approved', async () => {
+            await matcher.updateView()
             const providerWsClient = ioClient('notifications', providerAuth.accessToken)
             
             const notificationPromise = new Promise<void>((resolve, reject) => {
@@ -288,15 +341,12 @@ describe('NotificationWsGateway - All sendNotification Cases (e2e)', () => {
     })
 
     describe('NEW_MESSAGE notifications from chat', () => {
-        let horecaRequest: HorecaRequestDto
-        let providerRequest: ProviderRequestDto
-        let chat: ChatDto
-
-        beforeAll(async () => {
+        it('should send NEW_MESSAGE notification when chat message is sent', async () => {
+            // Create the required data first
             const acceptUntill = generateFutureDate()
             const deliveryTime = generateFutureDate(14)
 
-            horecaRequest = await createHorecaRequest(app, horecaAuth.accessToken, {
+            const horecaRequest = await createHorecaRequest(app, horecaAuth.accessToken, {
                 items: [{
                     name: 'Chat Test Item',
                     amount: 2,
@@ -312,7 +362,7 @@ describe('NotificationWsGateway - All sendNotification Cases (e2e)', () => {
                 comment: 'Chat test comment',
             })
 
-            providerRequest = await createProviderRequest(app, providerAuth.accessToken, {
+            const providerRequest = await createProviderRequest(app, providerAuth.accessToken, {
                 horecaRequestId: horecaRequest.id,
                 comment: 'Chat test provider request',
                 items: [{
@@ -323,20 +373,19 @@ describe('NotificationWsGateway - All sendNotification Cases (e2e)', () => {
                 }]
             })
 
+            await matcher.updateView()
+
             await approveProviderRequest(app, horecaAuth.accessToken, {
                 horecaRequestId: horecaRequest.id,
                 providerRequestId: providerRequest.id,
             })
 
-            chat = await createChat(app, horecaAuth.accessToken, {
+            const chat = await createChat(app, horecaAuth.accessToken, {
                 opponentId: provider.id,
                 horecaRequestId: horecaRequest.id,
                 providerRequestId: providerRequest.id,
                 type: ChatType.Order,
             })
-        })
-
-        it('should send NEW_MESSAGE notification when chat message is sent', async () => {
             const providerWsClient = ioClient('notifications', providerAuth.accessToken)
             const horecaWsClient = ioClient('chats', horecaAuth.accessToken)
             
@@ -408,6 +457,70 @@ describe('NotificationWsGateway - All sendNotification Cases (e2e)', () => {
 
     describe('REVIEW notifications', () => {
         it('should send REVIEW notification for first review reminder', async () => {
+            // Create data that matches the review notification criteria
+            // The service looks for requests that are 24+ hours old and have status Active with finished provider requests
+            const now = new Date()
+            const yesterday = new Date(now.getTime() - 25 * 60 * 60 * 1000) // 25 hours ago
+            
+            // Create the horeca request first
+            const horecaRequest = await db.horecaRequest.create({
+                data: {
+                    userId: horeca.id,
+                    address: 'Review Test Address',
+                    deliveryTime: new Date(now.getTime() + 24 * 60 * 60 * 1000), // tomorrow
+                    acceptUntill: new Date(now.getTime() + 2 * 60 * 60 * 1000), // 2 hours from now
+                    paymentType: 'Prepayment',
+                    name: 'Review Test Request',
+                    phone: '+1234567890',
+                    comment: 'Review test comment',
+                    status: 'Active', // Required for review notifications
+                    createdAt: yesterday, // Make it old enough
+                    updatedAt: yesterday,
+                }
+            })
+
+            // Create the horeca request item
+            const horecaRequestItem = await db.horecaRequestItem.create({
+                data: {
+                    horecaRequestId: horecaRequest.id,
+                    name: 'Review Test Item',
+                    amount: 1,
+                    unit: 'piece',
+                    category: Categories.meat,
+                }
+            })
+
+            // Create the provider request
+            const providerRequest = await db.providerRequest.create({
+                data: {
+                    userId: provider.id,
+                    horecaRequestId: horecaRequest.id,
+                    comment: 'Review test provider request',
+                    status: 'Finished', // Required for review notifications
+                    createdAt: yesterday,
+                    updatedAt: yesterday,
+                }
+            })
+
+            // Create the provider request item
+            await db.providerRequestItem.create({
+                data: {
+                    providerRequestId: providerRequest.id,
+                    horecaRequestItemId: horecaRequestItem.id,
+                    available: true,
+                    manufacturer: 'Review Test Manufacturer',
+                    cost: 1000,
+                }
+            })
+
+            // Create the chat
+            const chat = await db.chat.create({
+                data: {
+                    opponents: [horeca.id, provider.id],
+                    type: 'Order'
+                }
+            })
+
             const horecaWsClient = ioClient('notifications', horecaAuth.accessToken)
             
             const notificationPromise = new Promise<void>((resolve, reject) => {
@@ -455,6 +568,71 @@ describe('NotificationWsGateway - All sendNotification Cases (e2e)', () => {
         }, 15000)
 
         it('should send REVIEW_REMINDER notification for second review reminder', async () => {
+            // Create data that matches the second review notification criteria  
+            // The service looks for requests that are 72+ hours old with firstReviewNotificationSent = true
+            const now = new Date()
+            const threeDaysAgo = new Date(now.getTime() - 73 * 60 * 60 * 1000) // 73 hours ago
+            
+            // Create the horeca request first
+            const horecaRequest = await db.horecaRequest.create({
+                data: {
+                    userId: horeca.id,
+                    address: 'Review Reminder Test Address',
+                    deliveryTime: new Date(now.getTime() + 24 * 60 * 60 * 1000), // tomorrow
+                    acceptUntill: new Date(now.getTime() + 2 * 60 * 60 * 1000), // 2 hours from now
+                    paymentType: 'Prepayment',
+                    name: 'Review Reminder Test Request',
+                    phone: '+1234567890',
+                    comment: 'Review reminder test comment',
+                    status: 'Active', // Required for review notifications
+                    reviewNotificationSent: true, // Required for second notification
+                    createdAt: threeDaysAgo, // Make it old enough
+                    updatedAt: threeDaysAgo,
+                }
+            })
+
+            // Create the horeca request item
+            const horecaRequestItem = await db.horecaRequestItem.create({
+                data: {
+                    horecaRequestId: horecaRequest.id,
+                    name: 'Review Reminder Test Item',
+                    amount: 1,
+                    unit: 'piece',
+                    category: Categories.meat,
+                }
+            })
+
+            // Create the provider request
+            const providerRequest = await db.providerRequest.create({
+                data: {
+                    userId: provider.id,
+                    horecaRequestId: horecaRequest.id,
+                    comment: 'Review reminder test provider request',
+                    status: 'Finished', // Required for review notifications
+                    createdAt: threeDaysAgo,
+                    updatedAt: threeDaysAgo,
+                }
+            })
+
+            // Create the provider request item
+            await db.providerRequestItem.create({
+                data: {
+                    providerRequestId: providerRequest.id,
+                    horecaRequestItemId: horecaRequestItem.id,
+                    available: true,
+                    manufacturer: 'Review Reminder Test Manufacturer',
+                    cost: 1000,
+                }
+            })
+
+            // Create the chat
+            const chat = await db.chat.create({
+                data: {
+                    opponents: [horeca.id, provider.id],
+                    type: 'Order'
+                }
+            })
+
             const horecaWsClient = ioClient('notifications', horecaAuth.accessToken)
             
             const notificationPromise = new Promise<void>((resolve, reject) => {
@@ -503,22 +681,17 @@ describe('NotificationWsGateway - All sendNotification Cases (e2e)', () => {
     })
 
     describe('Server message notifications', () => {
-        let chat: ChatDto
-
-        beforeAll(async () => {
+        it('should send NEW_MESSAGE notification when server message is sent', async () => {
             // Create a private chat for server message testing
             const fav = await addFavourites(app, horecaAuth.accessToken, {
                 providerId: provider.id,
             })
             
-            chat = await createChat(app, horecaAuth.accessToken, {
+            const chat = await createChat(app, horecaAuth.accessToken, {
                 opponentId: provider.id,
                 horecaFavouriteId: fav.id,
                 type: ChatType.Private,
             })
-        })
-
-        it('should send NEW_MESSAGE notification when server message is sent', async () => {
             const horecaWsClient = ioClient('notifications', horecaAuth.accessToken)
             const providerWsClient = ioClient('notifications', providerAuth.accessToken)
             

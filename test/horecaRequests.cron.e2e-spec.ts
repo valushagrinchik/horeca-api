@@ -1,13 +1,23 @@
 import { INestApplication } from '@nestjs/common'
-import { initApp } from './helpers'
+import { 
+    activateUser,
+    initApp,
+    registrateUser
+} from './helpers/api'
 import { HorecaRequestsService } from '../src/horecaRequests/services/horecaRequests.service'
 import { DatabaseService } from '../src/system/database/database.service'
+import { cleanDatabase } from './helpers/seed'
+import { horecaUsers, providerUsers } from './mock/authData'
+import { adminUserInput } from './mock/seedData'
 import * as dayjs from 'dayjs'
 import { HorecaRequestStatus, ProviderRequestStatus } from '@prisma/client'
 
 let app: INestApplication
 let service: HorecaRequestsService
 let db: DatabaseService
+let horecaUserId: number
+let providerUserId: number
+let adminUserId: number
 
 beforeAll(async () => {
     app = await initApp(undefined, tm => {
@@ -16,9 +26,51 @@ beforeAll(async () => {
     })
 })
 
-afterAll(async () => {
-    await app.close()
+beforeEach(async () => {
+    try {
+        await cleanDatabase(db)
+        
+        // Create users for the test
+        const horecaUser = await registrateUser(app, horecaUsers[0])
+        await activateUser(app, horecaUser.activationLink)
+        horecaUserId = horecaUser.id
+        
+        const providerUser = await registrateUser(app, providerUsers[0])
+        await activateUser(app, providerUser.activationLink)
+        providerUserId = providerUser.id
+        
+        // Create admin user directly in database
+        const adminUser = await db.user.create({
+            data: adminUserInput
+        })
+        adminUserId = adminUser.id
+    } catch (error) {
+        console.error('Error in beforeEach setup:', error)
+        throw error
+    }
 })
+
+afterEach(async () => {
+    try {
+        await cleanDatabase(db)
+    } catch (error) {
+        console.error('Error in afterEach cleanup:', error)
+    }
+})
+
+afterAll(async () => {
+    try {
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        if (db) {
+            await db.$disconnect()
+        }
+        if (app) {
+            await app.close()
+        }
+    } catch (error) {
+        console.error('Error during cleanup:', error)
+    }
+}, 10000)
 
 describe('HorecaRequestsService', () => {
     it('should ...', async () => {
@@ -26,7 +78,7 @@ describe('HorecaRequestsService', () => {
         await db.horecaRequest.createMany({
             data: [
                 {
-                    userId: 1,
+                    userId: horecaUserId,
                     address: '',
                     deliveryTime: now.add(2, 'days').toISOString(),
                     acceptUntill: now.add(2, 'hours').toISOString(),
@@ -35,7 +87,7 @@ describe('HorecaRequestsService', () => {
                     phone: '',
                 },
                 {
-                    userId: 1,
+                    userId: horecaUserId,
                     address: '',
                     deliveryTime: now.add(2, 'days').toISOString(),
                     acceptUntill: now.add(1, 'day').toISOString(),
@@ -47,7 +99,7 @@ describe('HorecaRequestsService', () => {
         })
         await db.horecaRequest.create({
             data: {
-                userId: 1,
+                userId: horecaUserId,
                 address: '',
                 deliveryTime: now.add(2, 'days').toISOString(),
                 acceptUntill: now.add(2, 'hours').toISOString(),
@@ -58,7 +110,7 @@ describe('HorecaRequestsService', () => {
                     createMany: {
                         data: [
                             {
-                                userId: 2,
+                                userId: providerUserId,
                             },
                         ],
                     },
@@ -67,7 +119,7 @@ describe('HorecaRequestsService', () => {
         })
         await db.horecaRequest.create({
             data: {
-                userId: 1,
+                userId: horecaUserId,
                 address: '',
                 deliveryTime: now.toISOString(),
                 acceptUntill: now.add(-2, 'days').toISOString(),
@@ -79,7 +131,7 @@ describe('HorecaRequestsService', () => {
                     createMany: {
                         data: [
                             {
-                                userId: 2,
+                                userId: providerUserId,
                                 status: ProviderRequestStatus.Pending,
                             },
                         ],
@@ -89,7 +141,7 @@ describe('HorecaRequestsService', () => {
         })
         await db.horecaRequest.create({
             data: {
-                userId: 1,
+                userId: horecaUserId,
                 address: '',
                 deliveryTime: now.toISOString(),
                 acceptUntill: now.add(-2, 'days').toISOString(),
@@ -101,11 +153,11 @@ describe('HorecaRequestsService', () => {
                     createMany: {
                         data: [
                             {
-                                userId: 2,
+                                userId: providerUserId,
                                 status: ProviderRequestStatus.Active,
                             },
                             {
-                                userId: 3,
+                                userId: adminUserId,
                                 status: ProviderRequestStatus.Pending,
                             },
                         ],

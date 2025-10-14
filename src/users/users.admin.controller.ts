@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common'
+import { Controller, Delete, Get, Param } from '@nestjs/common'
 import { UsersService } from './users.service'
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { UserDto } from './dto/user.dto'
@@ -15,7 +15,7 @@ import { UsersSearchAdminDto } from './dto/usersSearch.admin.dto'
 
 @Controller('admin/users')
 @ApiTags('Users')
-@AuthUser(UserRole.Provider, UserRole.Horeca, UserRole.Admin)
+@AuthUser(UserRole.Admin)
 export class UsersAdminController {
     constructor(private readonly usersService: UsersService) {}
 
@@ -30,4 +30,12 @@ export class UsersAdminController {
         const [data, total] = await this.usersService.findAllAndCount(auth, paginate)
         return new PaginatedDto<UserDto>(data, total)
     }
+
+
+    @Delete(':id')
+    @ApiOperation({ summary: 'Удалить пользователя по id. Роль пользователя: Админ' })
+    async delete(@Param('id') id: number) {
+        await this.usersService.delete(+id)
+    }
 }
+

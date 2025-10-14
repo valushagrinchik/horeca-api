@@ -1,12 +1,20 @@
 import { INestApplication } from '@nestjs/common'
-import { authUser, getProfile, initApp, ioClient } from './helpers'
+import { 
+    activateUser,
+    authUser, 
+    getProfile, 
+    initApp, 
+    ioClient,
+    registrateUser
+} from './helpers/api'
 import { AuthResultDto } from '../src/auth/dto/auth.result.dto'
-import { horecaUserInput, providerUserInput } from './mock/seedData'
+import { horecaUsers, providerUsers } from './mock/authData'
 import { UserDto } from '../src/users/dto/user.dto'
 import { NotificationWsGateway } from '@/notifications/notification.ws.gateway'
 import { NotificationEvents } from '@/shared/utils'
 import { HorecaRequestsConsumerService } from '@/horecaRequests/cron/horecaRequests.consumer.service'
 import { DatabaseService } from '@/system/database/database.service'
+import { cleanDatabase } from './helpers/seed'
 
 let app: INestApplication
 let gateway: NotificationWsGateway
@@ -23,17 +31,56 @@ beforeAll(async () => {
         hrConsumer = tm.get<HorecaRequestsConsumerService>(HorecaRequestsConsumerService)
         db = tm.get<DatabaseService>(DatabaseService)
     })
+})
 
-    horecaAuth = await authUser(app, horecaUserInput)
-    providerAuth = await authUser(app, providerUserInput)
+beforeEach(async () => {
+    try {
+        await cleanDatabase(db)
+        
+        // Create and activate horeca user
+        const horecaUser = await registrateUser(app, horecaUsers[0])
+        await activateUser(app, horecaUser.activationLink)
+        horecaAuth = await authUser(app, {
+            email: horecaUsers[0].email,
+            password: horecaUsers[0].password
+        })
+        horeca = await getProfile(app, horecaAuth.accessToken)
+        
+        // Create and activate provider user  
+        const providerUser = await registrateUser(app, providerUsers[0])
+        await activateUser(app, providerUser.activationLink)
+        providerAuth = await authUser(app, {
+            email: providerUsers[0].email,
+            password: providerUsers[0].password
+        })
+        provider = await getProfile(app, providerAuth.accessToken)
+    } catch (error) {
+        console.error('Error in beforeEach setup:', error)
+        throw error
+    }
+})
 
-    horeca = await getProfile(app, horecaAuth.accessToken)
-    provider = await getProfile(app, providerAuth.accessToken)
+afterEach(async () => {
+    try {
+        await cleanDatabase(db)
+    } catch (error) {
+        console.error('Error in afterEach cleanup:', error)
+    }
 })
 
 afterAll(async () => {
-    await app.close()
-})
+    try {
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        if (db) {
+            await db.$disconnect()
+        }
+        if (app) {
+            await app.close()
+        }
+    } catch (error) {
+        console.error('Error during cleanup:', error)
+    }
+}, 10000)
 
 describe('NotificationWsGateway (e2e)', () => {
     it('NotificationWsGateway should be defined', () => {

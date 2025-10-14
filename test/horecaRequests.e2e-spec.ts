@@ -1,36 +1,82 @@
 import { INestApplication } from '@nestjs/common'
 import {
+    activateUser,
     authUser,
     createHorecaRequest,
     createProviderRequest,
     findAllHorecaRequest,
     getHorecaRequest,
     initApp,
-} from './helpers'
+    registrateUser,
+} from './helpers/api'
 import { ENDPOINTS } from './constants'
 import { AuthResultDto } from '../src/auth/dto/auth.result.dto'
-import { horecaRequestInput, horecaUserInput, providerUserInput } from './mock/seedData'
+import { horecaRequestInput } from './mock/seedData'
+import { horecaUsers, providerUsers } from './mock/authData'
 import { DatabaseService } from '@/system/database/database.service'
+import { cleanDatabase } from './helpers/seed'
+import { RequestsMatcherDbService } from '@/shared/requestsMatcher/requestsMatcher.db.service'
 
 let app: INestApplication
 let horecaAuth: AuthResultDto
 let providerAuth: AuthResultDto
 let createdRequestId: number
-
 let db: DatabaseService
+let matcher: RequestsMatcherDbService
 
 beforeAll(async () => {
     app = await initApp(undefined, tm => {
         db = tm.get<DatabaseService>(DatabaseService)
+        matcher = tm.get<RequestsMatcherDbService>(RequestsMatcherDbService)
     })
-    horecaAuth = await authUser(app, horecaUserInput)
-    providerAuth = await authUser(app, providerUserInput)
+})
+
+beforeEach(async () => {
+    try {
+        await cleanDatabase(db)
+        
+        // Create and activate horeca user
+        const horecaUser = await registrateUser(app, horecaUsers[0])
+        await activateUser(app, horecaUser.activationLink)
+        horecaAuth = await authUser(app, {
+            email: horecaUsers[0].email,
+            password: horecaUsers[0].password
+        })
+        
+        // Create and activate provider user  
+        const providerUser = await registrateUser(app, providerUsers[0])
+        await activateUser(app, providerUser.activationLink)
+        providerAuth = await authUser(app, {
+            email: providerUsers[0].email,
+            password: providerUsers[0].password
+        })
+    } catch (error) {
+        console.error('Error in beforeEach setup:', error)
+        throw error
+    }
+})
+
+afterEach(async () => {
+    try {
+        await cleanDatabase(db)
+    } catch (error) {
+        console.error('Error in afterEach cleanup:', error)
+    }
 })
 
 afterAll(async () => {
-    await db.horecaRequest.deleteMany({})
-    await app.close()
-})
+    try {
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        if (db) {
+            await db.$disconnect()
+        }
+        if (app) {
+            await app.close()
+        }
+    } catch (error) {
+        console.error('Error during cleanup:', error)
+    }
+}, 10000)
 
 describe('HorecaRequestsController (e2e)', () => {
     describe('POST ' + ENDPOINTS.HOREKA_REQUESTS, () => {
@@ -55,9 +101,11 @@ describe('HorecaRequestsController (e2e)', () => {
                     available: true,
                     manufacturer: 'smb',
                     cost: 3000,
-                    horecaRequestItemId: item.horecaRequestId,
+                    horecaRequestItemId: item.id,
                 })),
             })
+
+            await matcher.updateView()
 
             const res = await getHorecaRequest(app, horecaAuth.accessToken, createdHorecaRequest.id)
 
@@ -75,6 +123,9 @@ describe('HorecaRequestsController (e2e)', () => {
 
     describe('GET ' + ENDPOINTS.HOREKA_REQUESTS, () => {
         it('should return array of requests', async () => {
+            // Create a horeca request first
+            await createHorecaRequest(app, horecaAuth.accessToken, horecaRequestInput)
+            
             const res = await findAllHorecaRequest(app, horecaAuth.accessToken)
 
             expect(res).toHaveProperty('data')

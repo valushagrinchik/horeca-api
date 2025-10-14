@@ -20,11 +20,12 @@
         "migration:reset": "pnpm exec prisma migrate reset",
         "test:watch": "jest --watch",
         "test:cov": "jest --coverage",
-        "test:docker:restart": "pnpm exec docker compose -f docker-compose.test.yml down && pnpm exec docker compose -f docker-compose.test.yml up -d",
+        "test:docker:run": "docker compose -f docker-compose.test.yml up -d",
         "test:db:reset": "dotenv -e .env.test -- sh -c 'NODE_ENV=test npx prisma migrate reset'",
-        "test:db:prepare": "pnpm test:docker:restart && pnpm test:db:reset",
-        "test": "pnpm test:db:prepare && dotenvx run -f .env.test -- jest -i",
-        "test:e2e": "pnpm test:db:prepare && dotenvx run -f .env.test -- jest --config ./test/jest-e2e.json --runInBand"
+        "test": "pnpm test:docker:run && dotenvx run -f .env.test -- jest -i",
+        "prisma:db:push": "dotenvx run -f .env.test -- pnpm exec prisma db push",
+
+        "test:e2e": "pnpm test:docker:run && pnpm test:db:reset && dotenvx run -f .env.test -- jest --config ./test/jest-e2e.json --runInBand"
     },
     "dependencies": {
         "@bull-board/api": "^6.9.6",
