@@ -69,7 +69,11 @@ export class AuthorizationService {
     async login(dto: LoginUserDto) {
         const user = await this.userService.getUserByEmail(dto.email)
 
-        if (!user?.isActivated) {
+        if (!user) {
+            throw new BadRequestException(new ErrorDto(ErrorCodes.ITEM_NOT_FOUND, ['user_not_found']))
+        }
+
+        if (!user.isActivated) {
             throw new BadRequestException(new ErrorDto(ErrorCodes.AUTH_FAIL, ['user_is_not_activated']))
         }
 
