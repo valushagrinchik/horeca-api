@@ -1,30 +1,27 @@
 # HORECA API
 
-```
-<!-- docker -->
-pnpm run docker
+## Запуск 
 
-<!-- pm2 -->
-pnpm run db:seed
-pnpm run build
-pm2 start dist/src/main.js --name horeca-api
+### Запуск всех сервисов в докере `pnpm run docker`
 
-```
+### Для удобства разработки лучше остановить horeca_api процесс в докере и запустить его локально `pnpm start:dev`
 
-### Authentication
+### Проверить доступность API и документации по ссылке `http://localhost:3001/doc`
 
 
-#### Provider
+## Авторизация
+
+### Provider
 
 provider@test.com
 provider!
 
-#### Horeca
+### Horeca
 
 horeca@test.com
 horeca!
 
-#### Admin
+### Admin
 
 admin@test.com
 admin!

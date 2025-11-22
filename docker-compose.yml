@@ -8,12 +8,17 @@ services:
             - ~/docker-volumes/horeca_api-uploads:/app/uploads
             - ~/docker-volumes/horeca_api-logs:/app/logs
         env_file: '.env'
+        environment:
+            - DATABASE_URL=postgresql://horeca:horeca@horeca_ps:5432/horeca?schema=public
         ports:
             - '127.0.0.1:3001:3001'
             - '127.0.0.1:4001:4001'
         restart: unless-stopped
         depends_on:
-            - horeca_ps
+            horeca_ps:
+                condition: service_healthy
+            horeca_redis:
+                condition: service_healthy
         networks:
             - horeca_api_network
 
@@ -25,11 +30,16 @@ services:
             - ./db_scripts:/docker-entrypoint-initdb.d
             - ~/docker-volumes/horeca_postgres-data:/var/lib/postgresql/data
         ports:
-            - '127.0.0.1:5433:5432'
+            - '127.0.0.1:5435:5432'
         environment:
             - POSTGRES_USER=horeca
             - POSTGRES_PASSWORD=horeca
             - POSTGRES_DB=horeca
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U horeca -d horeca"]
+            interval: 5s
+            timeout: 5s
+            retries: 5
         networks:
             - horeca_api_network
     horeca_redis:
@@ -38,6 +48,11 @@ services:
         ports:
             - "127.0.0.1:6380:6379"
         restart: unless-stopped
+        healthcheck:
+            test: ["CMD", "redis-cli", "ping"]
+            interval: 5s
+            timeout: 3s
+            retries: 5
         networks:
             - horeca_api_network
         
